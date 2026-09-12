@@ -853,7 +853,7 @@ struct ContentView: View {
     @State private var pointerPanel = false
     @Namespace private var pointerNS
     /// .compact = iPhone landscape: game surface expands, arrow keys appear.
-    @Environment(\.verticalSizeClass) private var vSizeClass
+    // @Environment(\.verticalSizeClass) private var fvSizeClass
     @State private var orientation = UIDevice.current.orientation
     
     enum JITStatus {
@@ -886,7 +886,7 @@ struct ContentView: View {
             // a fresh placeholder only re-parents the same CAMetalLayer.
             .navigationTitle("Madeira")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarHidden(vSizeClass == .compact)
+            .navigationBarHidden(orientation.isLandscape)
             .onAppear {
                 jit_install_trap_handler()
                 entitlements = EntitlementStatus.check()
