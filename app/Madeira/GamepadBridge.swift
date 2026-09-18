@@ -13,7 +13,7 @@ import CoreHaptics
 /// Everything runs on the main queue: GC handlers, touch gestures and the
 /// rumble poll timer.
 final class GamepadBridge {
-   
+   static let shared = GamepadBridge()
     func start() {
         if #available(iOS 14.0, OSX 10.16, *) {
             NotificationCenter.default.addObserver(self, selector: #selector(self.handleMouseDidConnect),
