@@ -389,6 +389,7 @@ private final class PadRumble {
     
     func unregisterMouse() {
         delta = CGPoint.zero
+        
     }
     
     func registerMouse(_ mouseDevice: GCMouse) {
@@ -398,9 +399,12 @@ private final class PadRumble {
             }
             
             mouseInput.mouseMovedHandler = {(_ mouse: GCMouseInput, _ deltaX: Float, _ deltaY: Float) -> Void in
-                winios_pointer(deltaX, deltaY, 0x0001, 0)
+                winios_pointer(Int32(deltaX), Int32(deltaY), 0x0001, 0)
             }
-            
+            mouseInput.scroll.valueChangedHandler = {
+                (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
+                winios_pointer(0, 0, 0x0800, Int32(scrollY))
+            }
         }
     }
 }
