@@ -357,7 +357,7 @@ final class MetalBackedView: UIView {
         let maxY = CGFloat(envInt("MADEIRA_SCREEN_H", 768) - 1)
         Self.cursor.x = min(max(Self.cursor.x + dx * sens, 0), maxX)
         Self.cursor.y = min(max(Self.cursor.y + dy * sens, 0), maxY)
-        postPointer(F_MOVE | F_ABS)
+        // postPointer(F_MOVE | F_ABS)
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
