@@ -406,6 +406,5 @@ private final class PadRumble {
             }
         }
     }
-}
-
+    
 }
