@@ -354,8 +354,8 @@ private final class PadRumble {
             }
         }
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.handleKeyboardDidConnect),
-                                               name: NSNotification.Name.GCKeyboardDidConnect, object: nil)
+        // NotificationCenter.default.addObserver(self, selector: #selector(self.handleKeyboardDidConnect),
+        //                                       name: NSNotification.Name.GCKeyboardDidConnect, object: nil)
     }
     
    // @objc
