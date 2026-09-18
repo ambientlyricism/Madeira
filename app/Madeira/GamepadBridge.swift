@@ -78,11 +78,11 @@ final class GamepadBridge {
            // }
         }
     }
-    func GCMouseInputX() -> Int32 {
-       return Int32(self.delta.x)
+    func GCMouseInputX() -> CGFloat {
+       return self.delta.x
     }
-    func GCMouseInputY() -> Int32 {
-       return Int32(self.delta.y)
+    func GCMouseInputY() -> CGFloat {
+       return self.delta.y
     }
     
 }
