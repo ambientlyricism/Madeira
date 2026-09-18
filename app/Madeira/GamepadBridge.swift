@@ -403,7 +403,7 @@ private final class PadRumble {
             }
             mouseInput.scroll.valueChangedHandler = {
                 (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
-                winios_pointer(0, 0, 0x0800, Int32(scrollY))
+                winios_pointer(0, 0, 0x0800, UInt32(scrollY))
             }
         }
     }
