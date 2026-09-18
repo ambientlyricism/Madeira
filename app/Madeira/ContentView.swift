@@ -355,11 +355,11 @@ final class MetalBackedView: UIView {
         let sens = CGFloat(InputSettings.shared.sensAbs)   // desktop px per view pt
         let maxX = CGFloat(envInt("MADEIRA_SCREEN_W", 1024) - 1)
         let maxY = CGFloat(envInt("MADEIRA_SCREEN_H", 768) - 1)
-        Self.cursor.x = min(max(Self.cursor.x + dx * sens, 0), maxX)
-        Self.cursor.y = min(max(Self.cursor.y + dy * sens, 0), maxY)
+        // Self.cursor.x = min(max(Self.cursor.x + dx * sens, 0), maxX)
+        // Self.cursor.y = min(max(Self.cursor.y + dy * sens, 0), maxY)
         // Self.cursor.x = GamepadBridge.shared.GCMouseInputX()
         // Self.cursor.y = GamepadBridge.shared.GCMouseInputY()
-        postPointer(F_MOVE | F_ABS)
+        // postPointer(F_MOVE | F_ABS)
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
