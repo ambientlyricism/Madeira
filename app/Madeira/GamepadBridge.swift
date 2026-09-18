@@ -14,7 +14,7 @@ import CoreHaptics
 /// rumble poll timer.
 final class GamepadBridge {
    static let shared = GamepadBridge()
-    func start() {
+   func start() {
         if #available(iOS 14.0, OSX 10.16, *) {
             NotificationCenter.default.addObserver(self, selector: #selector(self.handleMouseDidConnect),
                                                    name: NSNotification.Name.GCMouseDidBecomeCurrent, object: nil)
@@ -27,7 +27,7 @@ final class GamepadBridge {
         
         // NotificationCenter.default.addObserver(self, selector: #selector(self.handleKeyboardDidConnect),
         //                                       name: NSNotification.Name.GCKeyboardDidConnect, object: nil)
-    }
+   }
     
    // @objc
    // func handleKeyboardDidConnect(_ notification: Notification) {
@@ -71,10 +71,10 @@ final class GamepadBridge {
             mouseInput.mouseMovedHandler = {(_ mouse: GCMouseInput, _ deltaX: Float, _ deltaY: Float) -> Void in
                 winios_pointer(Int32(deltaX), Int32(deltaY), 0x0001, 0)
             }
-            mouseInput.scroll.valueChangedHandler = {
-                (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
-                winios_pointer(0, 0, 0x0800, UInt32(scrollY))
-            }
+           // mouseInput.scroll.valueChangedHandler = {
+           //     (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
+           //     winios_pointer(0, 0, 0x0800, UInt32(scrollY))
+           // }
         }
     }
     
