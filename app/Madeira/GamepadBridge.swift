@@ -358,13 +358,12 @@ private final class PadRumble {
                                                name: NSNotification.Name.GCKeyboardDidConnect, object: nil)
     }
     
-    @objc
-    func handleKeyboardDidConnect(_ notification: Notification) {
-        guard let keyboard = notification.object as? GCKeyboard else {
-            return
-        }
-       
-    }
+   // @objc
+   // func handleKeyboardDidConnect(_ notification: Notification) {
+   //     guard let keyboard = notification.object as? GCKeyboard else {
+   //         return
+   //     }
+   // }
 
     var delta: CGPoint = CGPoint.zero
     var keyboard: GCKeyboard? = nil
