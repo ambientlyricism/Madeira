@@ -343,4 +343,66 @@ private final class PadRumble {
         low.engine.stop(completionHandler: nil)
         high.engine.stop(completionHandler: nil)
     }
+    func setupGameController() {
+        if #available(iOS 14.0, OSX 10.16, *) {
+            NotificationCenter.default.addObserver(self, selector: #selector(self.handleMouseDidConnect),
+                                                   name: NSNotification.Name.GCMouseDidBecomeCurrent, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(self.handleMouseDidDisconnect),
+                                                   name: NSNotification.Name.GCMouseDidStopBeingCurrent, object: nil)
+            if let mouse = GCMouse.mice().first {
+                registerMouse(mouse)
+            }
+        }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.handleKeyboardDidConnect),
+                                               name: NSNotification.Name.GCKeyboardDidConnect, object: nil)
+    }
+    
+    @objc
+    func handleKeyboardDidConnect(_ notification: Notification) {
+        guard let keyboard = notification.object as? GCKeyboard else {
+            return
+        }
+       
+    }
+
+    var delta: CGPoint = CGPoint.zero
+    var keyboard: GCKeyboard? = nil
+    
+    @objc
+    func handleMouseDidConnect(_ notification: Notification) {
+        if #available(iOS 14.0, OSX 10.16, *) {
+            guard let mouse = notification.object as? GCMouse else {
+                return
+            }
+            
+            unregisterMouse()
+            registerMouse(mouse)
+            
+        }
+    }
+    
+    @objc
+    func handleMouseDidDisconnect(_ notification: Notification) {
+        unregisterMouse()
+    }
+    
+    func unregisterMouse() {
+        delta = CGPoint.zero
+    }
+    
+    func registerMouse(_ mouseDevice: GCMouse) {
+        if #available(iOS 14.0, OSX 10.16, *) {
+            guard let mouseInput = mouseDevice.mouseInput else {
+                return
+            }
+            
+            mouseInput.mouseMovedHandler = {(_ mouse: GCMouseInput, _ deltaX: Float, _ deltaY: Float) -> Void in
+                winios_pointer(deltaX, deltaY, 0x0001, 0)
+            }
+            
+        }
+    }
+}
+
 }
