@@ -88,9 +88,6 @@ final class MetalBackedView: UIView {
     // → WM_KEYDOWN/WM_CHAR). Lets the user type into Windows dialogs (e.g.
     // Run) directly instead of relying on the browse list.
     static weak var keyboardTarget: MetalBackedView?
-    override var prefersPointerLocked: Bool {
-		return true
-	}
     override var canBecomeFirstResponder: Bool { true }
     static func toggleKeyboard() {
         guard let v = keyboardTarget else { return }
