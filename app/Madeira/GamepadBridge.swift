@@ -63,6 +63,7 @@ final class GamepadBridge {
     }
     var dx : Int32 = 0
     var dy : Int32 = 0
+    var sy : UInt32 = 0
     
     func registerMouse(_ mouseDevice: GCMouse) {
         if #available(iOS 14.0, OSX 10.16, *) {
@@ -78,15 +79,26 @@ final class GamepadBridge {
             }
             mouseInput.scroll.valueChangedHandler = {
                 (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
-                winios_pointer(0, 0, 0x0800, UInt32(scrollY))
+                self.sy = self.sy+UInt32(scrollY)
+                winios_pointer(0, 0, 0x0800, sy)
             }
             mouseInput.leftButton.valueChangedHandler = {
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
-                winios_pointer(0, 0, 0x0002, 0)
+               if pressed {
+                  winios_pointer(0, 0, 0x0002, 0)
+               }
+               else {
+                  winios_pointer(0, 0, 0x0004, 0)
+               }
             }
             mouseInput.rightButton?.valueChangedHandler = {
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
-                winios_pointer(0, 0, 0x0008, 0)
+               if pressed {
+                  winios_pointer(0, 0, 0x0008, 0)
+               }
+               else {
+                  winios_pointer(0, 0, 0x0010, 0)
+               }
             }
         }
     }
