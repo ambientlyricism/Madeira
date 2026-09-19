@@ -27,6 +27,9 @@ final class ViewController: UIViewController {
     override var prefersPointerLocked: Bool {
 		return true
 	}
+	init() {
+        GamepadBridge.shared.start()
+    }
 }
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
