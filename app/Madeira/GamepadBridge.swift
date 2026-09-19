@@ -76,10 +76,18 @@ final class GamepadBridge {
                 self.delta = CGPoint(x: CGFloat(deltaX), y: CGFloat(deltaY))
                 winios_pointer(self.dx, self.dy, 0x0001 | 0x8000, 0)
             }
-           // mouseInput.scroll.valueChangedHandler = {
-           //     (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
-           //     winios_pointer(0, 0, 0x0800, UInt32(scrollY))
-           // }
+            mouseInput.scroll.valueChangedHandler = {
+                (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
+                winios_pointer(0, 0, 0x0800, UInt32(scrollY))
+            }
+            mouseInput.leftButton.valueChangedHandler = {
+                (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
+                winios_pointer(0, 0, 0x0002, 0)
+            }
+            mouseInput.rightButton.valueChangedHandler = {
+                (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
+                winios_pointer(0, 0, 0x0008, 0)
+            }
         }
     }
     func GCMouseInputX() -> CGFloat {
@@ -88,5 +96,6 @@ final class GamepadBridge {
     func GCMouseInputY() -> CGFloat {
        return self.delta.y
     }
+    // static var MouseActive : Bool
     
 }
