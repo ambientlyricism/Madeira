@@ -297,20 +297,20 @@ final class MetalBackedView: UIView {
             return
         }
         let active = activeTouches(event)
-        if twoFingerActive {
-            guard active.count >= 2 else { return }
-            let avg = avgPoint(active)
-            let dy = avg.y - lastTwoFingerY
-            lastTwoFingerY = avg.y
-            if abs(dy) > 2 { twoFingerMoved = true }
-            scrollAccum += dy
+        // if twoFingerActive {
+        //    guard active.count >= 2 else { return }
+        //    let avg = avgPoint(active)
+        //    let dy = avg.y - lastTwoFingerY
+        //    lastTwoFingerY = avg.y
+        //    if abs(dy) > 2 { twoFingerMoved = true }
+        //    scrollAccum += dy
             // 14pt of finger travel = one wheel notch. ml641 flipped the sign:
             // on a touchscreen the content follows the finger, so dragging UP
             // scrolls DOWN through the document. It was mouse-wheel sense before.
-            while scrollAccum <= -14 { scrollAccum += 14; postPointer(F_WHEEL, data: -120) }
-            while scrollAccum >= 14 { scrollAccum -= 14; postPointer(F_WHEEL, data: 120) }
-            return
-        }
+        //    while scrollAccum <= -14 { scrollAccum += 14; postPointer(F_WHEEL, data: -120) }
+        //    while scrollAccum >= 14 { scrollAccum -= 14; postPointer(F_WHEEL, data: 120) }
+        //    return
+        // }
         let t: UITouch
         if dragActive, let d = dragTouch {
             guard touches.contains(d) else { return }  // only the old tap finger moved
