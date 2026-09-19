@@ -23,7 +23,7 @@ import os.log
 // SwiftUI hierarchy (and thus to the placeholder's touch handlers).
 
 /// Raw window-level host for the presenting CAMetalLayer.
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
     override var prefersPointerLocked: Bool {
 		return true
 	}
