@@ -80,7 +80,7 @@ final class GamepadBridge {
                 (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
                 winios_pointer(0, 0, 0x0800, UInt32(scrollY))
             }
-            mouseInput.leftButton?.valueChangedHandler = {
+            mouseInput.leftButton.valueChangedHandler = {
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
                 winios_pointer(0, 0, 0x0002, 0)
             }
