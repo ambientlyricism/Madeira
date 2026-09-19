@@ -71,10 +71,10 @@ final class GamepadBridge {
             }
             
             mouseInput.mouseMovedHandler = {(_ mouse: GCMouseInput, _ deltaX: Float, _ deltaY: Float) -> Void in
-                dx = dx+Int32(deltaX)
-                dy = dy+Int32(deltaY)
-                winios_pointer(dx, dy, 0x0001 | 0x8000, 0)
-                self.delta = CGPoint(x: CGFloat(deltaX), y: CGFloat(deltaY))                            
+                self.dx = self.dx+Int32(deltaX)
+                self.dy = self.dy+Int32(deltaY)
+                self.delta = CGPoint(x: CGFloat(deltaX), y: CGFloat(deltaY))
+                winios_pointer(self.dx, self.dy, 0x0001 | 0x8000, 0)
             }
            // mouseInput.scroll.valueChangedHandler = {
            //     (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
