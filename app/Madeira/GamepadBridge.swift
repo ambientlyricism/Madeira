@@ -61,6 +61,8 @@ final class GamepadBridge {
         delta = CGPoint.zero
         
     }
+    var dx : Int32 = 0
+    var dy : Int32 = 0
     
     func registerMouse(_ mouseDevice: GCMouse) {
         if #available(iOS 14.0, OSX 10.16, *) {
@@ -69,7 +71,9 @@ final class GamepadBridge {
             }
             
             mouseInput.mouseMovedHandler = {(_ mouse: GCMouseInput, _ deltaX: Float, _ deltaY: Float) -> Void in
-                winios_pointer(Int32(deltaX), Int32(deltaY), 0x0001 | 0x8000, 0)
+                dx = dx+Int32(deltaX)
+                dy = dy+Int32(deltaY)
+                winios_pointer(dx, dy, 0x0001 | 0x8000, 0)
                 self.delta = CGPoint(x: CGFloat(deltaX), y: CGFloat(deltaY))                            
             }
            // mouseInput.scroll.valueChangedHandler = {
