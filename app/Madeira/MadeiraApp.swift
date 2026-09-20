@@ -4,7 +4,7 @@ import UIKit
 @main
 struct MadeiraApp: App {
     final class ViewController: UIViewController {
-        var GamepadBridge = GamepadBridge!
+        var GamepadBridge = GamepadBridge?
         override var prefersPointerLocked: Bool {
             return true
         }
