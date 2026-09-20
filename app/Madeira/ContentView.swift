@@ -30,7 +30,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 }
 final class MetalViewController: UIViewController {
 	var MetalBackedView: MetalBackedView?
-	static let shared = ViewController()
+	static let shared = MetalViewController()
 	var shouldLockPointer: Bool = true
     override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
