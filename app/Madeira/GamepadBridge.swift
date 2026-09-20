@@ -20,10 +20,10 @@ import UIKit
 // }
 final class GamepadBridge: UIViewController {
    static let shared = GamepadBridge()
+   override var prefersPointerLocked: Bool {
+       return true
+   }
    func start() {
-	    override var prefersPointerLocked: Bool {
-			return true
-		}
         if #available(iOS 14.0, OSX 10.16, *) {
             NotificationCenter.default.addObserver(self, selector: #selector(self.handleMouseDidConnect),
                                                    name: NSNotification.Name.GCMouseDidBecomeCurrent, object: nil)
