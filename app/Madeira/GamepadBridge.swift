@@ -23,7 +23,7 @@ final class ViewController: UIViewController {
    override var prefersPointerLocked: Bool {
 	   return true
    }
-   GamepadBridge = GamepadBridge()
+   self.GamepadBridge = GamepadBridge()
 }
 final class GamepadBridge {
    static let shared = GamepadBridge()
