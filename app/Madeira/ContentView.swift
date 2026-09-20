@@ -23,14 +23,14 @@ import os.log
 // SwiftUI hierarchy (and thus to the placeholder's touch handlers).
 
 /// Raw window-level host for the presenting CAMetalLayer.
-final class ViewController: UIViewController {
-    override var prefersPointerLocked: Bool {
-		return true
-	}
+// final class ViewController: UIViewController {
+//    override var prefersPointerLocked: Bool {
+//		return true
+//	}
 	// init() {
     //    GamepadBridge.shared.start()
     // }
-}
+// }
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
     // swapchain exactly once; if the host were recreated on view teardown
