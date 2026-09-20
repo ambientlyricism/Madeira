@@ -18,19 +18,19 @@ import SwiftUI
 //   var ViewController: ViewController?
 //   ViewController = ViewController() 
 // }
-final class ViewController: UIHostingController {
-	static let shared = ViewController()
-	var GamepadBridge: GamepadBridge?
-	var shouldLockPointer: Bool = true
-	override var prefersPointerLocked: Bool {
-		return self.shouldLockPointer
-	}
-	func lockPointer() {
-		self.shouldLockPointer = true
-		setNeedsUpdateOfPrefersPointerLocked()
-		GamepadBridge = Madeira.GamepadBridge()
-	}
-}
+// final class ViewController: UIHostingController {
+//	static let shared = ViewController()
+//	var GamepadBridge: GamepadBridge?
+//	var shouldLockPointer: Bool = true
+//	override var prefersPointerLocked: Bool {
+//		return self.shouldLockPointer
+//	}
+//	func lockPointer() {
+//		self.shouldLockPointer = true
+//		setNeedsUpdateOfPrefersPointerLocked()
+//		GamepadBridge = Madeira.GamepadBridge()
+//	}
+// }
 final class GamepadBridge {
    static let shared = GamepadBridge()
    func start() {
@@ -43,7 +43,7 @@ final class GamepadBridge {
                 registerMouse(mouse)
             }
         }
-        
+        ViewController.shared.lockPointer()
         // NotificationCenter.default.addObserver(self, selector: #selector(self.handleKeyboardDidConnect),
         //                                       name: NSNotification.Name.GCKeyboardDidConnect, object: nil)
    }
