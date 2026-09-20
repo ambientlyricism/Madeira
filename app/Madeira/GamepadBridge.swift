@@ -16,12 +16,13 @@ import UIKit
 struct GCViewController: UIViewControllerRepresentable {
    var ViewController: ViewController?
    ViewController = ViewController() 
+}
 final class ViewController: UIViewController {
-   var GamePadBridge: GamePadBridge? 
+   var GamepadBridge: GamepadBridge? 
    override var prefersPointerLocked: Bool {
 	   return true
    }
-   GamePadBridge = GamepadBridge()
+   GamepadBridge = GamepadBridge.start()
 }
 final class GamepadBridge {
    static let shared = GamepadBridge()
