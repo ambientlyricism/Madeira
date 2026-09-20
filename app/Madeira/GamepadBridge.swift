@@ -14,16 +14,16 @@ import SwiftUI
 ///
 /// Everything runs on the main queue: GC handlers, touch gestures and the
 /// rumble poll timer.
-struct GCViewController: UIViewControllerRepresentable {
-   var ViewController: ViewController?
-   ViewController = ViewController() 
-}
+// struct GCViewController: UIViewControllerRepresentable {
+//   var ViewController: ViewController?
+//   ViewController = ViewController() 
+// }
 final class ViewController: UIViewController {
    var GamepadBridge: GamepadBridge? 
    override var prefersPointerLocked: Bool {
 	   return true
    }
-   GamepadBridge = GamepadBridge.start()
+   GamepadBridge = GamepadBridge()
 }
 final class GamepadBridge {
    static let shared = GamepadBridge()
