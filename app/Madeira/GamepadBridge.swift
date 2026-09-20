@@ -2,6 +2,7 @@ import Foundation
 import GameController
 import CoreHaptics
 import UIKit
+import SwiftUI
 
 /// Feeds GameController.framework pads to Wine's XInput.
 ///
