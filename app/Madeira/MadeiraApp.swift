@@ -5,14 +5,12 @@ import UIKit
 struct MadeiraApp: App {
 		// GamepadBridge = GamepadBridge()
 		// GamepadBridge()
-        init() {
-			GamepadBridge.shared.start()
-        }
         // required init?(coder: NSCoder) {
 		//   fatalError("init(coder:) has not been implemented")
 	    // }
-    }
-
+    init() {
+		GamepadBridge()
+	}
     var body: some Scene {
         WindowGroup {
             ContentView()
