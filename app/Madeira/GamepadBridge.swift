@@ -13,14 +13,17 @@ import UIKit
 ///
 /// Everything runs on the main queue: GC handlers, touch gestures and the
 /// rumble poll timer.
-final class ViewController: UIViewController {
-    override var prefersPointerLocked: Bool {
-		return true
-	}
-}
-final class GamepadBridge {
+// final class ViewController: UIViewController {
+//    override var prefersPointerLocked: Bool {
+//		return true
+//	}
+// }
+final class GamepadBridge: UIViewController {
    static let shared = GamepadBridge()
    func start() {
+	    override var prefersPointerLocked: Bool {
+			return true
+		}
         if #available(iOS 14.0, OSX 10.16, *) {
             NotificationCenter.default.addObserver(self, selector: #selector(self.handleMouseDidConnect),
                                                    name: NSNotification.Name.GCMouseDidBecomeCurrent, object: nil)
