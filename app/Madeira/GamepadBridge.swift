@@ -1,6 +1,7 @@
 import Foundation
 import GameController
 import CoreHaptics
+import UIKit
 
 /// Feeds GameController.framework pads to Wine's XInput.
 ///
@@ -12,6 +13,11 @@ import CoreHaptics
 ///
 /// Everything runs on the main queue: GC handlers, touch gestures and the
 /// rumble poll timer.
+final class ViewController: UIViewController {
+    override var prefersPointerLocked: Bool {
+		return true
+	}
+}
 final class GamepadBridge {
    static let shared = GamepadBridge()
    func start() {
