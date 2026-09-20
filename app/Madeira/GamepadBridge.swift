@@ -26,6 +26,7 @@ final class ViewController: UIViewController {
    }
    func ViewDidLoad() {
       GamepadBridge = Madeira.GamepadBridge()
+      setNeedsUpdateOfPrefersPointerLocked()
    }
 }
 final class GamepadBridge {
