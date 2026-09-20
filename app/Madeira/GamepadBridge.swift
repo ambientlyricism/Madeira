@@ -20,12 +20,13 @@ import SwiftUI
 // }
 final class ViewController: UIViewController {
 	static let shared = ViewController()
-	var GamepadBridge: GamepadBridge? 
+	var GamepadBridge: GamepadBridge?
+	var shouldLockPointer: Bool = true
 	override var prefersPointerLocked: Bool {
-		return true
+		return self.shouldLockPointer
 	}
 	func ViewDidLoad() {
-		prefersPointerLocked = true
+		self.shouldLockPointer = true
 		setNeedsUpdateOfPrefersPointerLocked()
 		GamepadBridge = Madeira.GamepadBridge()
 	}
