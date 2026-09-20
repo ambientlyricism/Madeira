@@ -19,6 +19,7 @@ struct MadeiraApp: App {
 		//   fatalError("init(coder:) has not been implemented")
 	    // }
     init() {
+		ViewController.shared.ViewDidLoad()
 		GamepadBridge.shared.start()
 	}
     var body: some Scene {
