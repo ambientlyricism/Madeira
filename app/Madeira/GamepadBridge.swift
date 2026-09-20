@@ -108,7 +108,7 @@ final class GamepadBridge {
     func GCMouseInputY() -> CGFloat {
        return self.delta.y
     }
-    static var MouseActive : Bool {
+    static func MouseActive() -> Bool {
        return self.delta.x != 0 || self.delta.y != 0
     }
     
