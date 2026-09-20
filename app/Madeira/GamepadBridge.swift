@@ -13,11 +13,16 @@ import UIKit
 ///
 /// Everything runs on the main queue: GC handlers, touch gestures and the
 /// rumble poll timer.
-// final class ViewController: UIViewController {
-//    override var prefersPointerLocked: Bool {
-//		return true
-//	}
-// }
+struct GCViewController: UIViewControllerRepresentable {
+   var ViewController: ViewController?
+   ViewController = ViewController() 
+final class ViewController: UIViewController {
+   var GamePadBridge: GamePadBridge? 
+   override var prefersPointerLocked: Bool {
+	   return true
+   }
+   GamePadBridge = GamepadBridge()
+}
 final class GamepadBridge {
    static let shared = GamepadBridge()
    func start() {
