@@ -1,20 +1,21 @@
 import SwiftUI
 import UIKit
+import SceneKit
 
 @main
 struct MadeiraApp: App {
     final class ViewController: UIViewController {
-        // var GamepadBridge: GameController?
+        var GamepadBridge: GameController?
         override var prefersPointerLocked: Bool {
             return true
         }
-		GamepadBridge()
-        // init() {
-            // self.GamepadBridge = GamepadBridge()
-        // }
-        // required init?(coder: NSCoder) {
-		//    fatalError("init(coder:) has not been implemented")
-	    // }
+		// GamepadBridge()
+        init() {
+            self.GamepadBridge = GamepadBridge()
+        }
+        required init?(coder: NSCoder) {
+		   fatalError("init(coder:) has not been implemented")
+	    }
     }
 
     var body: some Scene {
