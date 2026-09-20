@@ -18,13 +18,13 @@ import SwiftUI
 //   var ViewController: ViewController?
 //   ViewController = ViewController() 
 // }
-final class ViewController: UIViewController {
-   var GamepadBridge: GamepadBridge? 
-   override var prefersPointerLocked: Bool {
-	   return true
-   }
-   self.GamepadBridge = GamepadBridge()
-}
+// final class ViewController: UIViewController {
+//   var GamepadBridge: GamepadBridge? 
+//   override var prefersPointerLocked: Bool {
+//	   return true
+//   }
+//   self.GamepadBridge = GamepadBridge()
+// }
 final class GamepadBridge {
    static let shared = GamepadBridge()
    func start() {
