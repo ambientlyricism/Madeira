@@ -24,8 +24,13 @@ import os.log
 
 /// Raw window-level host for the presenting CAMetalLayer.
 final class ViewController: UIViewController {
+	var shouldLockPointer: Bool = true
     override var prefersPointerLocked: Bool {
-		return true
+		return self.shouldLockPointer
+	}
+	func lockPointer() {
+		self.shouldLockPointer = true
+		setNeedsUpdateOfPrefersPointerLocked
 	}
 }
 
