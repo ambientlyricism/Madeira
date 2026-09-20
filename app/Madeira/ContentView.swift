@@ -31,7 +31,7 @@ final class ViewController: UIViewController {
 	}
 	func lockPointer() {
 		self.shouldLockPointer = true
-		setNeedsUpdateOfPrefersPointerLocked
+		setNeedsUpdateOfPrefersPointerLocked()
 	}
 }
 
