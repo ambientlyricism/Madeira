@@ -9,7 +9,7 @@ struct MadeiraApp: App {
 		//   fatalError("init(coder:) has not been implemented")
 	    // }
     init() {
-		GamepadBridge.ViewController()
+		GamepadBridge()
 	}
     var body: some Scene {
         WindowGroup {
