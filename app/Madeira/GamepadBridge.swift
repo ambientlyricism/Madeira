@@ -25,7 +25,7 @@ final class ViewController: UIViewController {
 	   return true
    }
    func ViewDidLoad() {
-      GamepadBridge = GamepadBridge()
+      GamepadBridge = Madeira.GamepadBridge()
    }
 }
 final class GamepadBridge {
