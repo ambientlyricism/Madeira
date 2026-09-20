@@ -9,7 +9,7 @@ struct MadeiraApp: App {
         override var prefersPointerLocked: Bool {
             return true
         }
-		self.GamepadBridge = GamepadBridge()
+		GamepadBridge = GamepadBridge()
 		// GamepadBridge()
         // init() {
 
