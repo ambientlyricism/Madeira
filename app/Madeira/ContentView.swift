@@ -1183,6 +1183,7 @@ struct ContentView: View {
                 
                  Button("Full Screen") {
                     display.immersive = true
+					ViewController.shared.lockPointer()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.indigo)
