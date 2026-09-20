@@ -2,16 +2,16 @@ import SwiftUI
 import UIKit
 
 @main
-final class ViewController: UIViewController {
-   var GamepadBridge: GamepadBridge? 
-   override var prefersPointerLocked: Bool {
-	   return true
-   }
-   override func viewDidLoad() {
-	   super.viewDidLoad()
-   	   GamepadBridge = GamepadBridge()
-   }
-}
+// final class ViewController: UIViewController {
+//   var GamepadBridge: GamepadBridge? 
+//   override var prefersPointerLocked: Bool {
+//	   return true
+//   }
+//   override func viewDidLoad() {
+//	   super.viewDidLoad()
+//   	   GamepadBridge = GamepadBridge()
+//   }
+// }
 struct MadeiraApp: App {
 		// GamepadBridge = GamepadBridge()
 		// GamepadBridge()
