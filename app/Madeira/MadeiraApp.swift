@@ -7,7 +7,10 @@ final class ViewController: UIViewController {
    override var prefersPointerLocked: Bool {
 	   return true
    }
-   GamepadBridge = GamepadBridge()
+   override func viewDidLoad() {
+	   super.viewDidLoad()
+   	   GamepadBridge = GamepadBridge()
+   }
 }
 struct MadeiraApp: App {
 		// GamepadBridge = GamepadBridge()
