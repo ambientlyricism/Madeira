@@ -24,6 +24,7 @@ import os.log
 
 /// Raw window-level host for the presenting CAMetalLayer.
 final class ViewController: UIViewController {
+	var MetalBackedView: MetalBackedView?
 	static let shared = ViewController()
 	var shouldLockPointer: Bool = true
     override var prefersPointerLocked: Bool {
@@ -32,6 +33,7 @@ final class ViewController: UIViewController {
 	func lockPointer() {
 		self.shouldLockPointer = true
 		setNeedsUpdateOfPrefersPointerLocked()
+		MetalBackedView = MetalBackedView()
 	}
 }
 
