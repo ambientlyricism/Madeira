@@ -4,12 +4,13 @@ import UIKit
 @main
 struct MadeiraApp: App {
     final class ViewController: UIViewController {
-        var GamepadBridge = Gamepadbridge?
+        var GamepadBridge = GamepadBridge?
         override var prefersPointerLocked: Bool {
             return true
         }
         init() {
-            GamepadBridge.shared.start()
+            // GamepadBridge.shared.start()
+            GamepadBridge = GamepadBridge()
         }
     }
 
