@@ -9,11 +9,11 @@ struct MadeiraApp: App {
         override var prefersPointerLocked: Bool {
             return true
         }
-		GamepadBridge = GamepadBridge()
+		// GamepadBridge = GamepadBridge()
 		// GamepadBridge()
-        // init() {
-
-        // }
+        override init() {
+			GampadBridge.shared.start()
+        }
         // required init?(coder: NSCoder) {
 		//   fatalError("init(coder:) has not been implemented")
 	    // }
