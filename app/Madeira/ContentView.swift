@@ -27,15 +27,15 @@ import os.log
 struct MadeiraViewController: UIViewControllerRepresentable {
         
     typealias UIViewControllerType = UIViewController
-	var parent: MadeiraViewController
+	// var parent: MadeiraViewController
 	
-	init(_ parent: MadeiraViewController) {
-    	self.parent = parent
-	}
+	// init(_ parent: MadeiraViewController) {
+    //	self.parent = parent
+	// }
 
     func makeUIViewController(context: Context) -> UIViewController  {
         let myViewController = UIViewController()
-        myViewController.delegate = context.coordinator
+        // myViewController.delegate = context.coordinator
         return myViewController
     }
 
@@ -43,9 +43,9 @@ struct MadeiraViewController: UIViewControllerRepresentable {
             // left blank
     }
     
-	func makeCoordinator() -> Coordinator {
-        return Coordinator(self)
-    }
+	// func makeCoordinator() -> Coordinator {
+    //    return Coordinator(self)
+    // }
 }
 
 // extension MadeiraViewController {
