@@ -23,24 +23,6 @@ import os.log
 // SwiftUI hierarchy (and thus to the placeholder's touch handlers).
 
 /// Raw window-level host for the presenting CAMetalLayer.
-struct MadeiraViewController: UIViewControllerRepresentable {
-	func makeUIViewController(context: Context) -> MetalViewController {
-        return MetalViewController()
-    }
-}
-final class MetalViewController: UIViewController {
-	var MetalBackedView: MetalBackedView?
-	static let shared = MetalViewController()
-	var shouldLockPointer: Bool = true
-    override var prefersPointerLocked: Bool {
-		return self.shouldLockPointer
-	}
-	func lockPointer() {
-		self.shouldLockPointer = true
-		setNeedsUpdateOfPrefersPointerLocked()
-		MetalBackedView = MetalBackedView()
-	}
-}
 
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
