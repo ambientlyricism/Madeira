@@ -35,6 +35,9 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> MetalViewController  {
         let myViewController = MetalViewController()
+		let label = UILabel()
+		label.text = "Controller Active"
+		label.textColor = UIColor.red
         // myViewController.delegate = context.coordinator
         return myViewController
     }
