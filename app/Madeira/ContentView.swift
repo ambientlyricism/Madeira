@@ -24,6 +24,23 @@ import os.log
 
 /// Raw window-level host for the presenting CAMetalLayer.
 
+final class MetalViewController: UIViewController {
+	var MetalBackedView: MetalBackedView?
+	static let shared = MetalViewController()
+	var shouldLockPointer: Bool = true
+    override var prefersPointerLocked: Bool {
+		return self.shouldLockPointer
+	}
+	func lockPointer() {
+		self.shouldLockPointer = true
+		setNeedsUpdateOfPrefersPointerLocked()
+		MetalBackedView = MetalBackedView()
+	}
+	override func viewDidLoad() {
+       super.viewDidLoad()
+	}
+}
+
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
     // swapchain exactly once; if the host were recreated on view teardown
