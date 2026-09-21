@@ -976,6 +976,7 @@ struct ContentView: View {
                 // if orientation.isLandscape {
                 if display.immersive || vSizeClass == .compact {
                     landscapeBody
+					MadeiraViewController()
                 } else {
                     portraitBody
                 }
@@ -1005,7 +1006,6 @@ struct ContentView: View {
             //    self.orientation = UIDevice.current.orientation
             // }
         }
-		MadeiraViewController()
     }
 
     /// Portrait: classic tooling layout — header, badges, 240pt game strip,
