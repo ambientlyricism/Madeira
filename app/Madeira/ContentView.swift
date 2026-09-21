@@ -51,7 +51,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
             // left blank
     }
 	final class MetalViewController: UIViewController {
-		var MetalBackedView: MetalBackedView?
+		var MadeiraMetalView: MadeiraMetalView?
 		static let shared = MetalViewController()
 		var shouldLockPointer: Bool = true
 		override var prefersPointerLocked: Bool {
@@ -60,14 +60,14 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		func lockPointer() {
 			self.shouldLockPointer = true
 			setNeedsUpdateOfPrefersPointerLocked()
-			MetalBackedView = Madeira.MetalBackedView()
+			MadeiraMetalView = MadeiraMetalView()
 		}
 		override func viewDidLoad() {
       		super.viewDidLoad()
 		}
 	}
 	final class MetalHostingController: UIHostingController<ContentView> {
-		var ContentView: ContentView?
+		var MadeiraMetalView: MadeiraMetalView?
 		static let shared = MetalHostingController(rootView: ContentView())
 		override var childViewControllerForPointerLock: UIViewController? { nil }
 		var shouldLockPointer: Bool = true
@@ -77,7 +77,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		func lockPointer() {
 			self.shouldLockPointer = true
 			setNeedsUpdateOfPrefersPointerLocked()
-			ContentView = Madeira.ContentView()
+			MadeiraMetalView = MadeiraMetalView()
 		}
 		override func viewDidLoad() {
         	super.viewDidLoad()
