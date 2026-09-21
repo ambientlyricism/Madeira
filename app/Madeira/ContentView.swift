@@ -42,6 +42,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		// myViewController.view.addSubview(label)
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
+		myViewController.lockPointer()
         return myViewController
     }
 
