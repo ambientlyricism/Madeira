@@ -29,8 +29,8 @@ struct MadeiraViewController: UIViewControllerRepresentable {
         typealias UIViewControllerType = UIViewController
 
     func makeUIViewController(context: Context) -> UIViewController  {
-        let myViewController = UIViewController()
-        // myView.delegate = context.coordinator
+        let myViewController = MetalViewController()
+        myViewController.delegate = context.coordinator
         return myViewController
     }
 
@@ -41,36 +41,35 @@ struct MadeiraViewController: UIViewControllerRepresentable {
     func makeCoordinator() -> MyView.Coordinator {
         return Coordinator(self)
     }
+	final class MetalViewController: UIViewController {
+		var MetalBackedView: MetalBackedView?
+		static let shared = MetalViewController()
+		var shouldLockPointer: Bool = true
+    	override var prefersPointerLocked: Bool {
+			return self.shouldLockPointer
+		}
+		func lockPointer() {
+			self.shouldLockPointer = true
+			setNeedsUpdateOfPrefersPointerLocked()
+			MetalBackedView = Madeira.MetalBackedView()
+		}
+		override func viewDidLoad() {
+    	   super.viewDidLoad()
+		}
+	}
 }
 
-extension MadeiraViewController {
-    class Coordinator /*: SomeUIKitViewDelegate */ {
-        var parent: MyView
+// extension MadeiraViewController {
+//    class Coordinator /*: SomeUIKitViewDelegate */ {
+//        var parent: MadeiraViewController
         
-        init(_ parent: MyView) {
-            self.parent = parent
-        }
+//        init(_ parent: MadeiraViewController) {
+//            self.parent = parent
+//        }
         
         // Implement delegate methods here
-    }
-}
-
-final class MetalViewController: UIViewController {
-	var MetalBackedView: MetalBackedView?
-	static let shared = MetalViewController()
-	var shouldLockPointer: Bool = true
-    override var prefersPointerLocked: Bool {
-		return self.shouldLockPointer
-	}
-	func lockPointer() {
-		self.shouldLockPointer = true
-		setNeedsUpdateOfPrefersPointerLocked()
-		MetalBackedView = Madeira.MetalBackedView()
-	}
-	override func viewDidLoad() {
-       super.viewDidLoad()
-	}
-}
+//    }
+// }
 
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
