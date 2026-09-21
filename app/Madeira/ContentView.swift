@@ -1102,7 +1102,7 @@ struct ContentView: View {
                     }
                     .frame(width: barW)
                 }
-				// MadeiraViewController()
+				MadeiraViewController()
             }
         }
         .ignoresSafeArea()
