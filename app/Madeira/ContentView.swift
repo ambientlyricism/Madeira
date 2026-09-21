@@ -35,7 +35,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> MetalViewController  {
         let myViewController = MetalViewController()
-		myViewController.view.backgroundColor = .clear
+		// myViewController.view.backgroundColor = .clear
 		// let label = UILabel()
 		// label.text = "Controller Active"
 		// label.textColor = UIColor.red
@@ -1078,9 +1078,10 @@ struct ContentView: View {
     /// happens in MetalBackedView); ALL controls live in the pillarbox
     /// bars left/right of the game — the window-level surface would cover
     /// anything drawn over the game area itself. No header/log/nav chrome.
-	@State private var isPresenting = true
+	// @State private var isPresenting = true
     private var landscapeBody: some View {
         GeometryReader { geo in
+			MadeiraViewController()
             let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
             let barW = max((geo.size.width - gameW) / 2.0, 44)
             ZStack {
@@ -1107,7 +1108,7 @@ struct ContentView: View {
         }
         .ignoresSafeArea()
         .background(Color.black)
-		.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
+		// .fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
     }
 
     /// Hold-to-press key: VK down on touch, VK up on release — for keys
