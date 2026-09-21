@@ -77,8 +77,8 @@ final class MetalViewController: UIViewController {
 	}
 }
 final class MetalHostingController: UIHostingController<ContentView> {
-	var MetalBackedView: MetalBackedView?
-	static let shared = MetalHostingController<ContentView>()
+	// var MetalBackedView: MetalBackedView?
+	// static let shared = MetalHostingController<ContentView>()
 	var shouldLockPointer: Bool = true
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
@@ -86,7 +86,7 @@ final class MetalHostingController: UIHostingController<ContentView> {
 	func lockPointer() {
 		self.shouldLockPointer = true
 		setNeedsUpdateOfPrefersPointerLocked()
-		MetalBackedView = Madeira.MetalBackedView()
+		// MetalBackedView = Madeira.MetalBackedView()
 	}
 	override func viewDidLoad() {
        super.viewDidLoad()
@@ -1241,7 +1241,7 @@ struct ContentView: View {
                 
                  Button("Full Screen") {
                     display.immersive = true
-					MetalHostingController<ContentView>.shared.lockPointer()
+					MetalHostingController.lockPointer()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.indigo)
