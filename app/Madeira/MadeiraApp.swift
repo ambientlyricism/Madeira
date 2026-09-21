@@ -28,7 +28,7 @@ struct MadeiraApp: App {
 		//   fatalError("init(coder:) has not been implemented")
 	    // }
     init() {
-		MadeiraViewController.shared.lockPointer()
+		// MadeiraViewController.shared.lockPointer()
 		GamepadBridge.shared.start()
 	}
     var body: some Scene {
