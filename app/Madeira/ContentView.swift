@@ -1081,7 +1081,6 @@ struct ContentView: View {
 	@State private var isPresenting = true
     private var landscapeBody: some View {
         GeometryReader { geo in
-			.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
             let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
             let barW = max((geo.size.width - gameW) / 2.0, 44)
             ZStack {
@@ -1105,6 +1104,7 @@ struct ContentView: View {
                     .frame(width: barW)
                 }
             }
+			.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
         }
         .ignoresSafeArea()
         .background(Color.black)
