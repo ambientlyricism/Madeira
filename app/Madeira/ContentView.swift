@@ -976,7 +976,6 @@ struct ContentView: View {
                 // if orientation.isLandscape {
                 if display.immersive || vSizeClass == .compact {
                     landscapeBody
-					MadeiraViewController()
                 } else {
                     portraitBody
                 }
@@ -1109,6 +1108,7 @@ struct ContentView: View {
         }
         .ignoresSafeArea()
         .background(Color.black)
+		.background(MadeiraViewController())
 		//.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
     }
 
