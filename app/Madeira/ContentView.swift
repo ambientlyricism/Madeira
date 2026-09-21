@@ -1104,10 +1104,10 @@ struct ContentView: View {
                     .frame(width: barW)
                 }
             }
-			.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
         }
         .ignoresSafeArea()
         .background(Color.black)
+		.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
     }
 
     /// Hold-to-press key: VK down on touch, VK up on release — for keys
