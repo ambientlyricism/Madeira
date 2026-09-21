@@ -46,6 +46,8 @@ struct MadeiraViewController: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: MetalViewController, context: Context) {
+		MetalViewController.lockPointer()
+		// MetalHostingController.lockPointer()
             // left blank
     }
 	final class MetalViewController: UIViewController {
