@@ -33,8 +33,8 @@ struct MadeiraViewController: UIViewControllerRepresentable {
     //	self.parent = parent
 	// }
 
-    func makeUIViewController(context: Context) -> UIViewController  {
-        let myViewController = UIViewController()
+    func makeUIViewController(context: Context) -> MetalViewController  {
+        let myViewController = MetalViewController()
         // myViewController.delegate = context.coordinator
         return myViewController
     }
