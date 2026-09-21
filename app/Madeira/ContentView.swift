@@ -60,7 +60,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		func lockPointer() {
 			self.shouldLockPointer = true
 			setNeedsUpdateOfPrefersPointerLocked()
-			MadeiraMetalView = MadeiraMetalView()
+			MadeiraMetalView = Madeira.MadeiraMetalView()
 		}
 		override func viewDidLoad() {
       		super.viewDidLoad()
@@ -77,7 +77,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		func lockPointer() {
 			self.shouldLockPointer = true
 			setNeedsUpdateOfPrefersPointerLocked()
-			MadeiraMetalView = MadeiraMetalView()
+			MadeiraMetalView = Madeira.MadeiraMetalView()
 		}
 		override func viewDidLoad() {
         	super.viewDidLoad()
