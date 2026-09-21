@@ -998,7 +998,6 @@ struct ContentView: View {
                 logStore.log(enabled ? "Immersive mode enabled" : "Controls restored",
                              level: .info)
             }
-			.background(MadeiraViewController())
             // fix iPadOS rotation :sob: 
             // .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
             //    self.orientation = UIDevice.current.orientation
@@ -1083,6 +1082,7 @@ struct ContentView: View {
             let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
             let barW = max((geo.size.width - gameW) / 2.0, 44)
             ZStack {
+				MadeiraViewController()
                 Color.black
                 MadeiraMetalView()
                     .onAppear { TouchControlsHost.attach() }
