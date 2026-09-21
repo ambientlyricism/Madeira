@@ -33,6 +33,9 @@ final class MetalViewController: UIViewController {
 		setNeedsUpdateOfPrefersPointerLocked()
 		MetalBackedView = MetalBackedView()
 	}
+	override func viewDidLoad() {
+       super.viewDidLoad()
+	}
 }
 struct MadeiraApp: App {
 		// GamepadBridge = GamepadBridge()
