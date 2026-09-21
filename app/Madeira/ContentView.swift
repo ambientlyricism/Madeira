@@ -46,18 +46,20 @@ struct MadeiraViewController: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: MetalViewController, context: Context) {
-		MetalViewController.shared.lockPointer()
+		uiViewController.lockPointer()
 		// MetalHostingController.lockPointer()
             // left blank
     }
 	final class MetalViewController: UIViewController {
 		var MadeiraMetalView: MadeiraMetalView?
+		var MetalHostingController: MetalHostingController?
 		static let shared = MetalViewController()
 		var shouldLockPointer: Bool = true
 		override var prefersPointerLocked: Bool {
 			return self.shouldLockPointer
 		}
 		func lockPointer() {
+			let MetalHostingController, let MetalViewController = MetalHostingController.presentingViewController
 			self.shouldLockPointer = true
 			setNeedsUpdateOfPrefersPointerLocked()
 			MadeiraMetalView = Madeira.MadeiraMetalView()
