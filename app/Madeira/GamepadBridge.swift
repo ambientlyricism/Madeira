@@ -41,7 +41,7 @@ final class GamepadBridge {
                                                    name: NSNotification.Name.GCMouseDidStopBeingCurrent, object: nil)
             if let mouse = GCMouse.mice().first {
                 registerMouse(mouse)
-                MetalViewController.shared.lockPointer()
+                // MetalViewController.shared.lockPointer()
             }
         }
         // NotificationCenter.default.addObserver(self, selector: #selector(self.handleKeyboardDidConnect),
