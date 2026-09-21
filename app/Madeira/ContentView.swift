@@ -56,21 +56,21 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 // }
 
 final class MetalViewController: UIViewController {
-		var MetalBackedView: MetalBackedView?
-		static let shared = MetalViewController()
-		var shouldLockPointer: Bool = true
-    	override var prefersPointerLocked: Bool {
-			return self.shouldLockPointer
-		}
-		func lockPointer() {
-			self.shouldLockPointer = true
-			setNeedsUpdateOfPrefersPointerLocked()
-			MetalBackedView = Madeira.MetalBackedView()
-		}
-		override func viewDidLoad() {
-    	   super.viewDidLoad()
-		}
+	var MetalBackedView: MetalBackedView?
+	static let shared = MetalViewController()
+	var shouldLockPointer: Bool = true
+	override var prefersPointerLocked: Bool {
+		return self.shouldLockPointer
 	}
+	func lockPointer() {
+		self.shouldLockPointer = true
+		setNeedsUpdateOfPrefersPointerLocked()
+		MetalBackedView = Madeira.MetalBackedView()
+	}
+	override func viewDidLoad() {
+       super.viewDidLoad()
+	}
+}
 
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
