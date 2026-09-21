@@ -26,7 +26,7 @@ import os.log
 
 struct MadeiraViewController: UIViewControllerRepresentable {
         
-    typealias UIViewControllerType = MetalViewController
+    // typealias UIViewControllerType = MetalViewController
 	// var parent: MadeiraViewController
 	
 	// init(_ parent: MadeiraViewController) {
