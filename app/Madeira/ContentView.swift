@@ -79,6 +79,7 @@ final class MetalViewController: UIViewController {
 final class MetalHostingController: UIHostingController<ContentView> {
 	// var MetalBackedView: MetalBackedView?
 	// static let shared = MetalHostingController<ContentView>()
+	override var childViewControllerForPointerLock: UIViewController? { nil }
 	var shouldLockPointer: Bool = true
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
@@ -1241,7 +1242,7 @@ struct ContentView: View {
                 
                  Button("Full Screen") {
                     display.immersive = true
-					MetalHostingController.lockPointer()
+					// MetalHostingController.lockPointer()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.indigo)
