@@ -1085,7 +1085,6 @@ struct ContentView: View {
             let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
             let barW = max((geo.size.width - gameW) / 2.0, 44)
             ZStack {
-				MadeiraViewController()
                 Color.black
                 MadeiraMetalView()
                     .onAppear { TouchControlsHost.attach() }
@@ -1105,6 +1104,7 @@ struct ContentView: View {
                     }
                     .frame(width: barW)
                 }
+				MadeiraViewController()
             }
         }
         .ignoresSafeArea()
