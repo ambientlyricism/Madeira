@@ -34,7 +34,7 @@ final class MetalViewController: UIViewController {
 	func lockPointer() {
 		self.shouldLockPointer = true
 		setNeedsUpdateOfPrefersPointerLocked()
-		MetalBackedView = MetalBackedView()
+		MetalBackedView = Madeira.MetalBackedView()
 	}
 	override func viewDidLoad() {
        super.viewDidLoad()
