@@ -26,7 +26,7 @@ import os.log
 
 struct MadeiraViewController: UIViewControllerRepresentable {
         
-    // typealias UIViewControllerType = MetalViewController
+    typealias UIViewControllerType = MetalViewController
 	// var parent: MadeiraViewController
 	
 	// init(_ parent: MadeiraViewController) {
@@ -39,7 +39,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
         return myViewController
     }
 
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+    func updateUIViewController(_ uiViewController: MetalViewController, context: Context) {
             // left blank
     }
 	final class MetalViewController: UIViewController {
