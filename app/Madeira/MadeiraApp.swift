@@ -21,22 +21,6 @@ import UIKit
 //    var view: UIView?
 // }
     
-final class MetalViewController: UIViewController {
-	var MetalBackedView: MetalBackedView?
-	static let shared = MetalViewController()
-	var shouldLockPointer: Bool = true
-    override var prefersPointerLocked: Bool {
-		return self.shouldLockPointer
-	}
-	func lockPointer() {
-		self.shouldLockPointer = true
-		setNeedsUpdateOfPrefersPointerLocked()
-		MetalBackedView = MetalBackedView()
-	}
-	override func viewDidLoad() {
-       super.viewDidLoad()
-	}
-}
 struct MadeiraApp: App {
 		// GamepadBridge = GamepadBridge()
 		// GamepadBridge()
