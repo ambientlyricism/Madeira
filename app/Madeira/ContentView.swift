@@ -24,6 +24,37 @@ import os.log
 
 /// Raw window-level host for the presenting CAMetalLayer.
 
+struct MadeiraViewController: UIViewControllerRepresentable {
+        
+        typealias UIViewControllerType = UIViewController
+
+    func makeUIViewController(context: Context) -> UIViewController  {
+        let myViewController = UIViewController()
+        // myView.delegate = context.coordinator
+        return myViewController
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+            // left blank
+    }
+    
+    func makeCoordinator() -> MyView.Coordinator {
+        return Coordinator(self)
+    }
+}
+
+extension MadeiraViewController {
+    class Coordinator /*: SomeUIKitViewDelegate */ {
+        var parent: MyView
+        
+        init(_ parent: MyView) {
+            self.parent = parent
+        }
+        
+        // Implement delegate methods here
+    }
+}
+
 final class MetalViewController: UIViewController {
 	var MetalBackedView: MetalBackedView?
 	static let shared = MetalViewController()
