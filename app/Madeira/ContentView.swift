@@ -59,7 +59,8 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 			return self.shouldLockPointer
 		}
 		func lockPointer() {
-			let MetalHostingController, let MetalViewController = MetalHostingController.presentingViewController
+			MetalHostingController = MetalHostingController()
+			let MetalViewController = MetalHostingController.presentingViewController
 			self.shouldLockPointer = true
 			setNeedsUpdateOfPrefersPointerLocked()
 			MadeiraMetalView = Madeira.MadeiraMetalView()
