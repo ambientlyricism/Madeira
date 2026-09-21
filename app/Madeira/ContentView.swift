@@ -1078,8 +1078,8 @@ struct ContentView: View {
     /// happens in MetalBackedView); ALL controls live in the pillarbox
     /// bars left/right of the game — the window-level surface would cover
     /// anything drawn over the game area itself. No header/log/nav chrome.
-	@State private var isPresenting = true
     private var landscapeBody: some View {
+		@State var isPresenting = true
 		.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
         GeometryReader { geo in
             let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
