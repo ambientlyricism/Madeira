@@ -38,6 +38,8 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		let label = UILabel()
 		label.text = "Controller Active"
 		label.textColor = UIColor.red
+		myViewController.view.addSubview(label)
+		label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
         return myViewController
     }
