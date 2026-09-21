@@ -38,7 +38,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
             // left blank
     }
     
-	func makeCoordinator() -> Coordinator {
+	func makeCoordinator() -> MadeiraViewController.Coordinator {
         return Coordinator(self)
     }
 }
