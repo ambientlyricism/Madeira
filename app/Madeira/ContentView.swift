@@ -28,7 +28,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
         
         typealias UIViewControllerType = UIViewController
 
-    func makeUIViewController(context: Context) -> UIViewController  {
+    func makeUIViewController(context: Context) -> MetalViewController  {
         let myViewController = MetalViewController()
         myViewController.delegate = context.coordinator
         return myViewController
@@ -38,7 +38,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
             // left blank
     }
     
-	func makeCoordinator() -> MadeiraViewController.Coordinator {
+	func makeCoordinator() -> Coordinator {
         return Coordinator(self)
     }
 }
