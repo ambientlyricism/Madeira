@@ -57,11 +57,6 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		override func viewDidLoad() {
       		super.viewDidLoad()
 		}
-		var synchronize: (() -> Void)?
-        override func viewDidAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
-            synchronize?()
-        }
 	}
 	final class MetalHostingController: UIHostingController<ContentView> {
 		// var MetalBackedView: MetalBackedView?
@@ -79,10 +74,6 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		override func viewDidLoad() {
         	super.viewDidLoad()
 		}
-		override func viewDidAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
-            lockPointer()
-        }
 	}
     
 	// func makeCoordinator() -> Coordinator {
