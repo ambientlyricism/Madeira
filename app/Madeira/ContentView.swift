@@ -35,8 +35,8 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> MetalViewController  {
         let myViewController = MetalViewController()
-		myViewController.view.isOpaque = false
-		myViewController.view.backgroundColor = .clear
+		// myViewController.view.isOpaque = false
+		// myViewController.view.backgroundColor = .clear
 		// let label = UILabel()
 		// label.text = "Controller Active"
 		// label.textColor = UIColor.red
@@ -1107,9 +1107,9 @@ struct ContentView: View {
             }
         }
         .ignoresSafeArea()
-		// .background(MadeiraViewController())
         .background(Color.black)
-		.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
+		MadeiraViewController()
+		//.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
     }
 
     /// Hold-to-press key: VK down on touch, VK up on release — for keys
