@@ -38,10 +38,24 @@ struct MadeiraViewController: UIViewControllerRepresentable {
             // left blank
     }
     
-    func makeCoordinator() -> MyView.Coordinator {
+	func makeCoordinator() -> MadeiraViewController.Coordinator {
         return Coordinator(self)
     }
-	final class MetalViewController: UIViewController {
+}
+
+// extension MadeiraViewController {
+//    class Coordinator /*: SomeUIKitViewDelegate */ {
+//        var parent: MadeiraViewController
+        
+//        init(_ parent: MadeiraViewController) {
+//            self.parent = parent
+//        }
+        
+        // Implement delegate methods here
+//    }
+// }
+
+final class MetalViewController: UIViewController {
 		var MetalBackedView: MetalBackedView?
 		static let shared = MetalViewController()
 		var shouldLockPointer: Bool = true
@@ -57,19 +71,6 @@ struct MadeiraViewController: UIViewControllerRepresentable {
     	   super.viewDidLoad()
 		}
 	}
-}
-
-// extension MadeiraViewController {
-//    class Coordinator /*: SomeUIKitViewDelegate */ {
-//        var parent: MadeiraViewController
-        
-//        init(_ parent: MadeiraViewController) {
-//            self.parent = parent
-//        }
-        
-        // Implement delegate methods here
-//    }
-// }
 
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
