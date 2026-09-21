@@ -36,11 +36,11 @@ struct MadeiraViewController: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> MetalViewController  {
         let myViewController = MetalViewController()
 		myViewController.view.backgroundColor = .blue
-		let label = UILabel()
-		label.text = "Controller Active"
-		label.textColor = UIColor.red
-		myViewController.view.addSubview(label)
-		label.frame = myViewController.view.frame
+		// let label = UILabel()
+		// label.text = "Controller Active"
+		// label.textColor = UIColor.red
+		// myViewController.view.addSubview(label)
+		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
         return myViewController
     }
@@ -51,7 +51,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
             // left blank
     }
 	final class MetalViewController: UIViewController {
-		// var MetalBackedView: MetalBackedView?
+		var MetalBackedView: MetalBackedView?
 		static let shared = MetalViewController()
 		var shouldLockPointer: Bool = true
 		override var prefersPointerLocked: Bool {
@@ -60,14 +60,14 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		func lockPointer() {
 			self.shouldLockPointer = true
 			setNeedsUpdateOfPrefersPointerLocked()
-			// MetalBackedView = Madeira.MetalBackedView()
+			MetalBackedView = Madeira.MetalBackedView()
 		}
 		override func viewDidLoad() {
       		super.viewDidLoad()
 		}
 	}
 	final class MetalHostingController: UIHostingController<ContentView> {
-		// var MetalBackedView: MetalBackedView?
+		var ContentView: ContentView?
 		static let shared = MetalHostingController(rootView: ContentView())
 		override var childViewControllerForPointerLock: UIViewController? { nil }
 		var shouldLockPointer: Bool = true
@@ -77,7 +77,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		func lockPointer() {
 			self.shouldLockPointer = true
 			setNeedsUpdateOfPrefersPointerLocked()
-			// MetalBackedView = Madeira.MetalBackedView()
+			ContentView = Madeira.ContentView()
 		}
 		override func viewDidLoad() {
         	super.viewDidLoad()
