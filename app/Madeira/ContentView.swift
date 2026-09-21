@@ -78,7 +78,7 @@ final class MetalViewController: UIViewController {
 }
 final class MetalHostingController: UIHostingController<ContentView> {
 	// var MetalBackedView: MetalBackedView?
-	static let shared = MetalHostingController(rootView: <ContentView>)
+	static let shared = MetalHostingController(rootView: ContentView())
 	override var childViewControllerForPointerLock: UIViewController? { nil }
 	var shouldLockPointer: Bool = true
 	override var prefersPointerLocked: Bool {
