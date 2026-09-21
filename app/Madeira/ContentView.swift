@@ -1080,11 +1080,11 @@ struct ContentView: View {
     /// anything drawn over the game area itself. No header/log/nav chrome.
 	@State private var isPresenting = true
     private var landscapeBody: some View {
+		.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
         GeometryReader { geo in
             let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
             let barW = max((geo.size.width - gameW) / 2.0, 44)
             ZStack {
-				.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
                 Color.black
                 MadeiraMetalView()
                     .onAppear { TouchControlsHost.attach() }
