@@ -12,11 +12,15 @@ import UIKit
 //   	   GamepadBridge = GamepadBridge()
 //   }
 // }
-struct MadeiraViewController: UIViewControllerRepresentable {
-	func makeUIViewController(context: Context) -> MetalViewController {
-        return MetalViewController()
-    }
-}
+// struct MadeiraViewController: UIViewControllerRepresentable {
+//	func makeUIViewController(context: Context) -> MetalViewController {
+//        return MetalViewController()
+//    }
+// }
+// final class MainSceneDelegate: UIResponder, UIWindowSceneDelegate {
+//    var view: UIView?
+// }
+    
 final class MetalViewController: UIViewController {
 	var MetalBackedView: MetalBackedView?
 	static let shared = MetalViewController()
