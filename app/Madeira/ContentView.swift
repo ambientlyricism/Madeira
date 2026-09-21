@@ -42,6 +42,39 @@ struct MadeiraViewController: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
             // left blank
     }
+	final class MetalViewController: UIViewController {
+		// var MetalBackedView: MetalBackedView?
+		static let shared = MetalViewController()
+		var shouldLockPointer: Bool = true
+		override var prefersPointerLocked: Bool {
+			return self.shouldLockPointer
+		}
+		func lockPointer() {
+			self.shouldLockPointer = true
+			setNeedsUpdateOfPrefersPointerLocked()
+			// MetalBackedView = Madeira.MetalBackedView()
+		}
+		override func viewDidLoad() {
+      		super.viewDidLoad()
+		}
+	}
+	final class MetalHostingController: UIHostingController<ContentView> {
+		// var MetalBackedView: MetalBackedView?
+		static let shared = MetalHostingController(rootView: ContentView())
+		override var childViewControllerForPointerLock: UIViewController? { nil }
+		var shouldLockPointer: Bool = true
+		override var prefersPointerLocked: Bool {
+			return self.shouldLockPointer
+		}
+		func lockPointer() {
+			self.shouldLockPointer = true
+			setNeedsUpdateOfPrefersPointerLocked()
+			// MetalBackedView = Madeira.MetalBackedView()
+		}
+		override func viewDidLoad() {
+        	super.viewDidLoad()
+		}
+	}
     
 	// func makeCoordinator() -> Coordinator {
     //    return Coordinator(self)
@@ -59,40 +92,6 @@ struct MadeiraViewController: UIViewControllerRepresentable {
         // Implement delegate methods here
 //    }
 // }
-
-final class MetalViewController: UIViewController {
-	var MetalBackedView: MetalBackedView?
-	static let shared = MetalViewController()
-	var shouldLockPointer: Bool = true
-	override var prefersPointerLocked: Bool {
-		return self.shouldLockPointer
-	}
-	func lockPointer() {
-		self.shouldLockPointer = true
-		setNeedsUpdateOfPrefersPointerLocked()
-		MetalBackedView = Madeira.MetalBackedView()
-	}
-	override func viewDidLoad() {
-       super.viewDidLoad()
-	}
-}
-final class MetalHostingController: UIHostingController<ContentView> {
-	// var MetalBackedView: MetalBackedView?
-	static let shared = MetalHostingController(rootView: ContentView())
-	override var childViewControllerForPointerLock: UIViewController? { nil }
-	var shouldLockPointer: Bool = true
-	override var prefersPointerLocked: Bool {
-		return self.shouldLockPointer
-	}
-	func lockPointer() {
-		self.shouldLockPointer = true
-		setNeedsUpdateOfPrefersPointerLocked()
-		// MetalBackedView = Madeira.MetalBackedView()
-	}
-	override func viewDidLoad() {
-       super.viewDidLoad()
-	}
-}
 
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
@@ -1242,7 +1241,7 @@ struct ContentView: View {
                 
                  Button("Full Screen") {
                     display.immersive = true
-					MetalHostingController.shared.lockPointer()
+					// MetalHostingController.shared.lockPointer()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.indigo)
