@@ -60,8 +60,8 @@ struct MadeiraViewController: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: MetalViewController, context: Context) {
-		// uiViewController.lockPointer()
-		// MetalHostingController.lockPointer()
+		MetalHostingController.shared.lockPointer()
+		uiViewController.lockPointer()
             // left blank
     }
 	// func makeCoordinator() -> Coordinator {
@@ -1127,7 +1127,8 @@ struct ContentView: View {
             let barW = max((geo.size.width - gameW) / 2.0, 44)
             ZStack {
                 Color.black
-				.fullScreenCover(isPresented: $isPresenting, content: { MadeiraMetalView() })
+				MadeiraMetalView()
+				// .fullScreenCover(isPresented: $isPresenting, content: { MadeiraMetalView() })
                     .onAppear { TouchControlsHost.attach() }
                     .onReceive(NotificationCenter.default.publisher(
                         for: UIDevice.orientationDidChangeNotification)) { _ in
