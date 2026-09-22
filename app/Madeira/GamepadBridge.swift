@@ -52,6 +52,7 @@ final class GamepadBridge {
    }
     var delta: CGPoint = CGPoint.zero
     var keyboard: GCKeyboard? = nil
+    var key: Int32? = 0
     
    @objc
    func handleKeyboardDidConnect(_ notification: Notification) {
@@ -64,7 +65,7 @@ final class GamepadBridge {
                   return
                }
                let code = Int(value.rawValue)
-               let key = Int32(MadeiraKeys.virtualKey(hid: code))
+               let key = MadeiraKeys.virtualKey(hid: code)
                winios_post_key(key, pressed ? 1 : 0)
       }
          
