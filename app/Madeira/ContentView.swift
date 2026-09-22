@@ -1102,7 +1102,7 @@ struct ContentView: View {
                         FPSOverlay(compact: true)
                         Spacer()
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(width: barW)
                 }
             }
 			MadeiraViewController()
