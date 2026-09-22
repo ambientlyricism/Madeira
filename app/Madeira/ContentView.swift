@@ -52,7 +52,11 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		// MetalHostingController.lockPointer()
             // left blank
     }
-	final class MetalViewController: UIViewController {
+	// func makeCoordinator() -> Coordinator {
+    //    return Coordinator(self)
+    // }
+}
+final class MetalViewController: UIViewController {
 		var MadeiraMetalView: MadeiraMetalView?
 		// var MetalHostingController: MetalHostingController?
 		static let shared = MetalViewController()
@@ -72,31 +76,27 @@ struct MadeiraViewController: UIViewControllerRepresentable {
       		super.viewDidLoad()
 		}
 	}
-	final class MetalHostingController: UIHostingController<ContentView> {
-		var MadeiraMetalView: MadeiraMetalView?
-		static let shared = MetalHostingController(rootView: ContentView())
-		override var childViewControllerForPointerLock: UIViewController? { nil }
-		var shouldLockPointer: Bool = true
-		override var prefersPointerLocked: Bool {
-			return self.shouldLockPointer
-		}
-		func lockPointer() {
-			self.shouldLockPointer = true
-			setNeedsUpdateOfPrefersPointerLocked()
-			MadeiraMetalView = Madeira.MadeiraMetalView()
-		}
-		override func viewDidLoad() {
-        	super.viewDidLoad()
-		}
-		override func viewDidAppear(_ animated: Bool) {
-            super.viewDidAppear(animated)
-            lockPointer()
-        }
+	
+final class MetalHostingController: UIHostingController<ContentView> {
+	var MadeiraMetalView: MadeiraMetalView?
+	static let shared = MetalHostingController(rootView: ContentView())
+	override var childViewControllerForPointerLock: UIViewController? { nil }
+	var shouldLockPointer: Bool = true
+	override var prefersPointerLocked: Bool {
+		return self.shouldLockPointer
 	}
-    
-	// func makeCoordinator() -> Coordinator {
-    //    return Coordinator(self)
-    // }
+	func lockPointer() {
+		self.shouldLockPointer = true
+		setNeedsUpdateOfPrefersPointerLocked()
+		MadeiraMetalView = Madeira.MadeiraMetalView()
+	}
+	override func viewDidLoad() {
+      	super.viewDidLoad()
+	}
+	override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        lockPointer()
+    }
 }
 
 // extension MadeiraViewController {
@@ -1004,7 +1004,6 @@ struct ContentView: View {
             // .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
             //    self.orientation = UIDevice.current.orientation
             // }
-			MadeiraViewController()
         }
     }
 
@@ -1106,6 +1105,7 @@ struct ContentView: View {
                     .frame(width: barW)
                 }
             }
+			MadeiraViewController()
 		}
         .ignoresSafeArea()
         .background(Color.black)
