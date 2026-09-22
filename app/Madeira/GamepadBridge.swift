@@ -52,7 +52,6 @@ final class GamepadBridge {
    }
     var delta: CGPoint = CGPoint.zero
     var keyboard: GCKeyboard? = nil
-    var key: Int32? = 0
     
    @objc
    func handleKeyboardDidConnect(_ notification: Notification) {
@@ -163,7 +162,7 @@ final class GamepadBridge {
 
 // Hardware keyboard state, separate from the XInput controller bridge.
 struct MadeiraKeys {
-    static func virtualKey(hid: Int) -> Int32? {
+    static func virtualKey(hid: Int) -> Int32 {
         if (4...29).contains(hid) { return Int32(0x41 + hid - 4) }
         if (30...38).contains(hid) { return Int32(0x31 + hid - 30) }
         if (89...97).contains(hid) { return Int32(0x61 + hid - 89) }
