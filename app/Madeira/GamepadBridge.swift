@@ -47,16 +47,26 @@ final class GamepadBridge {
                 MetalViewController.shared.lockPointer()
             }
         }
-        // NotificationCenter.default.addObserver(self, selector: #selector(self.handleKeyboardDidConnect),
-        //                                       name: NSNotification.Name.GCKeyboardDidConnect, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.handleKeyboardDidConnect),
+                                               name: NSNotification.Name.GCKeyboardDidConnect, object: nil)
    }
     
-   // @objc
-   // func handleKeyboardDidConnect(_ notification: Notification) {
-   //     guard let keyboard = notification.object as? GCKeyboard else {
-   //         return
-   //     }
-   // }
+   @objc
+   func handleKeyboardDidConnect(_ notification: Notification) {
+      guard let keyboard = notification.object as? GCKeyboard else {
+         return
+      }
+      keyboard.keyboardInput?.valueChangedHandler = {
+            (_ button: GCDeviceButtonInput, _ value: Float, _ pressed: Bool) -> Void in
+               if pressed {
+                  winios_post_key(button, down ? 1 : 0)
+               }
+               else {
+                  return
+               }
+      }
+         
+   }
 
     var delta: CGPoint = CGPoint.zero
     var keyboard: GCKeyboard? = nil
