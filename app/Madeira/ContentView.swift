@@ -58,9 +58,9 @@ struct MadeiraViewController: UIViewControllerRepresentable {
     // }
 }
 final class MetalViewController: UIViewController {
-	var MadeiraMetalView: MadeiraMetalView
+	// var MadeiraMetalView: MadeiraMetalView?
 	// var MetalHostingController: MetalHostingController?
-	static let shared = MetalViewController()
+	// static let shared = MetalViewController()
 	var shouldLockPointer: Bool = true
 	var GamepadBridge: GamepadBridge?
 	override var prefersPointerLocked: Bool {
@@ -77,7 +77,7 @@ final class MetalViewController: UIViewController {
 	override func viewDidLoad() {
      	super.viewDidLoad()
 		// let ContentView = ContentView()
-		MadeiraMetalView = Madeira.MadeiraMetalView()
+		let MadeiraMetalView = Madeira.MadeiraMetalView()
         let hostingController = MetalHostingController(rootView: MadeiraMetalView)
 		if #available(iOS 16.4, *) {
    			hostingController.safeAreaRegions = .all
