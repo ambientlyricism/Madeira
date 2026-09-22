@@ -75,7 +75,7 @@ final class MetalViewController: UIViewController {
 	override func viewDidLoad() {
      	super.viewDidLoad()
 		let ContentView = ContentView()
-        let hostingController = UIHostingController(rootView: ContentView)
+        let hostingController = MetalHostingController(rootView: ContentView)
         
         addChild(hostingController)
         hostingController.view.frame = view.bounds
