@@ -105,6 +105,7 @@ final class MetalViewController: UIViewController {
 		hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = false
         hostingController.didMove(toParent: self)
 		// GamepadBridge = Madeira.GamepadBridge()
+		lockPointer()
 	}
 	var synchronize: (() -> Void)?
     override func viewDidAppear(_ animated: Bool) {
@@ -131,6 +132,7 @@ final class MetalHostingController: UIHostingController<MadeiraMetalView> {
       	super.viewDidLoad()
 		// MadeiraMetalView = Madeira.MadeiraMetalView()
 		GamepadBridge = Madeira.GamepadBridge()
+		lockPointer()
 		
 	}
 	override func viewDidAppear(_ animated: Bool) {
