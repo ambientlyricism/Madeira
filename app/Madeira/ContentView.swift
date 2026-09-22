@@ -86,7 +86,7 @@ final class MetalViewController: UIViewController {
 struct PointerView: View {
 	//@State private var isPresenting = true
 	var body: some View {
-		Group {
+		GeometryReader { geo in
 			MadeiraViewController()
 		}
 		//.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
