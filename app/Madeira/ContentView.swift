@@ -76,8 +76,9 @@ final class MetalViewController: UIViewController {
 	}
 	override func viewDidLoad() {
      	super.viewDidLoad()
-		let ContentView = ContentView()
-        let hostingController = MetalHostingController(rootView: ContentView)
+		// let ContentView = ContentView()
+		MadeiraMetalView = Madeira.MadeiraMetalView()
+        let hostingController = MetalHostingController(rootView: MadeiraMetalView)
 		if #available(iOS 16.4, *) {
    			hostingController.safeAreaRegions = .all
 		}
@@ -91,7 +92,7 @@ final class MetalViewController: UIViewController {
 		hostingController.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = false
 		hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = false
         hostingController.didMove(toParent: self)
-		GamepadBridge = Madeira.GamepadBridge()
+		// GamepadBridge = Madeira.GamepadBridge()
 		
 
 
@@ -108,9 +109,10 @@ struct PointerView: View {
 	}
 }
 	
-final class MetalHostingController: UIHostingController<ContentView> {
+final class MetalHostingController: UIHostingController<MadeiraMetalView> {
 	var MadeiraMetalView: MadeiraMetalView?
-	static let shared = MetalHostingController(rootView: ContentView())
+	var GamepadBridge: GamepadBridge?
+	static let shared = MetalHostingController(rootView: MadeiraMetalView())
 	override var childViewControllerForPointerLock: UIViewController? { nil }
 	var shouldLockPointer: Bool = true
 	override var prefersPointerLocked: Bool {
@@ -119,10 +121,13 @@ final class MetalHostingController: UIHostingController<ContentView> {
 	func lockPointer() {
 		self.shouldLockPointer = true
 		setNeedsUpdateOfPrefersPointerLocked()
-		MadeiraMetalView = Madeira.MadeiraMetalView()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
 	}
 	override func viewDidLoad() {
       	super.viewDidLoad()
+		MadeiraMetalView = Madeira.MadeiraMetalView()
+		GamepadBridge = Madeira.GamepadBridge()
+		
 	}
 	override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
