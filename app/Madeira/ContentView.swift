@@ -470,7 +470,7 @@ final class MetalBackedView: UIView {
             if ix != 0 || iy != 0 { winios_pointer(ix, iy, F_MOVE, 0) }
             return
         }
-		GamepadBridge.shared.registerMouse(GCMouse)
+		// GamepadBridge.shared.registerMouse(GCMouse)
 		guard !GamepadBridge.shared.MouseActive() else {return}
         let sens = CGFloat(InputSettings.shared.sensAbs)   // desktop px per view pt
         let maxX = CGFloat(envInt("MADEIRA_SCREEN_W", 1024) - 1)
