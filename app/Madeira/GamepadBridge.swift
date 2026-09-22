@@ -50,6 +50,8 @@ final class GamepadBridge {
         NotificationCenter.default.addObserver(self, selector: #selector(self.handleKeyboardDidConnect),
                                                name: NSNotification.Name.GCKeyboardDidConnect, object: nil)
    }
+    var delta: CGPoint = CGPoint.zero
+    var keyboard: GCKeyboard? = nil
     
    @objc
    func handleKeyboardDidConnect(_ notification: Notification) {
@@ -68,9 +70,6 @@ final class GamepadBridge {
       }
          
    }
-
-    var delta: CGPoint = CGPoint.zero
-    var keyboard: GCKeyboard? = nil
     
     @objc
     func handleMouseDidConnect(_ notification: Notification) {
