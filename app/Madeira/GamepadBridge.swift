@@ -64,7 +64,7 @@ final class GamepadBridge {
                   return
                }
                let code = Int(value.rawValue)
-               let key = MadeiraKeys.virtualKey(hid: code)
+               let key = Int32(MadeiraKeys.virtualKey(hid: code)!)
                winios_post_key(key, pressed ? 1 : 0)
       }
          
@@ -162,7 +162,7 @@ final class GamepadBridge {
 
 // Hardware keyboard state, separate from the XInput controller bridge.
 struct MadeiraKeys {
-    static func virtualKey(hid: Int) -> Int32 {
+    static func virtualKey(hid: Int) -> Int32? {
         if (4...29).contains(hid) { return Int32(0x41 + hid - 4) }
         if (30...38).contains(hid) { return Int32(0x31 + hid - 30) }
         if (89...97).contains(hid) { return Int32(0x61 + hid - 89) }
