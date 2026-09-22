@@ -86,12 +86,12 @@ final class GamepadBridge {
     var dx : Int32 = 0
     var dy : Int32 = 0
     var sy : Int32 = 0
-    private static var MouseMoving = false
-    private static var MouseClicking = false
+    var MouseMoving = false
+    var MouseClicking = false
     
     func registerMouse(_ mouseDevice: GCMouse) {
-        GamepadBridge.MouseMoving = false
-        GamepadBridge.MouseClicking = false
+        self.MouseMoving = false
+        self.MouseClicking = false
         if #available(iOS 14.0, OSX 10.16, *) {
             guard let mouseInput = mouseDevice.mouseInput else {
                 return
@@ -101,7 +101,7 @@ final class GamepadBridge {
                 self.dx = self.dx+Int32(deltaX)
                 self.dy = self.dy-Int32(deltaY)
                 self.delta = CGPoint(x: CGFloat(deltaX), y: CGFloat(deltaY))
-                GamepadBridge.MouseMoving = true
+                self.MouseMoving = true
                 winios_pointer(self.dx, self.dy, 0x0001 | 0x8000, 0)
             }
             mouseInput.scroll.valueChangedHandler = {
@@ -113,7 +113,7 @@ final class GamepadBridge {
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
                if pressed {
                   winios_pointer(0, 0, 0x0002, 0)
-                  GamepadBridge.MouseClicking = true
+                  self.MouseClicking = true
                }
                else {
                   winios_pointer(0, 0, 0x0004, 0)
@@ -123,7 +123,7 @@ final class GamepadBridge {
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
                if pressed {
                   winios_pointer(0, 0, 0x0008, 0)
-                  GamepadBridge.MouseClicking = true
+                  self.MouseClicking = true
                }
                else {
                   winios_pointer(0, 0, 0x0010, 0)
@@ -138,7 +138,7 @@ final class GamepadBridge {
        return self.delta.y
     }
     func MouseActive() -> Bool {
-       return GamepadBridge.MouseMoving || GamepadBridge.MouseClicking
+       return self.MouseMoving || self.MouseClicking
     }
     
 }
