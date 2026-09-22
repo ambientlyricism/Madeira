@@ -1140,6 +1140,7 @@ struct ContentView: View {
 			// MadeiraViewController()
 		}
         .ignoresSafeArea()
+		.statusBarHidden()
         .background(Color.black)
 		// .background(MadeiraViewController())
 		//.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
