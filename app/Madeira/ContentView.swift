@@ -84,9 +84,12 @@ final class MetalViewController: UIViewController {
 	}
 }
 struct PointerView: View {
-	@State private var isPresenting = true
+	//@State private var isPresenting = true
 	var body: some View {
-		.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
+		Group {
+			MadeiraViewController()
+		}
+		//.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
    		// ContentView()
 	}
 }
