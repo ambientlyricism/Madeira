@@ -58,8 +58,9 @@ final class GamepadBridge {
       }
       keyboard.keyboardInput?.keyChangedHandler = {
             (_ button: GCDeviceButtonInput, _ value: Float, _ pressed: Bool) -> Void in
+               let code = button.keyCode
                if pressed {
-                  winios_post_key(button, pressed ? 1 : 0)
+                  winios_post_key(code, pressed ? 1 : 0)
                }
                else {
                   return
