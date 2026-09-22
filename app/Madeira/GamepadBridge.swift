@@ -59,7 +59,7 @@ final class GamepadBridge {
       guard let keyboard = notification.object as? GCKeyboard else {
          return
       }
-      keyboard.keyboardInput?.keyChangedHandler = {
+      keyboard.keyboardInput?.valueChangedHandler = {
             ( _ keyboard, _ button: GCDeviceButtonInput, _ value: GCKeyCode, _ pressed: Bool) -> Void in
                guard pressed else {
                   return
