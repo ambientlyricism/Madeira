@@ -76,6 +76,9 @@ final class MetalViewController: UIViewController {
      	super.viewDidLoad()
 		let ContentView = ContentView()
         let hostingController = MetalHostingController(rootView: ContentView)
+		if #available(iOS 16.4, *) {
+   			hosting.safeAreaRegions = []
+		}
         
         addChild(hostingController)
         hostingController.view.frame = view.bounds
