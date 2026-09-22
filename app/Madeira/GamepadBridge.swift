@@ -83,8 +83,8 @@ final class GamepadBridge {
         delta = CGPoint.zero
         
     }
-    var dx : Int32 = 0
-    var dy : Int32 = 0
+    var dx : Int32 = 683
+    var dy : Int32 = 512
     var sy : Int32 = 0
     var MouseMoving = false
     var MouseClicking = false
