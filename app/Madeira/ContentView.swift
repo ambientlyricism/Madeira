@@ -83,6 +83,13 @@ final class MetalViewController: UIViewController {
         hostingController.didMove(toParent: self)
 	}
 }
+struct PointerView: some View {
+	@State private var isPresenting = true
+	var body: some View {
+		.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
+   		// ContentView()
+	}
+}
 	
 final class MetalHostingController: UIHostingController<ContentView> {
 	var MadeiraMetalView: MadeiraMetalView?
