@@ -34,7 +34,7 @@ struct MadeiraApp: App {
 	@State private var isPresenting = true
     var body: some Scene {
 		WindowGroup {
-			var body: some View {
+			struct PointerView: some View {
 				.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
             // ContentView()
        		}
