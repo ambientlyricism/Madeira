@@ -72,7 +72,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 final class MetalViewController: UIViewController {
 	// var MadeiraMetalView: MadeiraMetalView?
 	// var MetalHostingController: MetalHostingController?
-	// static let shared = MetalViewController()
+	static let shared = MetalViewController()
 	var shouldLockPointer: Bool = true
 	var GamepadBridge: GamepadBridge?
 	override var prefersPointerLocked: Bool {
