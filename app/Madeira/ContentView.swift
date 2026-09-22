@@ -90,7 +90,7 @@ final class MetalViewController: UIViewController {
 		// hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
 		// hostingController.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
 		// hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        // hostingController.didMove(toParent: self)
+        hostingController.didMove(toParent: self)
 		GamepadBridge = Madeira.GamepadBridge()
 		
 
