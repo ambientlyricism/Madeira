@@ -110,20 +110,20 @@ final class GamepadBridge {
                 winios_pointer(0, 0, 0x0800, UInt32(bitPattern: Int32(scrollY)))
             }
             mouseInput.leftButton.valueChangedHandler = {
-                GamepadBridge.MouseClicking = true
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
                if pressed {
                   winios_pointer(0, 0, 0x0002, 0)
+                  GamepadBridge.MouseClicking = true
                }
                else {
                   winios_pointer(0, 0, 0x0004, 0)
                }
             }
             mouseInput.rightButton?.valueChangedHandler = {
-               GamepadBridge.MouseClicking = true
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
                if pressed {
                   winios_pointer(0, 0, 0x0008, 0)
+                  GamepadBridge.MouseClicking = true
                }
                else {
                   winios_pointer(0, 0, 0x0010, 0)
