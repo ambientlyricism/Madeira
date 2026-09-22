@@ -61,6 +61,7 @@ final class MetalViewController: UIViewController {
 	// var MetalHostingController: MetalHostingController?
 	static let shared = MetalViewController()
 	var shouldLockPointer: Bool = true
+	var GamepadBridge: GamepadBridge?
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
 	}
@@ -83,12 +84,15 @@ final class MetalViewController: UIViewController {
         addChild(hostingController)
         hostingController.view.frame = view.bounds
         view.addSubview(hostingController.view)
-		hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-		hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-		hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-		hostingController.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-		hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        hostingController.didMove(toParent: self)
+		// hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+		// hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+		// hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+		// hostingController.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+		// hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        // hostingController.didMove(toParent: self)
+
+		
+
 
 	}
 }
@@ -1130,6 +1134,8 @@ struct ContentView: View {
                     }
                     .frame(width: barW)
                 }
+				.frame(maxWidth: .infinity)
+				.frame(maxHeight: .infinity)
             }
 			// MadeiraViewController()
 		}
