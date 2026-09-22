@@ -79,11 +79,17 @@ final class MetalViewController: UIViewController {
 		if #available(iOS 16.4, *) {
    			hostingController.safeAreaRegions = .all
 		}
-        
+		
         addChild(hostingController)
         hostingController.view.frame = view.bounds
         view.addSubview(hostingController.view)
+		hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+		hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+		hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+		hostingController.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+		hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         hostingController.didMove(toParent: self)
+
 	}
 }
 struct PointerView: View {
