@@ -1081,7 +1081,8 @@ struct ContentView: View {
     /// anything drawn over the game area itself. No header/log/nav chrome.
 	// @State private var isPresenting = true
     private var landscapeBody: some View {
-        GeometryReader { geo in
+        GeometryReader { safeGeometry in
+		: nil, fullScreen: true) {
             let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
             let barW = max((geo.size.width - gameW) / 2.0, 44)
             ZStack {
@@ -1107,6 +1108,7 @@ struct ContentView: View {
             }
 			MadeiraViewController()
         }
+		}
         .ignoresSafeArea()
         .background(Color.black)
 		// .background(MadeiraViewController())
