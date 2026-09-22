@@ -1120,14 +1120,14 @@ struct ContentView: View {
     /// happens in MetalBackedView); ALL controls live in the pillarbox
     /// bars left/right of the game — the window-level surface would cover
     /// anything drawn over the game area itself. No header/log/nav chrome.
-	// @State private var isPresenting = true
+	@State private var isPresenting = true
     private var landscapeBody: some View {
         GeometryReader { geo in
             let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
             let barW = max((geo.size.width - gameW) / 2.0, 44)
             ZStack {
                 Color.black
-                MadeiraMetalView()
+				.fullScreenCover(isPresented: $isPresenting, content: { MadeiraMetalView() })
                     .onAppear { TouchControlsHost.attach() }
                     .onReceive(NotificationCenter.default.publisher(
                         for: UIDevice.orientationDidChangeNotification)) { _ in
