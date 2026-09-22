@@ -55,7 +55,8 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
 		myViewController.modalPresentationStyle = .fullScreen
-		// myViewController.lockPointer()
+		MetalHostingController.shared.lockPointer()
+		myViewController.lockPointer()
         return myViewController
     }
 
