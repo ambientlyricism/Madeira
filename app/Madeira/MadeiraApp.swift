@@ -33,7 +33,7 @@ struct MadeiraApp: App {
 	}
     var body: some Scene {
         WindowGroup {
-			MadeiraViewController()
+			.fullScreenCover(MadeiraViewController())
             // ContentView()
         }
     }
