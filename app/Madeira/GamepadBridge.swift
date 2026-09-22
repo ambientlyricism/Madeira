@@ -59,7 +59,7 @@ final class GamepadBridge {
          return
       }
       keyboard.coalesced?.keyboardInput?.keyChangedHandler = {
-            (_ button: GCDeviceButtonInput, _ value: Float, _ pressed: Bool) -> Void in
+            ( _ keyboard, _ button: GCDeviceButtonInput, _ value: Float, _ pressed: Bool) -> Void in
                guard pressed else {
                   return
                }
