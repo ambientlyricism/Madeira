@@ -72,7 +72,7 @@ final class MetalViewController: UIViewController {
 		MetalHostingController.shared.lockPointer()
 		self.shouldLockPointer = true
 		setNeedsUpdateOfPrefersPointerLocked()
-		MadeiraMetalView = Madeira.MadeiraMetalView()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
 	}
 	override func viewDidLoad() {
      	super.viewDidLoad()
