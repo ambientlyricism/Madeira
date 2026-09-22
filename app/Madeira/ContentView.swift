@@ -82,6 +82,7 @@ final class MetalViewController: UIViewController {
 		if #available(iOS 16.4, *) {
    			hostingController.safeAreaRegions = .all
 		}
+		self.navigationController?.isNavigationBarHidden = true
 		
         addChild(hostingController)
         hostingController.view.frame = view.bounds
