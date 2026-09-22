@@ -1082,7 +1082,6 @@ struct ContentView: View {
 	// @State private var isPresenting = true
     private var landscapeBody: some View {
         GeometryReader { safeGeometry in
-		: nil, fullScreen: true) {
             let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
             let barW = max((geo.size.width - gameW) / 2.0, 44)
             ZStack {
@@ -1107,7 +1106,6 @@ struct ContentView: View {
                 }
             }
 			MadeiraViewController()
-        }
 		}
         .ignoresSafeArea()
         .background(Color.black)
@@ -1285,7 +1283,7 @@ struct ContentView: View {
                     // render), -console (Steam's own log → our stderr). Steam
                     // WILL try to self-update through our GnuTLS stack — that
                     // attempt is itself an informative S0 re-test.
-                    let deskW = 1024, deskH = 768
+                    let deskW = 1366, deskH = 1024
                     // ml589: find Steam and (re)write the launch batch. Returns
                     // false — having logged why — when there is nothing to run.
                     guard prepareSteamLaunch() else { return }
@@ -1557,7 +1555,7 @@ struct ContentView: View {
                     // Known risk: if shellwindows_init beats services.exe's
                     // RPC_Init, OpenSCManager fails → watch whether that
                     // fails fast or hits the RaiseException→CS wedge again.
-                    let deskW = 960, deskH = 540
+                    let deskW = 2732, deskH = 2048
                     setenv("MADEIRA_EXE", "explorer.exe", 1)
                     setenv("MADEIRA_ARGS",
                            "/desktop=shell,\(deskW)x\(deskH) C:\\windows\\system32\\services.exe", 1)
