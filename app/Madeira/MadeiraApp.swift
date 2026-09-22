@@ -31,9 +31,10 @@ struct MadeiraApp: App {
 		// MadeiraViewController.shared.lockPointer()
 		GamepadBridge.shared.start()
 	}
+	@State private var isPresenting = true
     var body: some Scene {
         WindowGroup {
-			.fullScreenCover(MadeiraViewController())
+			.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
             // ContentView()
         }
     }
