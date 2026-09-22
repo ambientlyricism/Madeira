@@ -33,7 +33,8 @@ struct MadeiraApp: App {
 	}
     var body: some Scene {
 		WindowGroup {
-			PointerView()
+			// PointerView()
+			MadeiraViewController()
    		}
 	}
 }
