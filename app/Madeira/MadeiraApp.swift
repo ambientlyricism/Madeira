@@ -29,7 +29,7 @@ struct MadeiraApp: App {
 	    // }
     init() {
 		// MadeiraViewController.shared.lockPointer()
-		GamepadBridge.shared.start()
+		// GamepadBridge.shared.start()
 	}
     var body: some Scene {
 		WindowGroup {
