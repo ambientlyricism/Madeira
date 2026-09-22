@@ -57,25 +57,25 @@ struct MadeiraViewController: UIViewControllerRepresentable {
     // }
 }
 final class MetalViewController: UIViewController {
-		var MadeiraMetalView: MadeiraMetalView?
-		// var MetalHostingController: MetalHostingController?
-		static let shared = MetalViewController()
-		var shouldLockPointer: Bool = true
-		override var prefersPointerLocked: Bool {
-			return self.shouldLockPointer
-		}
-		func lockPointer() {
-			// MetalHostingController = MetalHostingController(ContentView())
-			// let MetalViewController = MetalHostingController.presentingViewController
-			MetalHostingController.shared.lockPointer()
-			self.shouldLockPointer = true
-			setNeedsUpdateOfPrefersPointerLocked()
-			MadeiraMetalView = Madeira.MadeiraMetalView()
-		}
-		override func viewDidLoad() {
-      		super.viewDidLoad()
-		}
+	var MadeiraMetalView: MadeiraMetalView?
+	// var MetalHostingController: MetalHostingController?
+	static let shared = MetalViewController()
+	var shouldLockPointer: Bool = true
+	override var prefersPointerLocked: Bool {
+		return self.shouldLockPointer
 	}
+	func lockPointer() {
+		// MetalHostingController = MetalHostingController(ContentView())
+		// let MetalViewController = MetalHostingController.presentingViewController
+		MetalHostingController.shared.lockPointer()
+		self.shouldLockPointer = true
+		setNeedsUpdateOfPrefersPointerLocked()
+		MadeiraMetalView = Madeira.MadeiraMetalView()
+	}
+	override func viewDidLoad() {
+     	super.viewDidLoad()
+	}
+}
 	
 final class MetalHostingController: UIHostingController<ContentView> {
 	var MadeiraMetalView: MadeiraMetalView?
