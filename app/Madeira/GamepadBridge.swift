@@ -133,7 +133,7 @@ final class GamepadBridge {
                }
                else {
                   winios_pointer(0, 0, 0x0010, 0)
-                  self.MouseCliCking = false
+                  self.MouseClicking = false
                }
             }
         }
