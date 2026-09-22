@@ -90,8 +90,8 @@ final class GamepadBridge {
     private static var MouseClicking = false
     
     func registerMouse(_ mouseDevice: GCMouse) {
-        MouseMoving = false
-        MouseClicking = false
+        GamepadBridge.MouseMoving = false
+        GamepadBridge.MouseClicking = false
         if #available(iOS 14.0, OSX 10.16, *) {
             guard let mouseInput = mouseDevice.mouseInput else {
                 return
@@ -101,7 +101,7 @@ final class GamepadBridge {
                 self.dx = self.dx+Int32(deltaX)
                 self.dy = self.dy-Int32(deltaY)
                 self.delta = CGPoint(x: CGFloat(deltaX), y: CGFloat(deltaY))
-                MouseMoving = true
+                GamepadBridge.MouseMoving = true
                 winios_pointer(self.dx, self.dy, 0x0001 | 0x8000, 0)
             }
             mouseInput.scroll.valueChangedHandler = {
@@ -110,7 +110,7 @@ final class GamepadBridge {
                 winios_pointer(0, 0, 0x0800, UInt32(bitPattern: Int32(scrollY)))
             }
             mouseInput.leftButton.valueChangedHandler = {
-                MouseClicking = true
+                GamepadBridge.MouseClicking = true
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
                if pressed {
                   winios_pointer(0, 0, 0x0002, 0)
@@ -120,7 +120,7 @@ final class GamepadBridge {
                }
             }
             mouseInput.rightButton?.valueChangedHandler = {
-               MouseClicking = true
+               GamepadBridge.MouseClicking = true
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
                if pressed {
                   winios_pointer(0, 0, 0x0008, 0)
@@ -138,7 +138,7 @@ final class GamepadBridge {
        return self.delta.y
     }
     func MouseActive() -> Bool {
-       return self.MouseMoving || self.MouseClicking
+       return GamepadBridge.MouseMoving || GamepadBridge.MouseClicking
     }
     
 }
