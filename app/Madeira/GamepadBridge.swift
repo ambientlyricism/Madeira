@@ -145,7 +145,8 @@ final class GamepadBridge {
        return self.delta.y
     }
     func MouseActive() -> Bool {
-       return self.MouseMoving || self.MouseClicking
+       // return self.MouseMoving || self.MouseClicking
+       return self.MouseClicking
     }
     
 }
