@@ -110,7 +110,7 @@ struct PointerView: View {
 }
 	
 final class MetalHostingController: UIHostingController<MadeiraMetalView> {
-	var MadeiraMetalView: MadeiraMetalView?
+	// var MadeiraMetalView: MadeiraMetalView?
 	var GamepadBridge: GamepadBridge?
 	static let shared = MetalHostingController(rootView: Madeira.MadeiraMetalView())
 	override var childViewControllerForPointerLock: UIViewController? { nil }
@@ -125,7 +125,7 @@ final class MetalHostingController: UIHostingController<MadeiraMetalView> {
 	}
 	override func viewDidLoad() {
       	super.viewDidLoad()
-		MadeiraMetalView = Madeira.MadeiraMetalView()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
 		GamepadBridge = Madeira.GamepadBridge()
 		
 	}
