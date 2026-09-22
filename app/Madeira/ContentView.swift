@@ -112,7 +112,7 @@ struct PointerView: View {
 final class MetalHostingController: UIHostingController<MadeiraMetalView> {
 	var MadeiraMetalView: MadeiraMetalView?
 	var GamepadBridge: GamepadBridge?
-	static let shared = MetalHostingController(rootView: MadeiraMetalView())
+	static let shared = MetalHostingController(rootView: Madeira.MadeiraMetalView())
 	override var childViewControllerForPointerLock: UIViewController? { nil }
 	var shouldLockPointer: Bool = true
 	override var prefersPointerLocked: Bool {
