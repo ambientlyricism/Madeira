@@ -34,7 +34,6 @@ import CoreHaptics
 final class GamepadBridge {
    static let shared = GamepadBridge()
    init() {
-      super.init()
       start()
    }
    func start() {
