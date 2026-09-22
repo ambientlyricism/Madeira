@@ -44,12 +44,12 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
 		myViewController.modalPresentationStyle = .fullScreen
-		myViewController.lockPointer()
+		// myViewController.lockPointer()
         return myViewController
     }
 
     func updateUIViewController(_ uiViewController: MetalViewController, context: Context) {
-		uiViewController.lockPointer()
+		// uiViewController.lockPointer()
 		// MetalHostingController.lockPointer()
             // left blank
     }
