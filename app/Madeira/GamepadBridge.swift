@@ -101,7 +101,12 @@ final class GamepadBridge {
                 self.dx = self.dx+Int32(deltaX)
                 self.dy = self.dy-Int32(deltaY)
                 self.delta = CGPoint(x: CGFloat(deltaX), y: CGFloat(deltaY))
-                self.MouseMoving = true
+                if deltaX != 0 || deltaY != 0 {
+                   self.MouseMoving = true
+                }
+                else {
+                   self.MouseMoving = false
+                }
                 winios_pointer(self.dx, self.dy, 0x0001 | 0x8000, 0)
             }
             mouseInput.scroll.valueChangedHandler = {
@@ -117,6 +122,7 @@ final class GamepadBridge {
                }
                else {
                   winios_pointer(0, 0, 0x0004, 0)
+                  self.MouseClicking = false
                }
             }
             mouseInput.rightButton?.valueChangedHandler = {
@@ -127,6 +133,7 @@ final class GamepadBridge {
                }
                else {
                   winios_pointer(0, 0, 0x0010, 0)
+                  self.MouseCliCking = false
                }
             }
         }
