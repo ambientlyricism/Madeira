@@ -34,7 +34,8 @@ struct MadeiraApp: App {
     var body: some Scene {
 		WindowGroup {
 			// PointerView()
-			MadeiraViewController()
+			// MadeiraViewController()
+			ContentView()
    		}
 	}
 }
