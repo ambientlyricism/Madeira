@@ -74,6 +74,13 @@ final class MetalViewController: UIViewController {
 	}
 	override func viewDidLoad() {
      	super.viewDidLoad()
+		let ContentView = ContentView()
+        let hostingController = UIHostingController(rootView: ContentView)
+        
+        addChild(hostingController)
+        hostingController.view.frame = view.bounds
+        view.addSubview(hostingController.view)
+        hostingController.didMove(toParent: self)
 	}
 }
 	
@@ -1105,7 +1112,7 @@ struct ContentView: View {
                     .frame(width: barW)
                 }
             }
-			MadeiraViewController()
+			// MadeiraViewController()
 		}
         .ignoresSafeArea()
         .background(Color.black)
