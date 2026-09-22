@@ -90,7 +90,7 @@ final class MetalViewController: UIViewController {
 		// hostingController.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
 		// hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         // hostingController.didMove(toParent: self)
-
+		GamepadBridge = GamepadBridge()
 		
 
 
