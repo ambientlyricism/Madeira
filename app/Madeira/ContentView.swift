@@ -24,6 +24,17 @@ import os.log
 
 /// Raw window-level host for the presenting CAMetalLayer.
 
+struct PointerView: View {
+	@State private var isPresenting = true
+	var body: some View {
+		GeometryReader { geo in
+			// MadeiraViewController()
+		}
+		.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
+   		// ContentView()
+	}
+}
+
 struct MadeiraViewController: UIViewControllerRepresentable {
         
     typealias UIViewControllerType = MetalViewController
@@ -94,20 +105,12 @@ final class MetalViewController: UIViewController {
 		hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = false
         hostingController.didMove(toParent: self)
 		// GamepadBridge = Madeira.GamepadBridge()
-		
-
-
 	}
-}
-struct PointerView: View {
-	@State private var isPresenting = true
-	var body: some View {
-		GeometryReader { geo in
-			// MadeiraViewController()
-		}
-		.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
-   		// ContentView()
-	}
+	var synchronize: (() -> Void)?
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        synchronize?()
+    }
 }
 	
 final class MetalHostingController: UIHostingController<MadeiraMetalView> {
