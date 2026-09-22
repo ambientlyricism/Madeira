@@ -56,10 +56,10 @@ final class GamepadBridge {
       guard let keyboard = notification.object as? GCKeyboard else {
          return
       }
-      keyboard.keyboardInput?.valueChangedHandler = {
+      keyboard.keyboardInput?.keyChangedHandler = {
             (_ button: GCDeviceButtonInput, _ value: Float, _ pressed: Bool) -> Void in
                if pressed {
-                  winios_post_key(button, down ? 1 : 0)
+                  winios_post_key(button, pressed ? 1 : 0)
                }
                else {
                   return
