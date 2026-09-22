@@ -58,7 +58,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
     // }
 }
 final class MetalViewController: UIViewController {
-	var MadeiraMetalView: MadeiraMetalView?
+	var MadeiraMetalView: MadeiraMetalView
 	// var MetalHostingController: MetalHostingController?
 	static let shared = MetalViewController()
 	var shouldLockPointer: Bool = true
