@@ -33,6 +33,10 @@ import CoreHaptics
 // }
 final class GamepadBridge {
    static let shared = GamepadBridge()
+   init() {
+      super.init()
+      start()
+   }
    func start() {
         if #available(iOS 14.0, OSX 10.16, *) {
             NotificationCenter.default.addObserver(self, selector: #selector(self.handleMouseDidConnect),
