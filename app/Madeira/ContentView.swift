@@ -77,7 +77,7 @@ final class MetalViewController: UIViewController {
 		let ContentView = ContentView()
         let hostingController = MetalHostingController(rootView: ContentView)
 		if #available(iOS 16.4, *) {
-   			hostingController.safeAreaRegions = []
+   			hostingController.safeAreaRegions = .all
 		}
         
         addChild(hostingController)
