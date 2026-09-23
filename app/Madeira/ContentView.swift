@@ -3,6 +3,7 @@ import UIKit
 import QuartzCore
 import Metal
 import os.log
+import Foundation
 // import Combine
 // import GameController
 
