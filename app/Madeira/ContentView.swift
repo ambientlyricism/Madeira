@@ -87,7 +87,7 @@ final class MetalUIViewController: UIViewController {
 		self.shouldLockPointer = true
 		setNeedsUpdateOfPrefersPointerLocked()
 		// MadeiraMetalView = Madeira.MadeiraMetalView()
-	// }
+	}
 	override func viewDidLoad() {
      	super.viewDidLoad()
 		// let ContentView = ContentView()
