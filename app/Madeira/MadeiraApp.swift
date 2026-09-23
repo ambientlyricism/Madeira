@@ -62,7 +62,7 @@ class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject { // Make
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         self.window = (scene as? UIWindowScene)?.keyWindow
-		self.window?.rootViewController = MetalUIViewController
+		self.window?.rootViewController = UIViewController
     }
 }
 /*:
