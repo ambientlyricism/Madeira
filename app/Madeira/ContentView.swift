@@ -1155,8 +1155,8 @@ struct ContentView: View {
                     .onReceive(NotificationCenter.default.publisher(
                         for: UIDevice.orientationDidChangeNotification)) { _ in
                         TouchControlsHost.attach()
-				.frame(maxWidth: .infinity)
-				.frame(maxHeight: .infinity)
+				// .frame(maxWidth: .infinity)
+				// .frame(maxHeight: .infinity)
             }
 			// MadeiraViewController()
 		}
