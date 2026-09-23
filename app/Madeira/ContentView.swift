@@ -48,6 +48,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
     //	self.parent = parent
 	// }
 	// var PointerLockNotice: PointerLockNotice
+	/*:
 	class Coordinator: NSObject, MetalUIViewControllerDelegate {
         var parent: MadeiraUIViewController
 
@@ -58,9 +59,10 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 	func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
+	*/
     func makeUIViewController(context: Context) -> MetalUIViewController  {
         let myViewController = MetalUIViewController()
-        myViewController.delegate = context.coordinator
+        // myViewController.delegate = context.coordinator
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
 		// let label = UILabel()
@@ -86,11 +88,11 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
     //    return Coordinator(self)
     // }
 }
-protocol MetalUIViewControllerDelegate {
-    func runMetalUI(identifier: String)
-}
+// protocol MetalUIViewControllerDelegate {
+//    func runMetalUI(identifier: String)
+// }
 final class MetalUIViewController: UIViewController {
-	public var delegate: MetalUIViewControllerDelegate?
+	// public var delegate: MetalUIViewControllerDelegate?
 	var MetalBackedView: MetalBackedView?
 	static let shared = MetalUIViewController()
 	var shouldLockPointer: Bool = true
