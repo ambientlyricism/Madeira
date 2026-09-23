@@ -48,7 +48,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
     //	self.parent = parent
 	// }
 	// var PointerLockNotice: PointerLockNotice
-	class Coordinator: NSObject, MetalUIViewControllerDelegate {
+	class Coordinator: NSObject, UIViewControllerDelegate {
         var parent: MadeiraUIViewController
 
         init(_ parent: MadeiraUIViewController) {
@@ -87,7 +87,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
     // }
 }
 final class MetalUIViewController: UIViewController {
-	public var delegate: MetalUIViewControllerDelegate?
+	public var delegate: UIViewControllerDelegate?
 	var MetalBackedView: MetalBackedView?
 	static let shared = MetalUIViewController()
 	var shouldLockPointer: Bool = true
