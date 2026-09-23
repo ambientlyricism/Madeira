@@ -1153,12 +1153,11 @@ struct ContentView: View {
 				// .frame(maxWidth: .infinity)
 				// .frame(maxHeight: .infinity)
             }
-			.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
+			MadeiraViewController()
                 .onAppear { TouchControlsHost.attach() }
                 .onReceive(NotificationCenter.default.publisher(
                     for: UIDevice.orientationDidChangeNotification)) { _ in
                     TouchControlsHost.attach()
-			// MadeiraViewController()
 		}
         .ignoresSafeArea()
 		.statusBarHidden()
