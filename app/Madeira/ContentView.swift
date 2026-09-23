@@ -48,8 +48,19 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
     //	self.parent = parent
 	// }
 	// var PointerLockNotice: PointerLockNotice
+	class Coordinator: NSObject, MetalUIViewControllerDelegate {
+        var parent: MadeiraUIViewController
+
+        init(_ parent: MadeiraUIViewController) {
+            self.parent = parent
+        }
+    }
+	func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
     func makeUIViewController(context: Context) -> MetalUIViewController  {
         let myViewController = MetalUIViewController()
+        myViewController.delegate = context.coordinator
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
 		// let label = UILabel()
