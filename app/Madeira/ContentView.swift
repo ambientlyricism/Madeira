@@ -1140,9 +1140,9 @@ struct ContentView: View {
             let barW = max((geo.size.width - gameW) / 2.0, 44)
         	ZStack {
                 Color.black
-				//MadeiraMetalView()
+				MadeiraMetalView()
 				//.fullScreenCover(isPresented: $isPresenting, content: { MadeiraMetalView() })
-				MadeiraViewController()
+				// MadeiraViewController()
             	    .onAppear { TouchControlsHost.attach() }
             		.onReceive(NotificationCenter.default.publisher(
                     	for: UIDevice.orientationDidChangeNotification)) { _ in
