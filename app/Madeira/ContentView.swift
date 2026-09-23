@@ -93,23 +93,23 @@ final class MetalUIViewController: UIViewController {
 		// let ContentView = ContentView()
 		let MetalBackedView = Madeira.MetalBackedView()
         // let hostingController = MetalHostingController(rootView: Madeira.MadeiraMetalView())
-		if #available(iOS 16.4, *) {
+		// if #available(iOS 16.4, *) {
 			// hostingController._disableSafeArea = true
    			// hostingController.safeAreaRegions = .all
-			MetalBackedView.safeAreaRegions = SafeAreaRegions()
-		}
+		//	MetalBackedView.safeAreaRegions = SafeAreaRegions()
+		// }
 		self.modalPresentationStyle = .fullScreen
 		self.navigationController?.isNavigationBarHidden = true
 		
-        addChild(MetalBackedView)
-        view.addSubview(MetalBackedView.view)
-		MetalBackedView.view.translatesAutoresizingMaskIntoConstraints = false
-		MetalBackedView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-		MetalBackedView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-		MetalBackedView.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-		MetalBackedView.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-		MetalBackedView.view.frame = view.bounds
-        MetalBackedView.didMove(toParent: self)
+        // addChild(MetalBackedView)
+        self.view.addSubview(MetalBackedView)
+		MetalBackedView.translatesAutoresizingMaskIntoConstraints = false
+		MetalBackedView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+		MetalBackedView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+		MetalBackedView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+		MetalBackedView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+		// MetalBackedView.frame = view.bounds
+        // MetalBackedView.didMove(toParent: self)
 		// GamepadBridge = Madeira.GamepadBridge()
 		lockPointer()
 	}
