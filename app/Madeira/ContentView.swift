@@ -55,6 +55,7 @@ struct MadeiraViewController: UIViewControllerRepresentable {
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
 		myViewController.modalPresentationStyle = .fullScreen
+		// self.present(myViewController, animated: true)
 		MetalHostingController.shared.lockPointer()
 		myViewController.lockPointer()
         return myViewController
@@ -1126,8 +1127,8 @@ struct ContentView: View {
 	@State private var isPresenting = true
     private var landscapeBody: some View {
         // GeometryReader { geo in
-            let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
-            let barW = max((geo.size.width - gameW) / 2.0, 44)
+        //    let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
+        //    let barW = max((geo.size.width - gameW) / 2.0, 44)
             // ZStack {
                 //Color.black
 				//MadeiraViewController()
@@ -1142,14 +1143,14 @@ struct ContentView: View {
                 // The FPS readout stays, pinned in the right pillarbox bar —
                 // the window-level surface covers anything drawn over the
                 // game area itself, so it cannot ride on the game view.
-                HStack(spacing: 0) {
-                    Spacer(minLength: 0)
-                    VStack {
-                        FPSOverlay(compact: true)
-                        Spacer()
-                    }
-                    .frame(width: barW)
-                }
+                // HStack(spacing: 0) {
+                //    Spacer(minLength: 0)
+                //    VStack {
+                //        FPSOverlay(compact: true)
+                //        Spacer()
+                //    }
+                //    .frame(width: barW)
+                // }
 				// .frame(maxWidth: .infinity)
 				// .frame(maxHeight: .infinity)
             // }
@@ -1158,7 +1159,7 @@ struct ContentView: View {
                 .onReceive(NotificationCenter.default.publisher(
                     for: UIDevice.orientationDidChangeNotification)) { _ in
                     TouchControlsHost.attach()
-		}
+				}
         .ignoresSafeArea()
 		.statusBarHidden()
         .background(Color.black)
