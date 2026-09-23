@@ -89,9 +89,9 @@ final class MetalViewController: UIViewController {
 	// }
 	override func viewDidLoad() {
      	super.viewDidLoad()
-		// let ContentView = ContentView()
-		let MadeiraMetalView = Madeira.MadeiraMetalView()
-        let hostingController = MetalHostingController(rootView: MadeiraMetalView)
+		let ContentView = ContentView()
+		// let MadeiraMetalView = Madeira.MadeiraMetalView()
+        let hostingController = MetalHostingController(rootView: ContentView)
 		if #available(iOS 16.4, *) {
 			// hostingController._disableSafeArea = true
    			// hostingController.safeAreaRegions = .all
@@ -118,10 +118,10 @@ final class MetalViewController: UIViewController {
     }
 }
 	
-final class MetalHostingController: UIHostingController<MadeiraMetalView> {
+final class MetalHostingController: UIHostingController<ContentView> {
 	// var MadeiraMetalView: MadeiraMetalView?
 	var GamepadBridge: GamepadBridge?
-	static let shared = MetalHostingController(rootView: Madeira.MadeiraMetalView())
+	static let shared = MetalHostingController(rootView: ContentView())
 	override var childViewControllerForPointerLock: UIViewController? { nil }
 	var shouldLockPointer: Bool = true
 	override var prefersPointerLocked: Bool {
