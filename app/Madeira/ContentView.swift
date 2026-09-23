@@ -110,6 +110,7 @@ final class MetalUIViewController: UIViewController {
         // MetalBackedView.didMove(toParent: self)
 		// GamepadBridge = Madeira.GamepadBridge()
 		lockPointer()
+		/*:
 		let window: UIWindow
 		let mainView: UIView
 		private init(window: UIWindow, mainView: UIView) throws {
@@ -129,10 +130,14 @@ final class MetalUIViewController: UIViewController {
 			label.text = lockState
 			label.textColor = UIColor.red
 		}
+		*/
 	}
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         lockPointer()
+		if let parent = parent {
+			parent.setChildViewControllerForPointerLock(self)
+		}
     }
 }
 
