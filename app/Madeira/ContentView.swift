@@ -3,8 +3,8 @@ import UIKit
 import QuartzCore
 import Metal
 import os.log
-import Combine
-import GameController
+// import Combine
+// import GameController
 
 // 2026-07-03 window-hosted Metal layer.
 //
@@ -25,7 +25,7 @@ import GameController
 // SwiftUI hierarchy (and thus to the placeholder's touch handlers).
 
 /// Raw window-level host for the presenting CAMetalLayer.
-
+/*:
 struct PointerView: View {
 	@State private var isPresenting = true
 	var body: some View {
@@ -36,7 +36,7 @@ struct PointerView: View {
    		// ContentView()
 	}
 }
-
+*/
 struct MadeiraUIViewController: UIViewControllerRepresentable {
         
     typealias UIViewControllerType = MetalUIViewController
@@ -73,7 +73,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
     // }
 }
 final class MetalUIViewController: UIViewController {
-	var MetalBackedView: MetalBackedView?
+	var MetalBackedView: MetalBackedView!
 	static let shared = MetalUIViewController()
 	var shouldLockPointer: Bool = true
 	// var GamepadBridge: GamepadBridge?
