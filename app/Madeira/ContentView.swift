@@ -39,7 +39,7 @@ struct PointerView: View {
 }
 */
 // public var currentLock: String = "Initiating"
-struct MadeiraUIViewController: UIViewControllerRepresentable, UIWindow {
+struct MadeiraUIViewController: UIViewControllerRepresentable {
         
     typealias UIViewControllerType = MetalUIViewController
 	// var parent: MadeiraViewController
@@ -157,6 +157,10 @@ final class MetalUIViewController: UIViewController {
 	}
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        lockPointer()
+    }
+	override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         lockPointer()
     }
 }
