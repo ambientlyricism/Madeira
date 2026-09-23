@@ -73,7 +73,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
     // }
 }
 final class MetalUIViewController: UIViewController {
-	var MetalBackedView: MetalBackedView!
+	var MetalBackedView: MetalBackedView?
 	static let shared = MetalUIViewController()
 	var shouldLockPointer: Bool = true
 	// var GamepadBridge: GamepadBridge?
@@ -91,7 +91,7 @@ final class MetalUIViewController: UIViewController {
 	override func viewDidLoad() {
      	super.viewDidLoad()
 		// let ContentView = ContentView()
-		let MetalBackedView = MetalBackedView()
+		let MetalBackedView = Madeira.MetalBackedView()
         // let hostingController = MetalHostingController(rootView: Madeira.MadeiraMetalView())
 		if #available(iOS 16.4, *) {
 			// hostingController._disableSafeArea = true
