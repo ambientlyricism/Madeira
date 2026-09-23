@@ -87,6 +87,15 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
     // }
 }
 final class MetalUIViewController: UIViewController {
+	@interface mergeConfig {
+    	id delegate;
+	}
+	@property (nonatomic, assign) id delegate;        
+	@end
+
+	@implementation mergeConfig
+	@synthesize delegate;
+	@end
 	var MetalBackedView: MetalBackedView?
 	static let shared = MetalUIViewController()
 	var shouldLockPointer: Bool = true
