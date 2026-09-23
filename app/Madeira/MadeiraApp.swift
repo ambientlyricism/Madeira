@@ -40,6 +40,6 @@ struct MadeiraApp: App {
 			// .fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
    		}
 		.ignoresSafeArea()
-        .background(Color.black)
+        // .background(Color.black)
 	}
 }
