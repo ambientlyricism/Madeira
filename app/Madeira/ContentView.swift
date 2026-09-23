@@ -142,17 +142,17 @@ final class MetalUIViewController: UIViewController {
         lockPointer()
     }
 }
-public var currentLock String: = "Initiating"
+public var currentLock: String = "Initiating"
 final class PointerLockNotice: UIWindow {
-	let shared = PointerLockNotice()
+	let shared = PointerLockNotice(init(coder:))
 	// let window: UIWindow
 	// let mainView: UIView
 	var observer: Any?
 	required init?(coder: NSCoder) { fatalError() }
 	func status() {
 	// NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedNotification(notification:)), name: Notification.Name("NotificationIdentifier"), object: nil)
-		if let pointerLockState = window.windowScene?.pointerLockState {
-    		observer = notificationCenter.addObserver(forName: UIPointerLockState.didChangeNotification,
+		if let pointerLockState = window?.windowScene?.pointerLockState {
+    		observer = NotificationCenter.default.addObserver(forName: UIPointerLockState.didChangeNotification,
               	                                     		object: pointerLockState,
               	                                     		queue: OperationQueue.main) { (note) in
        		guard let lockState = note.object as? UIPointerLockState else { return }
