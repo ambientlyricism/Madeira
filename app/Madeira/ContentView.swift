@@ -38,6 +38,24 @@ struct PointerView: View {
 	}
 }
 */
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        let configuration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        configuration.delegateClass = SceneDelegate.self
+        return configuration
+    }
+}
+
+class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject { // Make SceneDelegate conform ObservableObject
+    var window: UIWindow?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        self.window = (scene as? UIWindowScene)?.keyWindow
+    }
+}
+
+
 struct MadeiraUIViewController: UIViewControllerRepresentable {
         
     typealias UIViewControllerType = MetalUIViewController
@@ -46,13 +64,13 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 	// init(_ parent: MadeiraViewController) {
     //	self.parent = parent
 	// }
-	var PointerLockNotice: PointerLockNotice
+	// var PointerLockNotice: PointerLockNotice
     func makeUIViewController(context: Context) -> MetalUIViewController  {
         let myViewController = MetalUIViewController()
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
 		let label = UILabel()
-		let PointerLockNotice = PointerLockNotice.shared.status()
+		// let PointerLockNotice = PointerLockNotice.shared.status()
 		label.text = currentLock
 		label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
