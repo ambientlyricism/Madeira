@@ -62,23 +62,13 @@ struct MadeiraUIViewController: UIViewControllerRepresentable, UIWindow {
 	*/
     func makeUIViewController(context: Context) -> MetalUIViewController  {
         let myViewController = MetalUIViewController()
-		var observer: Any?
-		if let pointerLockState = window?.windowScene?.pointerLockState {
-    		observer = NotificationCenter.default.addObserver(forName: UIPointerLockState.didChangeNotification,
-              	                                     		object: pointerLockState,
-              	                                     		queue: OperationQueue.main) { (note) in
-       		guard let lockState = note.object as? UIPointerLockState else { return }
-			currentLock = String(lockState.isLocked)
-   			}
-		}
-		else { currentLock = "Not Found" }
         // myViewController.delegate = context.coordinator
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
-		let label = UILabel()
+		// let label = UILabel()
 		// let PointerLockNotice = PointerLockNotice.shared.status()
-		label.text = currentLock
-		label.textColor = UIColor.red
+		// label.text = currentLock
+		// label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
