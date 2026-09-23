@@ -74,7 +74,7 @@ final class MetalUIViewController: UIViewController {
 	var MetalBackedView: MetalBackedView?
 	static let shared = MetalUIViewController()
 	var shouldLockPointer: Bool = true
-	// var GamepadBridge: GamepadBridge?
+	var GamepadBridge: GamepadBridge?
 	override var childViewControllerForPointerLock: UIViewController? { nil }
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
@@ -109,7 +109,7 @@ final class MetalUIViewController: UIViewController {
 		MetalBackedView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
 		// MetalBackedView.frame = view.bounds
         // MetalBackedView.didMove(toParent: self)
-		// GamepadBridge = Madeira.GamepadBridge()
+		GamepadBridge = Madeira.GamepadBridge()
 		lockPointer()
 		/*:
 		let window: UIWindow
