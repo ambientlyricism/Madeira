@@ -93,8 +93,9 @@ final class MetalViewController: UIViewController {
 		let MadeiraMetalView = Madeira.MadeiraMetalView()
         let hostingController = MetalHostingController(rootView: MadeiraMetalView)
 		if #available(iOS 16.4, *) {
-			hostingController._disableSafeArea = true
-   			hostingController.safeAreaRegions = .all
+			// hostingController._disableSafeArea = true
+   			// hostingController.safeAreaRegions = .all
+			hostingController.safeAreaRegions = SafeAreaRegions()
 		}
 		self.modalPresentationStyle = .fullScreen
 		self.navigationController?.isNavigationBarHidden = true
@@ -137,8 +138,9 @@ final class MetalHostingController: UIHostingController<MadeiraMetalView> {
 		// MadeiraMetalView = Madeira.MadeiraMetalView()
 		GamepadBridge = Madeira.GamepadBridge()
 		if #available(iOS 16.4, *) {
-			self._disableSafeArea = true
-   			self.safeAreaRegions = .all
+			// self._disableSafeArea = true
+   			// self.safeAreaRegions = .all
+			self.safeAreaRegions = SafeAreaRegions()
 		}
 		self.modalPresentationStyle = .fullScreen
 		self.navigationController?.isNavigationBarHidden = true
