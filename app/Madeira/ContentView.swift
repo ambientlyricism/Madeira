@@ -1150,14 +1150,14 @@ struct ContentView: View {
                     }
                     .frame(width: barW)
                 }
-				.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
-                    .onAppear { TouchControlsHost.attach() }
-                    .onReceive(NotificationCenter.default.publisher(
-                        for: UIDevice.orientationDidChangeNotification)) { _ in
-                        TouchControlsHost.attach()
 				// .frame(maxWidth: .infinity)
 				// .frame(maxHeight: .infinity)
             }
+			.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
+                .onAppear { TouchControlsHost.attach() }
+                .onReceive(NotificationCenter.default.publisher(
+                    for: UIDevice.orientationDidChangeNotification)) { _ in
+                    TouchControlsHost.attach()
 			// MadeiraViewController()
 		}
         .ignoresSafeArea()
