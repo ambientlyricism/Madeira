@@ -22,16 +22,16 @@ import SwiftUI
 // }
     
 struct MadeiraApp: App {
-		var GamepadBridge: GamepadBridge?
+		// var GamepadBridge: GamepadBridge?
 		// GamepadBridge()
         // required init?(coder: NSCoder) {
 		//   fatalError("init(coder:) has not been implemented")
 	    // }
-    init() {
+    // init() {
 		// MadeiraViewController.shared.lockPointer()
 		// GamepadBridge.shared.start()
-		GamepadBridge = Madeira.GamepadBridge()
-	}
+		// GamepadBridge = Madeira.GamepadBridge()
+	// }
 	// @State private var isPresenting = true
     var body: some Scene {
 		WindowGroup {
