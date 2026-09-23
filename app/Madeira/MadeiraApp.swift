@@ -73,14 +73,4 @@ struct YourView: View {
         sceneDelegate.window?.windowScene
     }
 }
-var observer: Any?
-		if let pointerLockState = window?.windowScene?.pointerLockState {
-    		observer = NotificationCenter.default.addObserver(forName: UIPointerLockState.didChangeNotification,
-              	                                     		object: pointerLockState,
-              	                                     		queue: OperationQueue.main) { (note) in
-       		guard let lockState = note.object as? UIPointerLockState else { return }
-			currentLock = String(lockState.isLocked)
-   			}
-		}
-		else { currentLock = "Not Found" }
 */
