@@ -74,7 +74,7 @@ final class MetalViewController: UIViewController {
 	// var MadeiraMetalView: MadeiraMetalView?
 	// var MetalHostingController: MetalHostingController?
 	static let shared = MetalViewController()
-	var shouldLockPointer: Bool = true
+	var shouldLockPointer: Bool = false
 	var GamepadBridge: GamepadBridge?
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
@@ -124,7 +124,7 @@ final class MetalHostingController: UIHostingController<MadeiraMetalView> {
 	var GamepadBridge: GamepadBridge?
 	static let shared = MetalHostingController(rootView: Madeira.MadeiraMetalView())
 	// override var childViewControllerForPointerLock: UIViewController? { nil }
-	var shouldLockPointer: Bool = true
+	var shouldLockPointer: Bool = false
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
 	}
