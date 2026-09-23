@@ -100,11 +100,11 @@ final class MetalViewController: UIViewController {
         addChild(hostingController)
         hostingController.view.frame = view.bounds
         view.addSubview(hostingController.view)
-		hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-		hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-		hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-		hostingController.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-		hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+		// hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+		// hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+		// hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+		// hostingController.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+		// hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         hostingController.didMove(toParent: self)
 		// GamepadBridge = Madeira.GamepadBridge()
 		lockPointer()
@@ -1126,40 +1126,35 @@ struct ContentView: View {
     /// anything drawn over the game area itself. No header/log/nav chrome.
 	@State private var isPresenting = true
     private var landscapeBody: some View {
-        // GeometryReader { geo in
-        //    let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
-        //    let barW = max((geo.size.width - gameW) / 2.0, 44)
-            // ZStack {
-                //Color.black
-				//MadeiraViewController()
+        GeometryReader { geo in
+            let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
+            let barW = max((geo.size.width - gameW) / 2.0, 44)
+        	ZStack {
+                Color.black
 				//MadeiraMetalView()
-				// .fullScreenCover(isPresented: $isPresenting, content: { MadeiraMetalView() })
-                //    .onAppear { TouchControlsHost.attach() }
-                //    .onReceive(NotificationCenter.default.publisher(
-                //        for: UIDevice.orientationDidChangeNotification)) { _ in
-                //        TouchControlsHost.attach()
-                //    }
+				//.fullScreenCover(isPresented: $isPresenting, content: { MadeiraMetalView() })
+				MadeiraViewController()
+            	    .onAppear { TouchControlsHost.attach() }
+            		.onReceive(NotificationCenter.default.publisher(
+                    	for: UIDevice.orientationDidChangeNotification)) { _ in
+                		TouchControlsHost.attach()
+                    }
                 // Controls removed for now (ml586): game-only landscape.
                 // The FPS readout stays, pinned in the right pillarbox bar —
                 // the window-level surface covers anything drawn over the
                 // game area itself, so it cannot ride on the game view.
-                // HStack(spacing: 0) {
-                //    Spacer(minLength: 0)
-                //    VStack {
-                //        FPSOverlay(compact: true)
-                //        Spacer()
-                //    }
-                //    .frame(width: barW)
-                // }
+                HStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack {
+                        FPSOverlay(compact: true)
+                        Spacer()
+                    }
+                    .frame(width: barW)
+                }
 				// .frame(maxWidth: .infinity)
 				// .frame(maxHeight: .infinity)
-            // }
-			MadeiraViewController()
-                .onAppear { TouchControlsHost.attach() }
-                .onReceive(NotificationCenter.default.publisher(
-                    for: UIDevice.orientationDidChangeNotification)) { _ in
-                    TouchControlsHost.attach()
-				}
+            }
+		}
         .ignoresSafeArea()
 		.statusBarHidden()
         .background(Color.black)
