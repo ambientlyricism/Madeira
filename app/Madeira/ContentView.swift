@@ -1151,9 +1151,9 @@ struct ContentView: View {
                     }
                     .frame(width: barW)
                 }
-				// .frame(maxWidth: .infinity)
-				// .frame(maxHeight: .infinity)
             }
+			.frame(maxWidth: .infinity)
+			.frame(maxHeight: .infinity)
 		}
         .ignoresSafeArea()
 		.statusBarHidden()
