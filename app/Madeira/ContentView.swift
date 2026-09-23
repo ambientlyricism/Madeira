@@ -145,8 +145,8 @@ final class MetalUIViewController: UIViewController {
 public var currentLock String: = "Initiating"
 final class PointerLockNotice: UIWindow {
 	let shared = PointerLockNotice()
-	let window: UIWindow
-	let mainView: UIView
+	// let window: UIWindow
+	// let mainView: UIView
 	var observer: Any?
 	required init?(coder: NSCoder) { fatalError() }
 	func status() {
