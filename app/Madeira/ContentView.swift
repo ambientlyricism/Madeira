@@ -124,12 +124,13 @@ final class MetalHostingController: UIHostingController<ContentView> {
 	static let shared = MetalHostingController(rootView: ContentView())
 	override var childViewControllerForPointerLock: UIViewController? { nil }
 	var shouldLockPointer: Bool = true
+	private var observers: [NSObjectProtocol] = []
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
 	}
 	func lockPointer() {
 		self.shouldLockPointer = true
-		self.setNeedsUpdateOfPrefersPointerLocked()
+		setNeedsUpdateOfPrefersPointerLocked()
 		// MadeiraMetalView = Madeira.MadeiraMetalView()
 	}
 	override func viewDidLoad() {
@@ -143,7 +144,14 @@ final class MetalHostingController: UIHostingController<ContentView> {
 		}
 		self.modalPresentationStyle = .fullScreen
 		self.navigationController?.isNavigationBarHidden = true
-		lockPointer()
+		for name in [Notification.Name.GCMouseDidConnect, .GCMouseDidDisconnect,
+                     UIApplication.didBecomeActiveNotification, UIApplication.willResignActiveNotification,
+                     UIAccessibility.assistiveTouchStatusDidChangeNotification,
+                     UIPointerLockState.didChangeNotification] {
+             observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+             	MainActor.assumeIsolated { self?.lockPointer() }
+             })
+         }
 		
 	}
 	override func viewDidAppear(_ animated: Bool) {
