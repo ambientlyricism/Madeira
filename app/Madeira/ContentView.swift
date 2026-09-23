@@ -1150,7 +1150,7 @@ struct ContentView: View {
                     }
                     .frame(width: barW)
                 }
-				.fullScreenCover(isPresented: $isPresenting, content: { MadeiraMetalView() })
+				.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
                     .onAppear { TouchControlsHost.attach() }
                     .onReceive(NotificationCenter.default.publisher(
                         for: UIDevice.orientationDidChangeNotification)) { _ in
