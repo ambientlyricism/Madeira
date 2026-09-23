@@ -63,7 +63,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
         return myViewController
     }
 
-    func updateUIViewController(_ uiViewController: MetalViewController, context: Context) {
+    func updateUIViewController(_ uiViewController: MetalUIViewController, context: Context) {
 		// MetalHostingController.shared.lockPointer()
 		// uiViewController.lockPointer()
             // left blank
