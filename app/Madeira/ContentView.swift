@@ -48,7 +48,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
     //	self.parent = parent
 	// }
 	// var PointerLockNotice: PointerLockNotice
-	class Coordinator: NSObject, UIMetalViewControllerDelegate {
+	class Coordinator: NSObject, MetalUIViewControllerDelegate {
         var parent: MadeiraUIViewController
 
         init(_ parent: MadeiraUIViewController) {
