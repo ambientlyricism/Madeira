@@ -36,10 +36,10 @@ struct MadeiraApp: App {
 		WindowGroup {
 			// PointerView()
 			MadeiraViewController()
+				.ignoresSafeArea()
 			// ContentView()
 			// .fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
    		}
-		.ignoresSafeArea()
         // .background(Color.black)
 	}
 }
