@@ -143,6 +143,7 @@ final class MetalUIViewController: UIViewController {
         lockPointer()
     }
 }
+/*:
 public var currentLock: String = "Initiating"
 final class PointerLockNotice: UIWindow {
 	let shared = PointerLockNotice(frame: CGRect(x: 0, y: 0, width: 800, height: 600))
@@ -167,7 +168,7 @@ final class PointerLockNotice: UIWindow {
 		else { currentLock = "Not Found" }
 	}
 }
-
+*/
 /*:	
 struct MadeiraViewController: UIViewControllerRepresentable {
         
