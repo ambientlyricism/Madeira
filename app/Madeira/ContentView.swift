@@ -74,19 +74,19 @@ final class MetalViewController: UIViewController {
 	// var MadeiraMetalView: MadeiraMetalView?
 	// var MetalHostingController: MetalHostingController?
 	static let shared = MetalViewController()
-	var shouldLockPointer: Bool = true
+	// var shouldLockPointer: Bool = true
 	var GamepadBridge: GamepadBridge?
-	override var prefersPointerLocked: Bool {
-		return self.shouldLockPointer
-	}
-	func lockPointer() {
+	// override var prefersPointerLocked: Bool {
+	//	return self.shouldLockPointer
+	// }
+	// func lockPointer() {
 		// MetalHostingController = MetalHostingController(ContentView())
 		// let MetalViewController = MetalHostingController.presentingViewController
-		MetalHostingController.shared.lockPointer()
-		self.shouldLockPointer = true
-		self.setNeedsUpdateOfPrefersPointerLocked()
+		// MetalHostingController.shared.lockPointer()
+		// self.shouldLockPointer = true
+		// self.setNeedsUpdateOfPrefersPointerLocked()
 		// MadeiraMetalView = Madeira.MadeiraMetalView()
-	}
+	// }
 	override func viewDidLoad() {
      	super.viewDidLoad()
 		// let ContentView = ContentView()
@@ -109,12 +109,12 @@ final class MetalViewController: UIViewController {
 		hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
 		hostingController.view.frame = view.bounds
         hostingController.didMove(toParent: self)
-		GamepadBridge = Madeira.GamepadBridge()
-		lockPointer()
+		// GamepadBridge = Madeira.GamepadBridge()
+		// lockPointer()
 	}
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        lockPointer()
+        // lockPointer()
     }
 }
 	
@@ -122,7 +122,7 @@ final class MetalHostingController: UIHostingController<MadeiraMetalView> {
 	// var MadeiraMetalView: MadeiraMetalView?
 	var GamepadBridge: GamepadBridge?
 	static let shared = MetalHostingController(rootView: Madeira.MadeiraMetalView())
-	// override var childViewControllerForPointerLock: UIViewController? { nil }
+	override var childViewControllerForPointerLock: UIViewController? { nil }
 	var shouldLockPointer: Bool = true
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
