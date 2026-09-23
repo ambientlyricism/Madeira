@@ -1130,13 +1130,13 @@ struct ContentView: View {
             let barW = max((geo.size.width - gameW) / 2.0, 44)
             ZStack {
                 Color.black
-				MadeiraViewController()
+				//MadeiraViewController()
 				//MadeiraMetalView()
 				// .fullScreenCover(isPresented: $isPresenting, content: { MadeiraMetalView() })
-                    .onAppear { TouchControlsHost.attach() }
-                    .onReceive(NotificationCenter.default.publisher(
-                        for: UIDevice.orientationDidChangeNotification)) { _ in
-                        TouchControlsHost.attach()
+                //    .onAppear { TouchControlsHost.attach() }
+                //    .onReceive(NotificationCenter.default.publisher(
+                //        for: UIDevice.orientationDidChangeNotification)) { _ in
+                //        TouchControlsHost.attach()
                     }
                 // Controls removed for now (ml586): game-only landscape.
                 // The FPS readout stays, pinned in the right pillarbox bar —
@@ -1150,6 +1150,11 @@ struct ContentView: View {
                     }
                     .frame(width: barW)
                 }
+				.fullScreenCover(isPresented: $isPresenting, content: { MadeiraMetalView() })
+                    .onAppear { TouchControlsHost.attach() }
+                    .onReceive(NotificationCenter.default.publisher(
+                        for: UIDevice.orientationDidChangeNotification)) { _ in
+                        TouchControlsHost.attach()
 				.frame(maxWidth: .infinity)
 				.frame(maxHeight: .infinity)
             }
