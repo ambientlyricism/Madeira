@@ -36,10 +36,14 @@ struct MadeiraApp: App {
     var body: some Scene {
 		WindowGroup {
 			// PointerView()
-			// MadeiraViewController()
-				// .ignoresSafeArea()
-			ContentView()
+			if DisplaySettings.shared.immersive {
+				MadeiraViewController()
+					.ignoresSafeArea()
+			}
+			else{
+				ContentView()
 			// .fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
+			}
    		}
         // .background(Color.black)
 	}
