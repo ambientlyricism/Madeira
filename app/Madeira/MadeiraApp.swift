@@ -31,6 +31,7 @@ struct MadeiraApp: App {
 		// MadeiraViewController.shared.lockPointer()
 		// GamepadBridge.shared.start()
 	}
+	@State private var isPresenting = true
     var body: some Scene {
 		WindowGroup {
 			// PointerView()
