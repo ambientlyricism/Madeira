@@ -1145,8 +1145,8 @@ struct ContentView: View {
                     	for: UIDevice.orientationDidChangeNotification)) { _ in
                 		TouchControlsHost.attach()
                     }
-					.ignoresSafeArea()
-					.statusBarHidden()
+					// .ignoresSafeArea()
+					// .statusBarHidden()
                 // Controls removed for now (ml586): game-only landscape.
                 // The FPS readout stays, pinned in the right pillarbox bar —
                 // the window-level surface covers anything drawn over the
@@ -1160,11 +1160,11 @@ struct ContentView: View {
                     .frame(width: barW)
                 }
             }
-			.frame(maxWidth: .infinity)
-			.frame(maxHeight: .infinity)
+			// .frame(maxWidth: .infinity)
+			// .frame(maxHeight: .infinity)
 		}
         .ignoresSafeArea()
-		.statusBarHidden()
+		// .statusBarHidden()
         .background(Color.black)
 		// .background(MadeiraViewController())
 		//.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
@@ -1612,7 +1612,7 @@ struct ContentView: View {
                     // Known risk: if shellwindows_init beats services.exe's
                     // RPC_Init, OpenSCManager fails → watch whether that
                     // fails fast or hits the RaiseException→CS wedge again.
-                    let deskW = 1366, deskH = 1024
+                    let deskW = 2732, deskH = 2048
                     setenv("MADEIRA_EXE", "explorer.exe", 1)
                     setenv("MADEIRA_ARGS",
                            "/desktop=shell,\(deskW)x\(deskH) C:\\windows\\system32\\services.exe", 1)
