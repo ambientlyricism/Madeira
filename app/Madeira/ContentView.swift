@@ -109,7 +109,7 @@ final class MetalViewController: UIViewController {
 		hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
 		hostingController.view.frame = view.bounds
         hostingController.didMove(toParent: self)
-		// GamepadBridge = Madeira.GamepadBridge()
+		GamepadBridge = Madeira.GamepadBridge()
 		lockPointer()
 	}
     override func viewDidAppear(_ animated: Bool) {
