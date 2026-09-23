@@ -144,10 +144,13 @@ final class MetalUIViewController: UIViewController {
 }
 public var currentLock: String = "Initiating"
 final class PointerLockNotice: UIWindow {
-	let shared = PointerLockNotice(init(coder:))
+	let shared = PointerLockNotice(frame: frame)
 	// let window: UIWindow
 	// let mainView: UIView
 	var observer: Any?
+	init(frame: frame) {
+		return
+	}
 	required init?(coder: NSCoder) { fatalError() }
 	func status() {
 	// NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedNotification(notification:)), name: Notification.Name("NotificationIdentifier"), object: nil)
