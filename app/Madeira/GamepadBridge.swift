@@ -64,6 +64,8 @@ final class GamepadBridge {
                // guard pressed else {
                //   return
                // }
+               MetalHostingController.shared.lockPointer()
+               MetalViewController.shared.lockPointer()
                let code = Int(value.rawValue)
                let key = MadeiraKeys.virtualKey(hid: code) ?? Int32(0)
                winios_post_key(key, pressed ? 1 : 0)
@@ -112,6 +114,8 @@ final class GamepadBridge {
                 self.dx = self.dx+Int32(deltaX)
                 self.dy = self.dy-Int32(deltaY)
                 self.delta = CGPoint(x: CGFloat(deltaX), y: CGFloat(deltaY))
+                MetalHostingController.shared.lockPointer()
+                MetalViewController.shared.lockPointer()
                 if deltaX != 0 || deltaY != 0 {
                    self.MouseMoving = true
                 }
@@ -123,10 +127,14 @@ final class GamepadBridge {
             mouseInput.scroll.valueChangedHandler = {
                 (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
                 // self.sy = self.sy+Int32(scrollY)
+                MetalHostingController.shared.lockPointer()
+                MetalViewController.shared.lockPointer()
                 winios_pointer(0, 0, 0x0800, UInt32(bitPattern: Int32(scrollY)))
             }
             mouseInput.leftButton.valueChangedHandler = {
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
+               MetalHostingController.shared.lockPointer()
+               MetalViewController.shared.lockPointer()
                if pressed {
                   winios_pointer(0, 0, 0x0002, 0)
                   self.MouseClicking = true
@@ -138,6 +146,8 @@ final class GamepadBridge {
             }
             mouseInput.rightButton?.valueChangedHandler = {
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
+               MetalHostingController.shared.lockPointer()
+               MetalViewController.shared.lockPointer()
                if pressed {
                   winios_pointer(0, 0, 0x0008, 0)
                   self.MouseClicking = true
