@@ -46,13 +46,13 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 	// init(_ parent: MadeiraViewController) {
     //	self.parent = parent
 	// }
-
+	var PointerLockNotice: PointerLockNotice()?
     func makeUIViewController(context: Context) -> MetalUIViewController  {
         let myViewController = MetalUIViewController()
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
 		let label = UILabel()
-		PointerLockNotice.shared.status()
+		PointerLockNotice = PointerLockNotice.shared.status()
 		label.text = currentLock
 		label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
@@ -160,8 +160,8 @@ final class PointerLockNotice: UIWindow {
               	                                     		object: pointerLockState,
               	                                     		queue: OperationQueue.main) { (note) in
        		guard let lockState = note.object as? UIPointerLockState else { return }
-   			}
 			currentLock = lockState
+   			}
 		}
 		else { currentLock = "Not Found" }
 	}
