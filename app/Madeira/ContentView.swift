@@ -38,7 +38,7 @@ struct PointerView: View {
 	}
 }
 */
-public var currentLock: String = "Initiating"
+// public var currentLock: String = "Initiating"
 struct MadeiraUIViewController: UIViewControllerRepresentable, UIWindow {
         
     typealias UIViewControllerType = MetalUIViewController
