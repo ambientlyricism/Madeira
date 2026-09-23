@@ -119,6 +119,7 @@ final class MetalUIViewController: UIViewController {
     }
 }
 
+/*:	
 struct MadeiraViewController: UIViewControllerRepresentable {
         
     typealias UIViewControllerType = MetalViewController
@@ -243,6 +244,8 @@ final class MetalHostingController: UIHostingController<MadeiraMetalView> {
         lockPointer()
     }
 }
+	
+*/
 
 // extension MadeiraViewController {
 //    class Coordinator /*: SomeUIKitViewDelegate */ {
