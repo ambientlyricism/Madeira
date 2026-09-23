@@ -1042,6 +1042,7 @@ struct ContentView: View {
                 if display.immersive || vSizeClass == .compact {
                     // landscapeBody
 					MadeiraViewController()
+						.ignoresSafeArea()
                 } else {
                     portraitBody
                 }
