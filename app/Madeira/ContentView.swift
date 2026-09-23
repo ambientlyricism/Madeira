@@ -138,7 +138,6 @@ final class MetalHostingController: UIHostingController<MadeiraMetalView> {
 	override func viewDidLoad() {
       	super.viewDidLoad()
 		// MadeiraMetalView = Madeira.MadeiraMetalView()
-		GamepadBridge = Madeira.GamepadBridge()
 		if #available(iOS 16.4, *) {
 			// self._disableSafeArea = true
    			// self.safeAreaRegions = .all
