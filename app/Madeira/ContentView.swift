@@ -144,7 +144,7 @@ final class MetalUIViewController: UIViewController {
 }
 public var currentLock: String = "Initiating"
 final class PointerLockNotice: UIWindow {
-	let shared = PointerLockNotice(frame: frame)
+	let shared = PointerLockNotice(frame: CGRect(x: 0, y: 0, width: 800, height: 600))
 	// let window: UIWindow
 	// let mainView: UIView
 	var observer: Any?
