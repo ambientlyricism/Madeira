@@ -56,14 +56,14 @@ struct MadeiraViewController: UIViewControllerRepresentable {
         // myViewController.delegate = context.coordinator
 		myViewController.modalPresentationStyle = .fullScreen
 		// self.present(myViewController, animated: true)
-		MetalHostingController.shared.lockPointer()
-		myViewController.lockPointer()
+		// MetalHostingController.shared.lockPointer()
+		// myViewController.lockPointer()
         return myViewController
     }
 
     func updateUIViewController(_ uiViewController: MetalViewController, context: Context) {
-		MetalHostingController.shared.lockPointer()
-		uiViewController.lockPointer()
+		// MetalHostingController.shared.lockPointer()
+		// uiViewController.lockPointer()
             // left blank
     }
 	// func makeCoordinator() -> Coordinator {
@@ -1323,8 +1323,8 @@ struct ContentView: View {
                 
                  Button("Full Screen") {
                     display.immersive = true
-					MetalHostingController.shared.lockPointer()
-					MetalViewController.shared.lockPointer()
+					// MetalHostingController.shared.lockPointer()
+					// MetalViewController.shared.lockPointer()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.indigo)
