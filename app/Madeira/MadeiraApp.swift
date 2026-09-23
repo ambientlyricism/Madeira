@@ -64,3 +64,11 @@ class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject { // Make
         self.window = (scene as? UIWindowScene)?.keyWindow
     }
 }
+
+struct YourView: View {
+    // SceneDelegate is automatically set if it conforms to `ObservableObject`
+    @EnvironmentObject var sceneDelegate: SceneDelegate
+    var windowScene: UIWindowScene? {
+        sceneDelegate.window?.windowScene
+    }
+}
