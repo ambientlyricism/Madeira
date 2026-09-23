@@ -51,6 +51,9 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
         let myViewController = MetalUIViewController()
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
+		let label = UILabel()
+		label.text = PointerLockNotice.shared.status()
+		label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
@@ -137,6 +140,27 @@ final class MetalUIViewController: UIViewController {
         super.viewDidAppear(animated)
         lockPointer()
     }
+}
+final class PointerLockNotice: UIWindow {
+	let shared = PointerLockNotice
+	let window: UIWindow
+	let mainView: UIView
+	private init(window: UIWindow, mainView: UIView) throws {
+        self.window = window
+        self.mainView = mainView
+	}
+	var observer: Any?
+	// NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedNotification(notification:)), name: Notification.Name("NotificationIdentifier"), object: nil)
+	if let pointerLockState = self.window.windowScene?.pointerLockState {
+    	self.observer = NotificationCenter.default.addObserver(forName: UIPointerLockState.didChangeNotification,
+                                                   		object: pointerLockState,
+                                                   		queue: OperationQueue.main) { (note) in
+        guard let lockState = note.object as? UIPointerLockState else { return }
+   		}
+	}
+	func status() -> String {
+		return lockState
+	}
 }
 
 /*:	
