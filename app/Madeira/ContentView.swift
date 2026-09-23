@@ -1139,6 +1139,8 @@ struct ContentView: View {
                     	for: UIDevice.orientationDidChangeNotification)) { _ in
                 		TouchControlsHost.attach()
                     }
+					.ignoresSafeArea()
+					.statusBarHidden()
                 // Controls removed for now (ml586): game-only landscape.
                 // The FPS readout stays, pinned in the right pillarbox bar —
                 // the window-level surface covers anything drawn over the
