@@ -3,6 +3,8 @@ import UIKit
 import QuartzCore
 import Metal
 import os.log
+import Combine
+import GameController
 
 // 2026-07-03 window-hosted Metal layer.
 //
@@ -89,9 +91,9 @@ final class MetalViewController: UIViewController {
 	// }
 	override func viewDidLoad() {
      	super.viewDidLoad()
-		let ContentView = ContentView()
-		// let MadeiraMetalView = Madeira.MadeiraMetalView()
-        let hostingController = MetalHostingController(rootView: ContentView)
+		// let ContentView = ContentView()
+		let MadeiraMetalView = Madeira.MadeiraMetalView()
+        let hostingController = MetalHostingController(rootView: Madeira.MadeiraMetalView())
 		if #available(iOS 16.4, *) {
 			// hostingController._disableSafeArea = true
    			// hostingController.safeAreaRegions = .all
@@ -118,10 +120,10 @@ final class MetalViewController: UIViewController {
     }
 }
 	
-final class MetalHostingController: UIHostingController<ContentView> {
+final class MetalHostingController: UIHostingController<MadeiraMetalView> {
 	// var MadeiraMetalView: MadeiraMetalView?
 	var GamepadBridge: GamepadBridge?
-	static let shared = MetalHostingController(rootView: ContentView())
+	static let shared = MetalHostingController(rootView: Madeira.MadeiraMetalView())
 	override var childViewControllerForPointerLock: UIViewController? { nil }
 	var shouldLockPointer: Bool = true
 	private var observers: [NSObjectProtocol] = []
@@ -144,14 +146,15 @@ final class MetalHostingController: UIHostingController<ContentView> {
 		}
 		self.modalPresentationStyle = .fullScreen
 		self.navigationController?.isNavigationBarHidden = true
-		for name in [Notification.Name.GCMouseDidConnect, .GCMouseDidDisconnect,
-                     UIApplication.didBecomeActiveNotification, UIApplication.willResignActiveNotification,
-                     UIAccessibility.assistiveTouchStatusDidChangeNotification,
-                     UIPointerLockState.didChangeNotification] {
-             observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
-             	MainActor.assumeIsolated { self?.lockPointer() }
-             })
-         }
+		lockPointer()
+		// for name in [Notification.Name.GCMouseDidConnect, .GCMouseDidDisconnect,
+        //             UIApplication.didBecomeActiveNotification, UIApplication.willResignActiveNotification,
+        //             UIAccessibility.assistiveTouchStatusDidChangeNotification,
+        //             UIPointerLockState.didChangeNotification] {
+        //     observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+        //     	MainActor.assumeIsolated { self?.lockPointer() }
+        //     })
+        // }
 		
 	}
 	override func viewDidAppear(_ animated: Bool) {
@@ -1037,7 +1040,8 @@ struct ContentView: View {
             Group {
                 // if orientation.isLandscape {
                 if display.immersive || vSizeClass == .compact {
-                    landscapeBody
+                    // landscapeBody
+					MadeiraViewController()
                 } else {
                     portraitBody
                 }
@@ -1320,7 +1324,6 @@ struct ContentView: View {
             logStore.log("  Tip: Use GetMoreRam to inject extended-virtual-addressing", level: .info)
         }
     }
-
     private var actionButtons: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
