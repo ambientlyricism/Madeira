@@ -46,7 +46,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 	// init(_ parent: MadeiraViewController) {
     //	self.parent = parent
 	// }
-	var PointerLockNotice: PointerLockNotice?
+	var PointerLockNotice: PointerLockNotice
     func makeUIViewController(context: Context) -> MetalUIViewController  {
         let myViewController = MetalUIViewController()
 		// myViewController.view.isOpaque = false
@@ -142,7 +142,7 @@ final class MetalUIViewController: UIViewController {
         lockPointer()
     }
 }
-public var currentLock: Bool = false
+public var currentLock: String = "Initiating"
 final class PointerLockNotice: UIWindow {
 	let shared = PointerLockNotice(frame: CGRect(x: 0, y: 0, width: 800, height: 600))
 	// let window: UIWindow
@@ -160,7 +160,7 @@ final class PointerLockNotice: UIWindow {
               	                                     		object: pointerLockState,
               	                                     		queue: OperationQueue.main) { (note) in
        		guard let lockState = note.object as? UIPointerLockState else { return }
-			currentLock = lockState.isLocked
+			currentLock = String(lockState.isLocked)
    			}
 		}
 		else { currentLock = "Not Found" }
