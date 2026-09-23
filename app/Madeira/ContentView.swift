@@ -50,17 +50,6 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
         let myViewController = MetalUIViewController()
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
-		if let pointerLockState = self.window.windowScene?.pointerLockState {
-    		self.observer = notificationCenter.addObserver(forName: UIPointerLockState.didChangeNotification,
-                                                   		object: pointerLockState,
-                                                   		queue: OperationQueue.main) { (note) in
-        		guard let lockState = note.object as? UIPointerLockState else { return }
-        		gameEngine.performExpensiveOperationWhile(lockState.isLocked)
-   		 	}
-			let label = UILabel()
-			label.text = lockState
-			label.textColor = UIColor.red
-		}
 		// myViewController.view.addSubview(label)
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
@@ -120,6 +109,17 @@ final class MetalUIViewController: UIViewController {
         // MetalBackedView.didMove(toParent: self)
 		// GamepadBridge = Madeira.GamepadBridge()
 		lockPointer()
+		if let pointerLockState = self.window.windowScene?.pointerLockState {
+    		self.observer = notificationCenter.addObserver(forName: UIPointerLockState.didChangeNotification,
+                                                   		object: pointerLockState,
+                                                   		queue: OperationQueue.main) { (note) in
+        		guard let lockState = note.object as? UIPointerLockState else { return }
+        		gameEngine.performExpensiveOperationWhile(lockState.isLocked)
+   		 	}
+			let label = UILabel()
+			label.text = lockState
+			label.textColor = UIColor.red
+		}
 	}
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
