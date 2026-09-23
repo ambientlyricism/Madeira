@@ -110,6 +110,13 @@ final class MetalUIViewController: UIViewController {
         // MetalBackedView.didMove(toParent: self)
 		// GamepadBridge = Madeira.GamepadBridge()
 		lockPointer()
+		public let window: UIWindow
+		public let mainView: UIView
+		private init(window: UIWindow, mainView: UIView) throws {
+        	self.window = window
+        	self.mainView = mainView
+		}
+		var observer: Any?
 		NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedNotification(notification:)), name: Notification.Name("NotificationIdentifier"), object: nil)
 		if let pointerLockState = self.window.windowScene?.pointerLockState {
     		self.observer = notificationCenter.addObserver(forName: UIPointerLockState.didChangeNotification,
