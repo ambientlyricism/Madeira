@@ -75,6 +75,7 @@ final class MetalUIViewController: UIViewController {
 	static let shared = MetalUIViewController()
 	var shouldLockPointer: Bool = true
 	// var GamepadBridge: GamepadBridge?
+	override var childViewControllerForPointerLock: UIViewController? { nil }
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
 	}
@@ -135,9 +136,6 @@ final class MetalUIViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         lockPointer()
-		if let parent = parent {
-			parent.setChildViewControllerForPointerLock(self)
-		}
     }
 }
 
