@@ -99,7 +99,7 @@ final class MetalViewController: UIViewController {
 		self.navigationController?.isNavigationBarHidden = true
 		
         addChild(hostingController)
-        hostingController.view.frame = view.bounds
+        // hostingController.view.frame = view.bounds
         view.addSubview(hostingController.view)
 		// hostingController.view.translatesAutoresizingMaskIntoConstraints = false
 		// hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
