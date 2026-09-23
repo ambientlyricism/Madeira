@@ -119,11 +119,11 @@ final class MetalUIViewController: UIViewController {
 		var observer: Any?
 		// NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedNotification(notification:)), name: Notification.Name("NotificationIdentifier"), object: nil)
 		if let pointerLockState = self.window.windowScene?.pointerLockState {
-    		self.observer = notificationCenter.addObserver(forName: UIPointerLockState.didChangeNotification,
+    		self.observer = NotificationCenter.default.addObserver(forName: UIPointerLockState.didChangeNotification,
                                                    		object: pointerLockState,
                                                    		queue: OperationQueue.main) { (note) in
         		guard let lockState = note.object as? UIPointerLockState else { return }
-        		gameEngine.performExpensiveOperationWhile(lockState.isLocked)
+        		// gameEngine.performExpensiveOperationWhile(lockState.isLocked)
    		 	}
 			let label = UILabel()
 			label.text = lockState
