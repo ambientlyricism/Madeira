@@ -46,13 +46,13 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 	// init(_ parent: MadeiraViewController) {
     //	self.parent = parent
 	// }
-	var PointerLockNotice: PointerLockNotice()?
+	// var PointerLockNotice: PointerLockNotice()?
     func makeUIViewController(context: Context) -> MetalUIViewController  {
         let myViewController = MetalUIViewController()
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
 		let label = UILabel()
-		PointerLockNotice = PointerLockNotice.shared.status()
+		PointerLockNotice.status()
 		label.text = currentLock
 		label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
