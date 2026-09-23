@@ -37,7 +37,7 @@ struct MadeiraApp: App {
 		WindowGroup {
 			// PointerView()
 			if DisplaySettings.shared.immersive {
-				MadeiraViewController()
+				MadeiraUIViewController()
 					.ignoresSafeArea()
 			}
 			else{
