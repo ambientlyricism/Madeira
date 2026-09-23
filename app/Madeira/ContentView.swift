@@ -37,6 +37,88 @@ struct PointerView: View {
 	}
 }
 
+struct MadeiraUIViewController: UIViewControllerRepresentable {
+        
+    typealias UIViewControllerType = MetalUIViewController
+	// var parent: MadeiraViewController
+	
+	// init(_ parent: MadeiraViewController) {
+    //	self.parent = parent
+	// }
+
+    func makeUIViewController(context: Context) -> MetalUIViewController  {
+        let myViewController = MetalUIViewController()
+		// myViewController.view.isOpaque = false
+		// myViewController.view.backgroundColor = .clear
+		// let label = UILabel()
+		// label.text = "Controller Active"
+		// label.textColor = UIColor.red
+		// myViewController.view.addSubview(label)
+		// label.frame = myViewController.view.frame
+        // myViewController.delegate = context.coordinator
+		myViewController.modalPresentationStyle = .fullScreen
+		// self.present(myViewController, animated: true)
+		// MetalHostingController.shared.lockPointer()
+		// myViewController.lockPointer()
+        return myViewController
+    }
+
+    func updateUIViewController(_ uiViewController: MetalViewController, context: Context) {
+		// MetalHostingController.shared.lockPointer()
+		// uiViewController.lockPointer()
+            // left blank
+    }
+	// func makeCoordinator() -> Coordinator {
+    //    return Coordinator(self)
+    // }
+}
+final class MetalUIViewController: UIViewController {
+	var MetalBackedView: MetalBackedView?
+	static let shared = MetalUIViewController()
+	var shouldLockPointer: Bool = true
+	// var GamepadBridge: GamepadBridge?
+	override var prefersPointerLocked: Bool {
+		return self.shouldLockPointer
+	}
+	func lockPointer() {
+		// MetalHostingController = MetalHostingController(ContentView())
+		// let MetalViewController = MetalHostingController.presentingViewController
+		// MetalHostingController.shared.lockPointer()
+		self.shouldLockPointer = true
+		setNeedsUpdateOfPrefersPointerLocked()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
+	// }
+	override func viewDidLoad() {
+     	super.viewDidLoad()
+		// let ContentView = ContentView()
+		let MetalBackedView = MetalBackedView()
+        // let hostingController = MetalHostingController(rootView: Madeira.MadeiraMetalView())
+		if #available(iOS 16.4, *) {
+			// hostingController._disableSafeArea = true
+   			// hostingController.safeAreaRegions = .all
+			MetalBackedView.safeAreaRegions = SafeAreaRegions()
+		}
+		self.modalPresentationStyle = .fullScreen
+		self.navigationController?.isNavigationBarHidden = true
+		
+        addChild(MetalBackedView)
+        view.addSubview(MetalBackedView.view)
+		MetalBackedView.view.translatesAutoresizingMaskIntoConstraints = false
+		MetalBackedView.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+		MetalBackedView.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+		MetalBackedView.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+		MetalBackedView.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+		MetalBackedView.view.frame = view.bounds
+        MetalBackedView.didMove(toParent: self)
+		// GamepadBridge = Madeira.GamepadBridge()
+		lockPointer()
+	}
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        lockPointer()
+    }
+}
+
 struct MadeiraViewController: UIViewControllerRepresentable {
         
     typealias UIViewControllerType = MetalViewController
@@ -1040,7 +1122,7 @@ struct ContentView: View {
                 // if orientation.isLandscape {
                 if display.immersive || vSizeClass == .compact {
                     // landscapeBody
-					MadeiraViewController()
+					MadeiraUIViewController()
 						.ignoresSafeArea()
                 } else {
                     portraitBody
