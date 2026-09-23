@@ -126,7 +126,7 @@ final class MetalHostingController: UIHostingController<MadeiraMetalView> {
 	static let shared = MetalHostingController(rootView: Madeira.MadeiraMetalView())
 	override var childViewControllerForPointerLock: UIViewController? { nil }
 	var shouldLockPointer: Bool = true
-	private var observers: [NSObjectProtocol] = []
+	// private var observers: [NSObjectProtocol] = []
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
 	}
