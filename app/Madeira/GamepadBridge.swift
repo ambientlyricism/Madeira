@@ -60,7 +60,7 @@ final class GamepadBridge {
       guard let keyboard = notification.object as? GCKeyboard else {
          return
       }
-      MetalBackView.toggleKeyboard()
+      MetalBackedView.toggleKeyboard()
       keyboard.keyboardInput?.keyChangedHandler = {
             ( _ keyboard, _ button: GCDeviceButtonInput, _ value: GCKeyCode, _ pressed: Bool) -> Void in
                // guard pressed else {
