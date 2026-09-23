@@ -35,9 +35,9 @@ struct MadeiraApp: App {
     var body: some Scene {
 		WindowGroup {
 			// PointerView()
-			MadeiraViewController()
-				.ignoresSafeArea()
-			// ContentView()
+			// MadeiraViewController()
+				// .ignoresSafeArea()
+			ContentView()
 			// .fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
    		}
         // .background(Color.black)
