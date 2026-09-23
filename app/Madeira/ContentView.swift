@@ -1125,11 +1125,11 @@ struct ContentView: View {
     /// anything drawn over the game area itself. No header/log/nav chrome.
 	@State private var isPresenting = true
     private var landscapeBody: some View {
-        GeometryReader { geo in
+        // GeometryReader { geo in
             let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
             let barW = max((geo.size.width - gameW) / 2.0, 44)
-            ZStack {
-                Color.black
+            // ZStack {
+                //Color.black
 				//MadeiraViewController()
 				//MadeiraMetalView()
 				// .fullScreenCover(isPresented: $isPresenting, content: { MadeiraMetalView() })
@@ -1137,7 +1137,7 @@ struct ContentView: View {
                 //    .onReceive(NotificationCenter.default.publisher(
                 //        for: UIDevice.orientationDidChangeNotification)) { _ in
                 //        TouchControlsHost.attach()
-                    }
+                //    }
                 // Controls removed for now (ml586): game-only landscape.
                 // The FPS readout stays, pinned in the right pillarbox bar —
                 // the window-level surface covers anything drawn over the
@@ -1152,7 +1152,7 @@ struct ContentView: View {
                 }
 				// .frame(maxWidth: .infinity)
 				// .frame(maxHeight: .infinity)
-            }
+            // }
 			MadeiraViewController()
                 .onAppear { TouchControlsHost.attach() }
                 .onReceive(NotificationCenter.default.publisher(
