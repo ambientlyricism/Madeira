@@ -148,8 +148,9 @@ final class PointerLockNotice: UIWindow {
 	// let window: UIWindow
 	// let mainView: UIView
 	var observer: Any?
-	init(frame: frame) {
-		return
+	override init(frame: CGRect) {
+		super.init(frame: frame)
+		status()
 	}
 	required init?(coder: NSCoder) { fatalError() }
 	func status() {
