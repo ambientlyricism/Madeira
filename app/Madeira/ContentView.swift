@@ -42,13 +42,13 @@ struct PointerView: View {
 struct MadeiraUIViewController: UIViewControllerRepresentable {
         
     typealias UIViewControllerType = MetalUIViewController
-	var parent: MadeiraViewController
+	var parent: MadeiraUIViewController
 	
-	init(_ parent: MadeiraViewController) {
+	init(_ parent: MadeiraUIViewController) {
     	self.parent = parent
 	}
 	// var PointerLockNotice: PointerLockNotice
-	public var scroll: Bool = false
+	public var scrolltest: Bool = false
 	class Coordinator: NSObject, UIScrollViewDelegate {
         var parent: MadeiraUIViewController
 
@@ -56,8 +56,8 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
             self.parent = parent
         }
 
-		func scrollViewDidScroll(_ ) {
-			scroll = true
+		func scrollViewDidScroll(_ scrollView: UIScrollView) {
+			scrolltest = true
 		}
     }
 	func makeCoordinator() -> Coordinator {
@@ -98,7 +98,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 final class MetalUIViewController: UIViewController, UIScrollViewDelegate {
 	// public var delegate: MetalUIViewControllerDelegate?
 	var MetalBackedView: MetalBackedView?
-	var scrollView: UIScrollView?
+	var scrollView: UIScrollView
 	static let shared = MetalUIViewController()
 	var shouldLockPointer: Bool = true
 	// var GamepadBridge: GamepadBridge?
