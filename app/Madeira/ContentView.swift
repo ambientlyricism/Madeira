@@ -74,8 +74,15 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 		// let PointerLockNotice = PointerLockNotice.shared.status()
 		label.text = currentLock
 		label.textColor = UIColor.red
-		myViewController.view.addSubview(label)
-		label.frame = myViewController.view.frame
+		// myViewController.view.addSubview(label)
+		label.translatesAutoresizingMaskIntoConstraints = false
+    	let topConstraint = NSLayoutConstraint(item: label, attribute: .Top, relatedBy: .Equal, toItem: textField, attribute: .Top, multiplier: 1.0, constant: 0.0)
+    	let leftConstraint = NSLayoutConstraint(item: label, attribute: .Left, relatedBy: .Equal, toItem: textField, attribute: .Left, multiplier: 1.0, constant: 0.0)
+    	let bottomConstraint = NSLayoutConstraint(item: label, attribute: .Bottom, relatedBy: .Equal, toItem: textField, attribute: .Bottom, multiplier: 1.0, constant: 0.0)
+    	let rightConstraint = NSLayoutConstraint(item: label, attribute: .Right, relatedBy: .Equal, toItem: textField, attribute: .Right, multiplier: 1.0, constant: 0.0)
+    	myViewController.view.addSubview(label)
+    	NSLayoutConstraint.activateConstraints([topConstraint, leftConstraint, bottomConstraint, rightConstraint])
+		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
 		myViewController.modalPresentationStyle = .fullScreen
 		// self.present(myViewController, animated: true)
