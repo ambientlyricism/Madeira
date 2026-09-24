@@ -183,14 +183,17 @@ final class MetalUIViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         lockPointer()
+		currentLock = String(self.shouldLockPointer)
     }
 	override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         lockPointer()
+		currentLock = String(self.shouldLockPointer)
     }
 	override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-		shouldLockPointer = false
+		self.shouldLockPointer = false
+		currentLock = String(self.shouldLockPointer)
     }
 }
 /*:
