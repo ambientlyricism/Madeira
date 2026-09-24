@@ -71,10 +71,10 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
 		myViewController.modalPresentationStyle = .fullScreen
-		let label = UILabel()
+		// let label = UILabel()
 		// let PointerLockNotice = PointerLockNotice.shared.status()
-		label.text = currentLock
-		label.textColor = UIColor.red
+		// label.text = currentLock
+		// label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
 		// label.view.addSubview(myViewController)
     	// label.translatesAutoresizingMaskIntoConstraints = false
@@ -86,7 +86,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 		// self.present(myViewController, animated: true)
 		// MetalHostingController.shared.lockPointer()
 		// myViewController.lockPointer()
-        return label
+        return myViewController
     }
 
     func updateUIViewController(_ uiViewController: MetalUIViewController, context: Context) {
@@ -3127,9 +3127,7 @@ struct TouchControlsOverlay: View {
                 }
                 .transition(.opacity.combined(with: .scale))
             }
-			let label = UILabel()
-			label.text = currentLock
-			label.textColor = UIColor.red
+			Text(String(currentLock))
         }
         .padding(.top, 10)
         .animation(.easeInOut(duration: 0.22), value: m.editing)
