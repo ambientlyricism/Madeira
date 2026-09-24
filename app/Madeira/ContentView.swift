@@ -162,7 +162,7 @@ final class MetalUIViewController: UIViewController {
 		// MetalBackedView.frame = view.bounds
         // MetalBackedView.didMove(toParent: self)
 		// GamepadBridge = Madeira.GamepadBridge()
-		lockPointer()
+		// lockPointer()
 		/*:
 		let window: UIWindow
 		let mainView: UIView
