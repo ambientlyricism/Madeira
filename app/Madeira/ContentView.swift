@@ -48,13 +48,17 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
     	self.parent = parent
 	}
 	// var PointerLockNotice: PointerLockNotice
-	
+	public var scroll: Bool = false
 	class Coordinator: NSObject, UIScrollViewDelegate {
         var parent: MadeiraUIViewController
 
         init(_ parent: MadeiraUIViewController) {
             self.parent = parent
         }
+
+		func scrollViewDidScroll(UIScrollView) {
+			scroll = true
+		}
     }
 	func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -120,10 +124,10 @@ final class MetalUIViewController: UIViewController, UIScrollViewDelegate {
 		// The scroll view is a programmatically-driven zoom/pan container only. Every touch is
 		// owned by touchOverlay (created below); the scroll view's own gestures are disabled so
 		// they can never race with or swallow our cursor / pinch / scroll handling.
-		scrollView.panGestureRecognizer.isEnabled = false
-		scrollView.pinchGestureRecognizer?.isEnabled = false
-		scrollView.isScrollEnabled = false
-		scrollView.bouncesZoom = false
+		scrollView.panGestureRecognizer.isEnabled = true
+		scrollView.pinchGestureRecognizer?.isEnabled = true
+		scrollView.isScrollEnabled = true
+		scrollView.bouncesZoom = true
 		view.addSubview(scrollView)
 		let pointerInteraction = UIPointerInteraction(delegate: self)
 		view.addInteraction(pointerInteraction)
