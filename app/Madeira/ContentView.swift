@@ -70,19 +70,19 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
         // myViewController.delegate = context.coordinator
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
+		myViewController.modalPresentationStyle = .fullScreen
 		let label = UILabel()
 		// let PointerLockNotice = PointerLockNotice.shared.status()
 		label.text = currentLock
 		label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
     	label.translatesAutoresizingMaskIntoConstraints = false
-  		label.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true		
-  		label.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
-   		label.centerYAnchor.constraint(equalTo:   view.centerYAnchor).isActive = true
+  		label.leftAnchor.constraint(equalTo: myViewController.leftAnchor, constant: 20).isActive = true		
+  		label.rightAnchor.constraint(equalTo: myViewController.rightAnchor, constant: -20).isActive = true
+   		label.centerYAnchor.constraint(equalTo:   myViewController.centerYAnchor).isActive = true
     	myViewController.view.addSubview(label)
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
-		myViewController.modalPresentationStyle = .fullScreen
 		// self.present(myViewController, animated: true)
 		// MetalHostingController.shared.lockPointer()
 		// myViewController.lockPointer()
