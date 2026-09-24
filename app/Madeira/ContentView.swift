@@ -76,7 +76,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 		label.text = currentLock
 		label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
-		label.view.addSubview(myViewController)
+		// label.view.addSubview(myViewController)
     	// label.translatesAutoresizingMaskIntoConstraints = false
   		// label.leadingAnchor.constraint(equalTo: myViewController.leadingAnchor, constant: 20).isActive = true		
   		// label.trailingAnchor.constraint(equalTo: myViewController.trailingAnchor, constant: -20).isActive = true
@@ -3127,6 +3127,9 @@ struct TouchControlsOverlay: View {
                 }
                 .transition(.opacity.combined(with: .scale))
             }
+			let label = UILabel()
+			label.text = currentLock
+			label.textColor = UIColor.red
         }
         .padding(.top, 10)
         .animation(.easeInOut(duration: 0.22), value: m.editing)
