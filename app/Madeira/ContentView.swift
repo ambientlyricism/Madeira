@@ -70,10 +70,10 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
         // myViewController.delegate = context.coordinator
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
-		let label = UILabel()
+		// let label = UILabel()
 		// let PointerLockNotice = PointerLockNotice.shared.status()
-		label.text = currentLock
-		label.textColor = UIColor.red
+		// label.text = currentLock
+		// label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
