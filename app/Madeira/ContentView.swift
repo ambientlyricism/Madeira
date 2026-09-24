@@ -413,7 +413,7 @@ final class MetalUIHostingController: UIHostingController<TouchControlsOverlay> 
 }
 final class JoyUIHostingController: UIHostingController<JoystickPadOverlay> {
 	var JoystickPadOverlay: JoystickPadOverlay?
-	static let shared = MetalUIHostingController(rootView: Madeira.JoystickPadOverlay())
+	static let shared = JoyUIHostingController(rootView: Madeira.JoystickPadOverlay())
 	// override var childViewControllerForPointerLock: UIHostingController<JoystickPadOverlay>? { nil }
 	var shouldLockPointer: Bool = true
 	override var prefersPointerLocked: Bool {
