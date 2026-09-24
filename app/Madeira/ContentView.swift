@@ -42,6 +42,7 @@ struct PointerView: View {
 struct MadeiraUIViewController: UIViewControllerRepresentable {
         
     typealias UIViewControllerType = MetalUIViewController
+	/*:
 	var parent: MadeiraUIViewController
 	
 	init(_ parent: MadeiraUIViewController) {
@@ -63,10 +64,10 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 	func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-	
+	*/
     func makeUIViewController(context: Context) -> MetalUIViewController  {
         let myViewController = MetalUIViewController()
-        myViewController.delegate = context.coordinator
+        // myViewController.delegate = context.coordinator
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
 		// let label = UILabel()
@@ -95,10 +96,10 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 // protocol MetalUIViewControllerDelegate {
 //    func runMetalUI(identifier: String)
 // }
-final class MetalUIViewController: UIViewController, UIScrollViewDelegate {
+final class MetalUIViewController: UIViewController {
 	// public var delegate: MetalUIViewControllerDelegate?
 	var MetalBackedView: MetalBackedView?
-	var scrollView: UIScrollView
+	// var scrollView: UIScrollView
 	static let shared = MetalUIViewController()
 	var shouldLockPointer: Bool = true
 	// var GamepadBridge: GamepadBridge?
@@ -116,6 +117,7 @@ final class MetalUIViewController: UIViewController, UIScrollViewDelegate {
 	}
 	override func viewDidLoad() {
      	super.viewDidLoad()
+		/*:
 		// ScrollView Setup
 		scrollView = UIScrollView(frame: view.bounds)
 		scrollView.delegate = self
@@ -132,6 +134,7 @@ final class MetalUIViewController: UIViewController, UIScrollViewDelegate {
 		view.addSubview(scrollView)
 		let pointerInteraction = UIPointerInteraction(delegate: self)
 		view.addInteraction(pointerInteraction)
+		*/
 		// let ContentView = ContentView()
 		let MetalBackedView = Madeira.MetalBackedView()
         // let hostingController = MetalHostingController(rootView: Madeira.MadeiraMetalView())
@@ -144,14 +147,14 @@ final class MetalUIViewController: UIViewController, UIScrollViewDelegate {
 		self.navigationController?.isNavigationBarHidden = true
 		
         // addChild(MetalBackedView)
-        scrollView.addSubview(MetalBackedView)
+        view.addSubview(MetalBackedView)
 		MetalBackedView.translatesAutoresizingMaskIntoConstraints = false
 		MetalBackedView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
 		MetalBackedView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
 		MetalBackedView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
 		MetalBackedView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
 		// MetalBackedView.frame = view.bounds
-        // MetalBackedView.didMove(toParent: self)
+        MetalBackedView.didMove(toParent: self)
 		// GamepadBridge = Madeira.GamepadBridge()
 		lockPointer()
 		/*:
