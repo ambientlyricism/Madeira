@@ -56,7 +56,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
             self.parent = parent
         }
 
-		func scrollViewDidScroll(UIScrollView) {
+		func scrollViewDidScroll(_ ) {
 			scroll = true
 		}
     }
@@ -98,7 +98,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 final class MetalUIViewController: UIViewController, UIScrollViewDelegate {
 	// public var delegate: MetalUIViewControllerDelegate?
 	var MetalBackedView: MetalBackedView?
-	var scrollView: scrollView?
+	var scrollView: UIScrollView?
 	static let shared = MetalUIViewController()
 	var shouldLockPointer: Bool = true
 	// var GamepadBridge: GamepadBridge?
@@ -144,7 +144,7 @@ final class MetalUIViewController: UIViewController, UIScrollViewDelegate {
 		self.navigationController?.isNavigationBarHidden = true
 		
         // addChild(MetalBackedView)
-        self.view.addSubview(MetalBackedView)
+        scrollView.addSubview(MetalBackedView)
 		MetalBackedView.translatesAutoresizingMaskIntoConstraints = false
 		MetalBackedView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
 		MetalBackedView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
