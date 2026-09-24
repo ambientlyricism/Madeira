@@ -76,8 +76,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 		label.text = currentLock
 		label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
-		myViewController.view.addSubview(label)
-		myViewController.bringSubviewToFront(label)
+		label.view.addSubview(myViewController)
     	// label.translatesAutoresizingMaskIntoConstraints = false
   		// label.leadingAnchor.constraint(equalTo: myViewController.leadingAnchor, constant: 20).isActive = true		
   		// label.trailingAnchor.constraint(equalTo: myViewController.trailingAnchor, constant: -20).isActive = true
@@ -87,7 +86,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 		// self.present(myViewController, animated: true)
 		// MetalHostingController.shared.lockPointer()
 		// myViewController.lockPointer()
-        return myViewController
+        return label
     }
 
     func updateUIViewController(_ uiViewController: MetalUIViewController, context: Context) {
