@@ -411,6 +411,29 @@ final class MetalUIHostingController: UIHostingController<TouchControlsOverlay> 
         lockPointer()
     }
 }
+final class JoyUIHostingController: UIHostingController<JoystickPadOverlay> {
+	var JoystickPadOverlay: JoystickPadOverlay?
+	static let shared = MetalUIHostingController(rootView: Madeira.JoystickPadOverlay())
+	override var childViewControllerForPointerLock: UIHostingController<JoystickPadOverlay>? { nil }
+	var shouldLockPointer: Bool = true
+	override var prefersPointerLocked: Bool {
+		return self.shouldLockPointer
+	}
+	func lockPointer() {
+		self.shouldLockPointer = true
+		setNeedsUpdateOfPrefersPointerLocked()
+	}
+	override func viewDidLoad() {
+      	super.viewDidLoad()
+		JoystickPadOverlay = Madeira.JoystickPadOverlay()
+		lockPointer()
+	}
+	override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        lockPointer()
+    }
+}
+
 
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
@@ -881,7 +904,7 @@ enum JoystickPadHost {
             w.windowLevel = .normal + 100
             w.backgroundColor = .clear
             w.isHidden = false                 // never becomes key: see PassthroughWindow
-            let host = MetalUIHostingController(rootView: JoystickPadOverlay())
+            let host = JoyUIHostingController(rootView: JoystickPadOverlay())
             host.view.backgroundColor = .clear
             host.view.isUserInteractionEnabled = false
             w.rootViewController = host
