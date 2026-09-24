@@ -38,7 +38,7 @@ struct PointerView: View {
 	}
 }
 */
-// public var currentLock: String = "Initiating"
+public var currentLock: String = "Initiating"
 struct MadeiraUIViewController: UIViewControllerRepresentable {
         
     typealias UIViewControllerType = MetalUIViewController
@@ -70,10 +70,10 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
         // myViewController.delegate = context.coordinator
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
-		// let label = UILabel()
+		let label = UILabel()
 		// let PointerLockNotice = PointerLockNotice.shared.status()
-		// label.text = currentLock
-		// label.textColor = UIColor.red
+		label.text = currentLock
+		label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
@@ -101,7 +101,7 @@ final class MetalUIViewController: UIViewController {
 	var MetalBackedView: MetalBackedView?
 	// var scrollView: UIScrollView
 	static let shared = MetalUIViewController()
-	var shouldLockPointer: Bool = true
+	var shouldLockPointer: Bool = false
 	// var GamepadBridge: GamepadBridge?
 	override var childViewControllerForPointerLock: UIViewController? { self }
 	override var prefersPointerLocked: Bool {
@@ -111,7 +111,8 @@ final class MetalUIViewController: UIViewController {
 		// MetalHostingController = MetalHostingController(ContentView())
 		// let MetalViewController = MetalHostingController.presentingViewController
 		// MetalHostingController.shared.lockPointer()
-		self.shouldLockPointer = false
+		self.shouldLockPointer = true
+		currentLock = String(self.shouldLockPointer)
 		setNeedsUpdateOfPrefersPointerLocked()
 		// MadeiraMetalView = Madeira.MadeiraMetalView()
 	}
