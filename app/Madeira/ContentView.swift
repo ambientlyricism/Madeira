@@ -373,7 +373,7 @@ final class MetalUIHostingController: UIHostingController<TouchControlsOverlay> 
 	var TouchControlsOverlay: TouchControlsOverlay?
 	// var GamepadBridge: GamepadBridge?
 	static let shared = MetalUIHostingController(rootView: Madeira.TouchControlsOverlay())
-	override var childViewControllerForPointerLock: UIHostingController<TouchControlsOverlay>? { nil }
+	// override var childViewControllerForPointerLock: UIHostingController<TouchControlsOverlay>? { nil }
 	var shouldLockPointer: Bool = true
 	// private var observers: [NSObjectProtocol] = []
 	override var prefersPointerLocked: Bool {
@@ -414,7 +414,7 @@ final class MetalUIHostingController: UIHostingController<TouchControlsOverlay> 
 final class JoyUIHostingController: UIHostingController<JoystickPadOverlay> {
 	var JoystickPadOverlay: JoystickPadOverlay?
 	static let shared = MetalUIHostingController(rootView: Madeira.JoystickPadOverlay())
-	override var childViewControllerForPointerLock: UIHostingController<JoystickPadOverlay>? { nil }
+	// override var childViewControllerForPointerLock: UIHostingController<JoystickPadOverlay>? { nil }
 	var shouldLockPointer: Bool = true
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
