@@ -98,6 +98,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 final class MetalUIViewController: UIViewController, UIScrollViewDelegate {
 	// public var delegate: MetalUIViewControllerDelegate?
 	var MetalBackedView: MetalBackedView?
+	var scrollView: scrollView?
 	static let shared = MetalUIViewController()
 	var shouldLockPointer: Bool = true
 	// var GamepadBridge: GamepadBridge?
