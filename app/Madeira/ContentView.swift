@@ -75,13 +75,11 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 		label.text = currentLock
 		label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
-		label.translatesAutoresizingMaskIntoConstraints = false
-    	let topConstraint = NSLayoutConstraint(item: label, attribute: .Top, relatedBy: .Equal, toItem: textField, attribute: .Top, multiplier: 1.0, constant: 0.0)
-    	let leftConstraint = NSLayoutConstraint(item: label, attribute: .Left, relatedBy: .Equal, toItem: textField, attribute: .Left, multiplier: 1.0, constant: 0.0)
-    	let bottomConstraint = NSLayoutConstraint(item: label, attribute: .Bottom, relatedBy: .Equal, toItem: textField, attribute: .Bottom, multiplier: 1.0, constant: 0.0)
-    	let rightConstraint = NSLayoutConstraint(item: label, attribute: .Right, relatedBy: .Equal, toItem: textField, attribute: .Right, multiplier: 1.0, constant: 0.0)
+    	label.translatesAutoresizingMaskIntoConstraints = false
+  		label.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true		
+  		label.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
+   		label.centerYAnchor.constraint(equalTo:   view.centerYAnchor).isActive = true
     	myViewController.view.addSubview(label)
-    	NSLayoutConstraint.activateConstraints([topConstraint, leftConstraint, bottomConstraint, rightConstraint])
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
 		myViewController.modalPresentationStyle = .fullScreen
