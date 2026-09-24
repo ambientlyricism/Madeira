@@ -42,14 +42,14 @@ struct PointerView: View {
 struct MadeiraUIViewController: UIViewControllerRepresentable {
         
     typealias UIViewControllerType = MetalUIViewController
-	// var parent: MadeiraViewController
+	var parent: MadeiraViewController
 	
-	// init(_ parent: MadeiraViewController) {
-    //	self.parent = parent
-	// }
+	init(_ parent: MadeiraViewController) {
+    	self.parent = parent
+	}
 	// var PointerLockNotice: PointerLockNotice
-	/*:
-	class Coordinator: NSObject, MetalUIViewControllerDelegate {
+	
+	class Coordinator: NSObject, UIScrollViewDelegate {
         var parent: MadeiraUIViewController
 
         init(_ parent: MadeiraUIViewController) {
@@ -59,10 +59,10 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 	func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-	*/
+	
     func makeUIViewController(context: Context) -> MetalUIViewController  {
         let myViewController = MetalUIViewController()
-        // myViewController.delegate = context.coordinator
+        myViewController.delegate = context.coordinator
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
 		// let label = UILabel()
@@ -91,7 +91,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 // protocol MetalUIViewControllerDelegate {
 //    func runMetalUI(identifier: String)
 // }
-final class MetalUIViewController: UIViewController {
+final class MetalUIViewController: UIViewController, UIScrollViewDelegate {
 	// public var delegate: MetalUIViewControllerDelegate?
 	var MetalBackedView: MetalBackedView?
 	static let shared = MetalUIViewController()
@@ -111,6 +111,22 @@ final class MetalUIViewController: UIViewController {
 	}
 	override func viewDidLoad() {
      	super.viewDidLoad()
+		// ScrollView Setup
+		scrollView = UIScrollView(frame: view.bounds)
+		scrollView.delegate = self
+		scrollView.minimumZoomScale = 1.0
+		scrollView.maximumZoomScale = 5.0
+		scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+		// The scroll view is a programmatically-driven zoom/pan container only. Every touch is
+		// owned by touchOverlay (created below); the scroll view's own gestures are disabled so
+		// they can never race with or swallow our cursor / pinch / scroll handling.
+		scrollView.panGestureRecognizer.isEnabled = false
+		scrollView.pinchGestureRecognizer?.isEnabled = false
+		scrollView.isScrollEnabled = false
+		scrollView.bouncesZoom = false
+		view.addSubview(scrollView)
+		let pointerInteraction = UIPointerInteraction(delegate: self)
+		view.addInteraction(pointerInteraction)
 		// let ContentView = ContentView()
 		let MetalBackedView = Madeira.MetalBackedView()
         // let hostingController = MetalHostingController(rootView: Madeira.MadeiraMetalView())
