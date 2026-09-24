@@ -111,7 +111,7 @@ final class MetalUIViewController: UIViewController {
 		// MetalHostingController = MetalHostingController(ContentView())
 		// let MetalViewController = MetalHostingController.presentingViewController
 		// MetalHostingController.shared.lockPointer()
-		self.shouldLockPointer = true
+		self.shouldLockPointer = false
 		setNeedsUpdateOfPrefersPointerLocked()
 		// MadeiraMetalView = Madeira.MadeiraMetalView()
 	}
@@ -154,7 +154,7 @@ final class MetalUIViewController: UIViewController {
 		MetalBackedView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
 		MetalBackedView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
 		// MetalBackedView.frame = view.bounds
-        MetalBackedView.didMove(toParent: self)
+        // MetalBackedView.didMove(toParent: self)
 		// GamepadBridge = Madeira.GamepadBridge()
 		lockPointer()
 		/*:
@@ -186,6 +186,10 @@ final class MetalUIViewController: UIViewController {
 	override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         lockPointer()
+    }
+	override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+		shouldLockPointer = false
     }
 }
 /*:
