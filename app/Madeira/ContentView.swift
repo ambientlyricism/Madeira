@@ -70,7 +70,7 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
         // myViewController.delegate = context.coordinator
 		// myViewController.view.isOpaque = false
 		// myViewController.view.backgroundColor = .clear
-		myViewController.modalPresentationStyle = .fullScreen
+		// myViewController.modalPresentationStyle = .fullScreen
 		// let label = UILabel()
 		// let PointerLockNotice = PointerLockNotice.shared.status()
 		// label.text = currentLock
