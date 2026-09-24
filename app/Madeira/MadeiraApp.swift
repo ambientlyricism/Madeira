@@ -39,6 +39,9 @@ struct MadeiraApp: App {
 			if DisplaySettings.shared.immersive {
 				MadeiraUIViewController()
 					.ignoresSafeArea()
+					let label = UILabel()
+					label.text = currentLock
+					label.textColor = UIColor.red
 			}
 			else{
 				ContentView()
