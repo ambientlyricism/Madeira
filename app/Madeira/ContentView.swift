@@ -373,7 +373,7 @@ final class MetalUIHostingController: UIHostingController<TouchControlsOverlay> 
 	var TouchControlsOverlay: TouchControlsOverlay?
 	// var GamepadBridge: GamepadBridge?
 	static let shared = MetalUIHostingController(rootView: Madeira.TouchControlsOverlay())
-	override var childViewControllerForPointerLock: UIHostingController? { nil }
+	override var childViewControllerForPointerLock: UIHostingController<TouchControlsOverlay>? { nil }
 	var shouldLockPointer: Bool = true
 	// private var observers: [NSObjectProtocol] = []
 	override var prefersPointerLocked: Bool {
@@ -881,7 +881,7 @@ enum JoystickPadHost {
             w.windowLevel = .normal + 100
             w.backgroundColor = .clear
             w.isHidden = false                 // never becomes key: see PassthroughWindow
-            let host = UIHostingController(rootView: JoystickPadOverlay())
+            let host = MetalUIHostingController(rootView: JoystickPadOverlay())
             host.view.backgroundColor = .clear
             host.view.isUserInteractionEnabled = false
             w.rootViewController = host
