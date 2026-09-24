@@ -77,9 +77,9 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 		label.textColor = UIColor.red
 		// myViewController.view.addSubview(label)
     	label.translatesAutoresizingMaskIntoConstraints = false
-  		label.leftAnchor.constraint(equalTo: myViewController.leftAnchor, constant: 20).isActive = true		
-  		label.rightAnchor.constraint(equalTo: myViewController.rightAnchor, constant: -20).isActive = true
-   		label.centerYAnchor.constraint(equalTo:   myViewController.centerYAnchor).isActive = true
+  		label.leftAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true		
+  		label.rightAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
+   		label.centerYAnchor.constraint(equalTo:   view.centerYAnchor).isActive = true
     	myViewController.view.addSubview(label)
 		// label.frame = myViewController.view.frame
         // myViewController.delegate = context.coordinator
