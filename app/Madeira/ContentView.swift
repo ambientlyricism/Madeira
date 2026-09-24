@@ -103,12 +103,13 @@ struct MadeiraUIViewController: UIViewControllerRepresentable {
 // }
 final class MetalUIViewController: UIViewController {
 	// public var delegate: MetalUIViewControllerDelegate?
+	// var MetalUIHostingController: MetalUIHostingController?
 	var MetalBackedView: MetalBackedView?
 	// var scrollView: UIScrollView
 	static let shared = MetalUIViewController()
-	var shouldLockPointer: Bool = false
+	var shouldLockPointer: Bool = true
 	// var GamepadBridge: GamepadBridge?
-	override var childViewControllerForPointerLock: UIViewController? { self }
+	override var childViewControllerForPointerLock: UIViewController? { nil }
 	override var prefersPointerLocked: Bool {
 		return self.shouldLockPointer
 	}
@@ -197,7 +198,7 @@ final class MetalUIViewController: UIViewController {
     }
 	override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-		self.shouldLockPointer = false
+		// self.shouldLockPointer = false
 		currentLock = String(self.shouldLockPointer)
     }
 }
@@ -310,6 +311,7 @@ final class MetalViewController: UIViewController {
         // lockPointer()
     }
 }
+
 	
 final class MetalHostingController: UIHostingController<MadeiraMetalView> {
 	// var MadeiraMetalView: MadeiraMetalView?
@@ -366,6 +368,49 @@ final class MetalHostingController: UIHostingController<MadeiraMetalView> {
         // Implement delegate methods here
 //    }
 // }
+// UIHostingController(rootView: TouchControlsOverlay())
+final class MetalUIHostingController: UIHostingController<TouchControlsOverlay> {
+	var TouchControlsOverlay: TouchControlsOverlay?
+	// var GamepadBridge: GamepadBridge?
+	static let shared = MetalUIHostingController(rootView: Madeira.TouchControlsOverlay())
+	override var childViewControllerForPointerLock: UIHostingController? { nil }
+	var shouldLockPointer: Bool = true
+	// private var observers: [NSObjectProtocol] = []
+	override var prefersPointerLocked: Bool {
+		return self.shouldLockPointer
+	}
+	func lockPointer() {
+		self.shouldLockPointer = true
+		setNeedsUpdateOfPrefersPointerLocked()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
+	}
+	override func viewDidLoad() {
+      	super.viewDidLoad()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
+		TouchControlsOverlay = Madeira.TouchControlsOverlay()
+		// if #available(iOS 16.4, *) {
+			// self._disableSafeArea = true
+   			// self.safeAreaRegions = .all
+			// self.safeAreaRegions = SafeAreaRegions()
+		// }
+		// self.modalPresentationStyle = .fullScreen
+		// self.navigationController?.isNavigationBarHidden = true
+		lockPointer()
+		// for name in [Notification.Name.GCMouseDidConnect, .GCMouseDidDisconnect,
+        //             UIApplication.didBecomeActiveNotification, UIApplication.willResignActiveNotification,
+        //             UIAccessibility.assistiveTouchStatusDidChangeNotification,
+        //             UIPointerLockState.didChangeNotification] {
+        //     observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+        //     	MainActor.assumeIsolated { self?.lockPointer() }
+        //     })
+        // }
+		
+	}
+	override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        lockPointer()
+    }
+}
 
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
@@ -3060,7 +3105,7 @@ enum TouchControlsHost {
             w.windowLevel = .normal + 101
             w.backgroundColor = .clear
             w.isHidden = false        // deliberately never made key
-            let host = UIHostingController(rootView: TouchControlsOverlay())
+            let host = MetalUIHostingController(rootView: TouchControlsOverlay())
             host.view.backgroundColor = .clear
             w.rootViewController = host
             window = w
