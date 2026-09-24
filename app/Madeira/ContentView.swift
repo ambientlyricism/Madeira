@@ -3127,7 +3127,7 @@ struct TouchControlsOverlay: View {
                 }
                 .transition(.opacity.combined(with: .scale))
             }
-			Text(String(currentLock))
+			// Text(String(currentLock))
         }
         .padding(.top, 10)
         .animation(.easeInOut(duration: 0.22), value: m.editing)
