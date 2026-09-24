@@ -29,8 +29,8 @@ struct MadeiraApp: App {
 	    // }
     init() {
 		// MadeiraViewController.shared.lockPointer()
-		GamepadBridge.shared.start()
-		// GamepadBridge = Madeira.GamepadBridge()
+		// GamepadBridge.shared.start()
+		GamepadBridge = Madeira.GamepadBridge()
 	}
 	// @State private var isPresenting = true
     var body: some Scene {
