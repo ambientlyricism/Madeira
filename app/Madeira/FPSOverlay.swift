@@ -179,7 +179,7 @@ struct FPSOverlay: View {
             .background(captureFlash ? Color.cyan : Color.clear)
             .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.cyan, lineWidth: 1))
             .onTapGesture {
-                madeira_capture_request(1)
+                // madeira_capture_request(1)
                 captureFlash = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { captureFlash = false }
             }
@@ -190,18 +190,18 @@ struct FPSOverlay: View {
     /// all of it before gameplay starts. ECO on = guest threads run at a low QoS
     /// class (efficiency cores, lower clocks): loading is slower but keeps the
     /// budget for gameplay. Turn it off once in game. Green = on.
-    @State private var ecoOn = madeira_get_eco() != 0
+    // @State private var ecoOn = madeira_get_eco() != 0
     private var ecoPill: some View {
         Text("ECO")
-            .foregroundColor(ecoOn ? .black : .green)
+            .// foregroundColor(ecoOn ? .black : .green)
             .padding(.horizontal, 5)
             .padding(.vertical, 1)
-            .background(ecoOn ? Color.green : Color.clear)
+            // .background(ecoOn ? Color.green : Color.clear)
             .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.green, lineWidth: 1))
-            .onTapGesture {
-                ecoOn.toggle()
-                madeira_set_eco(ecoOn ? 1 : 0)
-            }
+            // .onTapGesture {
+            //    ecoOn.toggle()
+            //    madeira_set_eco(ecoOn ? 1 : 0)
+            // }
     }
 
     /// ml1136: GPU encoder-sync mode, switchable live for in-place A/B tests.
@@ -223,7 +223,7 @@ struct FPSOverlay: View {
                 fenceMode = FPSOverlayFenceMode.current
                 fenceMode = fenceMode == 1 ? 6 : fenceMode == 6 ? 5 : fenceMode == 5 ? 0 : 1
                 FPSOverlayFenceMode.current = fenceMode
-                madeira_set_fence_mode(Int32(fenceMode == 0 ? 7 : fenceMode))
+                // madeira_set_fence_mode(Int32(fenceMode == 0 ? 7 : fenceMode))
             }
     }
 
