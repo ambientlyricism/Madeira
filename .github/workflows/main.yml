@@ -52,6 +52,11 @@ jobs:
           xcodebuild -downloadComponent MetalToolchain \
             || echo "downloadComponent unsupported; assuming bundled"
 
+      - name: Refresh Bundled License Files
+        run: |
+          chmod +x build/stage-licenses.sh
+          ./build/stage-licenses.sh
+          
       # ==============================================================
       # CHEAP STEPS FIRST — anything that can fail fast, fails in the
       # first few minutes rather than after the LLVM build.
