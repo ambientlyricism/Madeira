@@ -655,6 +655,7 @@ final class MetalBackedView: UIView {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard desktopMode else {
             guard let t = touches.first else { return }
+			guard !GamepadBridge.shared.MouseActive() else {return}
             let (x, y) = mapTouch(t)
             winios_post_touch_down(x, y)
             return
@@ -699,6 +700,7 @@ final class MetalBackedView: UIView {
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard desktopMode else {
             guard let t = touches.first else { return }
+			guard !GamepadBridge.shared.MouseActive() else {return}
             let (x, y) = mapTouch(t)
             winios_post_touch_move(x, y)
             return
@@ -753,7 +755,6 @@ final class MetalBackedView: UIView {
          * by dragging RIGHT. That is the same sign as a mouse. Negate both terms
          * for content-drag (finger-follows-world) feel. */
         if InputSettings.shared.relative {
-			guard !GamepadBridge.shared.MouseActive() else {return}
             let sens = CGFloat(InputSettings.shared.sensRel)
             relCarryX += dx * sens
             relCarryY += dy * sens
