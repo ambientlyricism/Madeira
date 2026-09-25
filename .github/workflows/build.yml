@@ -2,8 +2,6 @@ name: Build Madeira IPA
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 env:
   BUNDLE_ID: com.NotBoodiOS.madeira
