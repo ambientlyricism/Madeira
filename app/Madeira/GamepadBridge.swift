@@ -67,19 +67,19 @@ final class GamepadBridge {
                // 
                let code = Int(value.rawValue)
                if code == 0x7B {
-                  let key = 0x25
+                  self.key = 0x25
                }
                else if code == 0x7C {
-                  let key = 0x27
+                  self.key = 0x27
                }
                else if code == 0x7D {
-                  let key = 0x28
+                  self.key = 0x28
                }
                else if code == 0x7E {
-                  let key = 0x26
+                  self.key = 0x26
                }
                else {
-                  let key = MadeiraKeys.virtualKey(hid: code) ?? Int32(0)
+                  self.key = MadeiraKeys.virtualKey(hid: code) ?? Int32(0)
                }
                winios_post_key(key, pressed ? 1 : 0)
       }
