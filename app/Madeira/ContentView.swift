@@ -2593,6 +2593,7 @@ struct ContentView: View {
             // Reports its decision either way. A gate that stays silent when it
             // declines to run is indistinguishable from one that never executed,
             // which cost a device run to work out.
+			/*:
             if let d = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
                 let raw = MadeiraConfig.get("d3d12")   /* ml1095 */
                 let val = raw ?? ""
@@ -2614,7 +2615,7 @@ struct ContentView: View {
                     logStore.log("madeira-d3d12: gate off (madeira.cfg d3d12 \(raw == nil ? "unset" : "= '\(val)'"))", level: .debug)
                 }
             }
-
+			*/
             // ml821: coalesced remote messages. Documents/madeira-remote-batch.txt
             // == "1" makes the pre-submission flush send many buffer ranges per
             // round trip and drains autorelease pools in one call. It is OPT-IN
