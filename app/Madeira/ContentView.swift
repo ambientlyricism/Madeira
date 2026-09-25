@@ -3,6 +3,9 @@ import UIKit
 import QuartzCore
 import Metal
 import os.log
+import Foundation
+// import Combine
+// import GameController
 
 // 2026-07-03 window-hosted Metal layer.
 //
@@ -23,6 +26,415 @@ import os.log
 // SwiftUI hierarchy (and thus to the placeholder's touch handlers).
 
 /// Raw window-level host for the presenting CAMetalLayer.
+/*:
+struct PointerView: View {
+	@State private var isPresenting = true
+	var body: some View {
+		GeometryReader { geo in
+			// MadeiraViewController()
+		}
+		.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
+   		// ContentView()
+	}
+}
+*/
+public var currentLock: String = "Initiating"
+struct MadeiraUIViewController: UIViewControllerRepresentable {
+        
+    typealias UIViewControllerType = MetalUIViewController
+	/*:
+	var parent: MadeiraUIViewController
+	
+	init(_ parent: MadeiraUIViewController) {
+    	self.parent = parent
+	}
+	// var PointerLockNotice: PointerLockNotice
+	public var scrolltest: Bool = false
+	class Coordinator: NSObject, UIScrollViewDelegate {
+        var parent: MadeiraUIViewController
+
+        init(_ parent: MadeiraUIViewController) {
+            self.parent = parent
+        }
+
+		func scrollViewDidScroll(_ scrollView: UIScrollView) {
+			scrolltest = true
+		}
+    }
+	func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+	*/
+    func makeUIViewController(context: Context) -> MetalUIViewController  {
+        let myViewController = MetalUIViewController()
+        // myViewController.delegate = context.coordinator
+		// myViewController.view.isOpaque = false
+		// myViewController.view.backgroundColor = .clear
+		// myViewController.modalPresentationStyle = .fullScreen
+		// let label = UILabel()
+		// let PointerLockNotice = PointerLockNotice.shared.status()
+		// label.text = currentLock
+		// label.textColor = UIColor.red
+		// myViewController.view.addSubview(label)
+		// label.view.addSubview(myViewController)
+    	// label.translatesAutoresizingMaskIntoConstraints = false
+  		// label.leadingAnchor.constraint(equalTo: myViewController.leadingAnchor, constant: 20).isActive = true		
+  		// label.trailingAnchor.constraint(equalTo: myViewController.trailingAnchor, constant: -20).isActive = true
+   		// label.centerYAnchor.constraint(equalTo:   myViewController.centerYAnchor).isActive = true
+		// label.frame = myViewController.view.frame
+        // myViewController.delegate = context.coordinator
+		// self.present(myViewController, animated: true)
+		// MetalHostingController.shared.lockPointer()
+		// myViewController.lockPointer()
+        return myViewController
+    }
+
+    func updateUIViewController(_ uiViewController: MetalUIViewController, context: Context) {
+		// MetalHostingController.shared.lockPointer()
+		// uiViewController.lockPointer()
+            // left blank
+    }
+	// func makeCoordinator() -> Coordinator {
+    //    return Coordinator(self)
+    // }
+}
+// protocol MetalUIViewControllerDelegate {
+//    func runMetalUI(identifier: String)
+// }
+final class MetalUIViewController: UIViewController {
+	// public var delegate: MetalUIViewControllerDelegate?
+	// var MetalUIHostingController: MetalUIHostingController?
+	var MetalBackedView: MetalBackedView?
+	// var scrollView: UIScrollView
+	static let shared = MetalUIViewController()
+	var shouldLockPointer: Bool = true
+	// var GamepadBridge: GamepadBridge?
+	override var childViewControllerForPointerLock: UIViewController? { nil }
+	override var prefersPointerLocked: Bool {
+		return self.shouldLockPointer
+	}
+	func lockPointer() {
+		// MetalHostingController = MetalHostingController(ContentView())
+		// let MetalViewController = MetalHostingController.presentingViewController
+		// MetalHostingController.shared.lockPointer()
+		self.shouldLockPointer = true
+		currentLock = String(self.shouldLockPointer)
+		setNeedsUpdateOfPrefersPointerLocked()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
+	}
+	override func viewDidLoad() {
+     	super.viewDidLoad()
+		/*:
+		// ScrollView Setup
+		scrollView = UIScrollView(frame: view.bounds)
+		scrollView.delegate = self
+		scrollView.minimumZoomScale = 1.0
+		scrollView.maximumZoomScale = 5.0
+		scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+		// The scroll view is a programmatically-driven zoom/pan container only. Every touch is
+		// owned by touchOverlay (created below); the scroll view's own gestures are disabled so
+		// they can never race with or swallow our cursor / pinch / scroll handling.
+		scrollView.panGestureRecognizer.isEnabled = true
+		scrollView.pinchGestureRecognizer?.isEnabled = true
+		scrollView.isScrollEnabled = true
+		scrollView.bouncesZoom = true
+		view.addSubview(scrollView)
+		let pointerInteraction = UIPointerInteraction(delegate: self)
+		view.addInteraction(pointerInteraction)
+		*/
+		// let ContentView = ContentView()
+		let MetalBackedView = Madeira.MetalBackedView()
+        // let hostingController = MetalHostingController(rootView: Madeira.MadeiraMetalView())
+		// if #available(iOS 16.4, *) {
+			// hostingController._disableSafeArea = true
+   			// hostingController.safeAreaRegions = .all
+		//	MetalBackedView.safeAreaRegions = SafeAreaRegions()
+		// }
+		self.modalPresentationStyle = .fullScreen
+		self.navigationController?.isNavigationBarHidden = true
+		
+        // addChild(MetalBackedView)
+        view.addSubview(MetalBackedView)
+		MetalBackedView.translatesAutoresizingMaskIntoConstraints = false
+		MetalBackedView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+		MetalBackedView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+		MetalBackedView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+		MetalBackedView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+		// MetalBackedView.frame = view.bounds
+        // MetalBackedView.didMove(toParent: self)
+		// GamepadBridge = Madeira.GamepadBridge()
+		// lockPointer()
+		/*:
+		let window: UIWindow
+		let mainView: UIView
+		private init(window: UIWindow, mainView: UIView) throws {
+        	self.window = window
+        	self.mainView = mainView
+		}
+		var observer: Any?
+		// NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedNotification(notification:)), name: Notification.Name("NotificationIdentifier"), object: nil)
+		if let pointerLockState = self.window.windowScene?.pointerLockState {
+    		self.observer = NotificationCenter.default.addObserver(forName: UIPointerLockState.didChangeNotification,
+                                                   		object: pointerLockState,
+                                                   		queue: OperationQueue.main) { (note) in
+        		guard let lockState = note.object as? UIPointerLockState else { return }
+        		// gameEngine.performExpensiveOperationWhile(lockState.isLocked)
+   		 	}
+			let label = UILabel()
+			label.text = lockState
+			label.textColor = UIColor.red
+		}
+		*/
+	}
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        lockPointer()
+		currentLock = String(self.shouldLockPointer)
+    }
+	override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        lockPointer()
+		currentLock = String(self.shouldLockPointer)
+    }
+	override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+		// self.shouldLockPointer = false
+		currentLock = String(self.shouldLockPointer)
+    }
+}
+/*:
+public var currentLock: String = "Initiating"
+final class PointerLockNotice: UIWindow {
+	let shared = PointerLockNotice(frame: CGRect(x: 0, y: 0, width: 800, height: 600))
+	// let window: UIWindow
+	// let mainView: UIView
+	var observer: Any?
+	override init(frame: CGRect) {
+		super.init(frame: frame)
+		status()
+	}
+	required init?(coder: NSCoder) { fatalError() }
+	func status() {
+	// NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedNotification(notification:)), name: Notification.Name("NotificationIdentifier"), object: nil)
+		if let pointerLockState = window?.windowScene?.pointerLockState {
+    		observer = NotificationCenter.default.addObserver(forName: UIPointerLockState.didChangeNotification,
+              	                                     		object: pointerLockState,
+              	                                     		queue: OperationQueue.main) { (note) in
+       		guard let lockState = note.object as? UIPointerLockState else { return }
+			currentLock = String(lockState.isLocked)
+   			}
+		}
+		else { currentLock = "Not Found" }
+	}
+}
+*/
+/*:	
+struct MadeiraViewController: UIViewControllerRepresentable {
+        
+    typealias UIViewControllerType = MetalViewController
+	// var parent: MadeiraViewController
+	
+	// init(_ parent: MadeiraViewController) {
+    //	self.parent = parent
+	// }
+
+    func makeUIViewController(context: Context) -> MetalViewController  {
+        let myViewController = MetalViewController()
+		// myViewController.view.isOpaque = false
+		// myViewController.view.backgroundColor = .clear
+		// let label = UILabel()
+		// label.text = "Controller Active"
+		// label.textColor = UIColor.red
+		// myViewController.view.addSubview(label)
+		// label.frame = myViewController.view.frame
+        // myViewController.delegate = context.coordinator
+		myViewController.modalPresentationStyle = .fullScreen
+		// self.present(myViewController, animated: true)
+		// MetalHostingController.shared.lockPointer()
+		// myViewController.lockPointer()
+        return myViewController
+    }
+
+    func updateUIViewController(_ uiViewController: MetalViewController, context: Context) {
+		// MetalHostingController.shared.lockPointer()
+		// uiViewController.lockPointer()
+            // left blank
+    }
+	// func makeCoordinator() -> Coordinator {
+    //    return Coordinator(self)
+    // }
+}
+final class MetalViewController: UIViewController {
+	// var MadeiraMetalView: MadeiraMetalView?
+	// var MetalHostingController: MetalHostingController?
+	static let shared = MetalViewController()
+	// var shouldLockPointer: Bool = true
+	var GamepadBridge: GamepadBridge?
+	// override var prefersPointerLocked: Bool {
+	//	return self.shouldLockPointer
+	// }
+	// func lockPointer() {
+		// MetalHostingController = MetalHostingController(ContentView())
+		// let MetalViewController = MetalHostingController.presentingViewController
+		// MetalHostingController.shared.lockPointer()
+		// self.shouldLockPointer = true
+		// self.setNeedsUpdateOfPrefersPointerLocked()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
+	// }
+	override func viewDidLoad() {
+     	super.viewDidLoad()
+		// let ContentView = ContentView()
+		let MadeiraMetalView = Madeira.MadeiraMetalView()
+        let hostingController = MetalHostingController(rootView: Madeira.MadeiraMetalView())
+		if #available(iOS 16.4, *) {
+			// hostingController._disableSafeArea = true
+   			// hostingController.safeAreaRegions = .all
+			hostingController.safeAreaRegions = SafeAreaRegions()
+		}
+		self.modalPresentationStyle = .fullScreen
+		self.navigationController?.isNavigationBarHidden = true
+		
+        addChild(hostingController)
+        view.addSubview(hostingController.view)
+		hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+		hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+		hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+		hostingController.view.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+		hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+		hostingController.view.frame = view.bounds
+        hostingController.didMove(toParent: self)
+		// GamepadBridge = Madeira.GamepadBridge()
+		// lockPointer()
+	}
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // lockPointer()
+    }
+}
+
+	
+final class MetalHostingController: UIHostingController<MadeiraMetalView> {
+	// var MadeiraMetalView: MadeiraMetalView?
+	var GamepadBridge: GamepadBridge?
+	static let shared = MetalHostingController(rootView: Madeira.MadeiraMetalView())
+	override var childViewControllerForPointerLock: UIViewController? { nil }
+	var shouldLockPointer: Bool = true
+	// private var observers: [NSObjectProtocol] = []
+	override var prefersPointerLocked: Bool {
+		return self.shouldLockPointer
+	}
+	func lockPointer() {
+		self.shouldLockPointer = true
+		setNeedsUpdateOfPrefersPointerLocked()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
+	}
+	override func viewDidLoad() {
+      	super.viewDidLoad()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
+		if #available(iOS 16.4, *) {
+			// self._disableSafeArea = true
+   			// self.safeAreaRegions = .all
+			self.safeAreaRegions = SafeAreaRegions()
+		}
+		self.modalPresentationStyle = .fullScreen
+		self.navigationController?.isNavigationBarHidden = true
+		lockPointer()
+		// for name in [Notification.Name.GCMouseDidConnect, .GCMouseDidDisconnect,
+        //             UIApplication.didBecomeActiveNotification, UIApplication.willResignActiveNotification,
+        //             UIAccessibility.assistiveTouchStatusDidChangeNotification,
+        //             UIPointerLockState.didChangeNotification] {
+        //     observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+        //     	MainActor.assumeIsolated { self?.lockPointer() }
+        //     })
+        // }
+		
+	}
+	override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        lockPointer()
+    }
+}
+	
+*/
+
+// extension MadeiraViewController {
+//    class Coordinator /*: SomeUIKitViewDelegate */ {
+//        var parent: MadeiraViewController
+        
+//        init(_ parent: MadeiraViewController) {
+//            self.parent = parent
+//        }
+        
+        // Implement delegate methods here
+//    }
+// }
+// UIHostingController(rootView: TouchControlsOverlay())
+final class MetalUIHostingController: UIHostingController<TouchControlsOverlay> {
+	var TouchControlsOverlay: TouchControlsOverlay?
+	// var GamepadBridge: GamepadBridge?
+	static let shared = MetalUIHostingController(rootView: Madeira.TouchControlsOverlay())
+	// override var childViewControllerForPointerLock: UIHostingController<TouchControlsOverlay>? { nil }
+	var shouldLockPointer: Bool = true
+	// private var observers: [NSObjectProtocol] = []
+	override var prefersPointerLocked: Bool {
+		return self.shouldLockPointer
+	}
+	func lockPointer() {
+		self.shouldLockPointer = true
+		setNeedsUpdateOfPrefersPointerLocked()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
+	}
+	override func viewDidLoad() {
+      	super.viewDidLoad()
+		// MadeiraMetalView = Madeira.MadeiraMetalView()
+		TouchControlsOverlay = Madeira.TouchControlsOverlay()
+		// if #available(iOS 16.4, *) {
+			// self._disableSafeArea = true
+   			// self.safeAreaRegions = .all
+			// self.safeAreaRegions = SafeAreaRegions()
+		// }
+		// self.modalPresentationStyle = .fullScreen
+		// self.navigationController?.isNavigationBarHidden = true
+		lockPointer()
+		// for name in [Notification.Name.GCMouseDidConnect, .GCMouseDidDisconnect,
+        //             UIApplication.didBecomeActiveNotification, UIApplication.willResignActiveNotification,
+        //             UIAccessibility.assistiveTouchStatusDidChangeNotification,
+        //             UIPointerLockState.didChangeNotification] {
+        //     observers.append(NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+        //     	MainActor.assumeIsolated { self?.lockPointer() }
+        //     })
+        // }
+		
+	}
+	override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        lockPointer()
+    }
+}
+final class JoyUIHostingController: UIHostingController<JoystickPadOverlay> {
+	var JoystickPadOverlay: JoystickPadOverlay?
+	static let shared = JoyUIHostingController(rootView: Madeira.JoystickPadOverlay())
+	// override var childViewControllerForPointerLock: UIHostingController<JoystickPadOverlay>? { nil }
+	var shouldLockPointer: Bool = true
+	override var prefersPointerLocked: Bool {
+		return self.shouldLockPointer
+	}
+	func lockPointer() {
+		self.shouldLockPointer = true
+		setNeedsUpdateOfPrefersPointerLocked()
+	}
+	override func viewDidLoad() {
+      	super.viewDidLoad()
+		JoystickPadOverlay = Madeira.JoystickPadOverlay()
+		lockPointer()
+	}
+	override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        lockPointer()
+    }
+}
+
+
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
     // swapchain exactly once; if the host were recreated on view teardown
@@ -35,7 +447,6 @@ final class MetalHostView: UIView {
     var metalLayer: CAMetalLayer { return layer as! CAMetalLayer }
     override init(frame: CGRect) {
         super.init(frame: frame)
-        GamepadEventClaim.install(on: self)
         isUserInteractionEnabled = false   // touches fall through to SwiftUI
         backgroundColor = .black
         contentScaleFactor = UIScreen.main.scale
@@ -98,7 +509,6 @@ final class MetalBackedView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        GamepadEventClaim.install(on: self)
         // Multi-touch REQUIRED: with it off, a fast double-tap's second
         // touch (landing before the first lift is processed) is silently
         // swallowed — drag-arm never fired (2026-07-06). Two-finger
@@ -107,10 +517,7 @@ final class MetalBackedView: UIView {
         self.isUserInteractionEnabled = true
         self.backgroundColor = .clear
     }
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        GamepadEventClaim.install(on: self)
-    }
+    required init?(coder: NSCoder) { super.init(coder: coder) }
 
     // Visibility-stall postmortem (2026-07-03): the intermittent "presents
     // count but the screen stays black until a bg/fg or screenshot" state
@@ -246,6 +653,7 @@ final class MetalBackedView: UIView {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+		guard !GamepadBridge.shared.MouseActive() else {return}
         guard desktopMode else {
             guard let t = touches.first else { return }
             let (x, y) = mapTouch(t)
@@ -290,6 +698,7 @@ final class MetalBackedView: UIView {
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+		guard !GamepadBridge.shared.MouseActive() else {return}
         guard desktopMode else {
             guard let t = touches.first else { return }
             let (x, y) = mapTouch(t)
@@ -297,20 +706,20 @@ final class MetalBackedView: UIView {
             return
         }
         let active = activeTouches(event)
-        if twoFingerActive {
-            guard active.count >= 2 else { return }
-            let avg = avgPoint(active)
-            let dy = avg.y - lastTwoFingerY
-            lastTwoFingerY = avg.y
-            if abs(dy) > 2 { twoFingerMoved = true }
-            scrollAccum += dy
+        // if twoFingerActive {
+        //    guard active.count >= 2 else { return }
+        //    let avg = avgPoint(active)
+        //    let dy = avg.y - lastTwoFingerY
+        //    lastTwoFingerY = avg.y
+        //    if abs(dy) > 2 { twoFingerMoved = true }
+        //    scrollAccum += dy
             // 14pt of finger travel = one wheel notch. ml641 flipped the sign:
             // on a touchscreen the content follows the finger, so dragging UP
             // scrolls DOWN through the document. It was mouse-wheel sense before.
-            while scrollAccum <= -14 { scrollAccum += 14; postPointer(F_WHEEL, data: -120) }
-            while scrollAccum >= 14 { scrollAccum -= 14; postPointer(F_WHEEL, data: 120) }
-            return
-        }
+        //    while scrollAccum <= -14 { scrollAccum += 14; postPointer(F_WHEEL, data: -120) }
+        //    while scrollAccum >= 14 { scrollAccum -= 14; postPointer(F_WHEEL, data: 120) }
+        //    return
+        // }
         let t: UITouch
         if dragActive, let d = dragTouch {
             guard touches.contains(d) else { return }  // only the old tap finger moved
@@ -356,16 +765,20 @@ final class MetalBackedView: UIView {
             if ix != 0 || iy != 0 { winios_pointer(ix, iy, F_MOVE, 0) }
             return
         }
-
+		// GamepadBridge.shared.registerMouse(GCMouse)
+		// guard !GamepadBridge.shared.MouseActive() else {return}
         let sens = CGFloat(InputSettings.shared.sensAbs)   // desktop px per view pt
         let maxX = CGFloat(envInt("MADEIRA_SCREEN_W", 1024) - 1)
         let maxY = CGFloat(envInt("MADEIRA_SCREEN_H", 768) - 1)
         Self.cursor.x = min(max(Self.cursor.x + dx * sens, 0), maxX)
         Self.cursor.y = min(max(Self.cursor.y + dy * sens, 0), maxY)
+        // Self.cursor.x = GamepadBridge.shared.GCMouseInputX()
+        // Self.cursor.y = GamepadBridge.shared.GCMouseInputY()
         postPointer(F_MOVE | F_ABS)
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+		guard !GamepadBridge.shared.MouseActive() else {return}
         guard desktopMode else {
             guard let t = touches.first else { return }
             let (x, y) = mapTouch(t)
@@ -407,6 +820,7 @@ final class MetalBackedView: UIView {
     }
 
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+		guard !GamepadBridge.shared.MouseActive() else {return}
         guard desktopMode else {
             guard let t = touches.first else { return }
             let (x, y) = mapTouch(t)
@@ -494,7 +908,7 @@ enum JoystickPadHost {
             w.windowLevel = .normal + 100
             w.backgroundColor = .clear
             w.isHidden = false                 // never becomes key: see PassthroughWindow
-            let host = UIHostingController(rootView: JoystickPadOverlay())
+            let host = JoyUIHostingController(rootView: JoystickPadOverlay())
             host.view.backgroundColor = .clear
             host.view.isUserInteractionEnabled = false
             w.rootViewController = host
@@ -848,6 +1262,14 @@ struct MadeiraMetalView: UIViewRepresentable {
     }
     func updateUIView(_ uiView: MetalBackedView, context: Context) {}
 }
+/// Session-scoped display state. Immersive mode deliberately resets on a cold
+/// launch so the tooling UI is always recoverable, even if the previous Wine
+/// session ended unexpectedly.
+final class DisplaySettings: ObservableObject {
+    static let shared = DisplaySettings()
+    @Published var immersive = false
+    private init() {}
+}
 
 struct ContentView: View {
     @StateObject private var logStore = LogStore.shared
@@ -855,11 +1277,13 @@ struct ContentView: View {
     @State private var entitlements: EntitlementStatus?
     @State private var debuggerAttached = isDebuggerAttached()
     @ObservedObject private var input = InputSettings.shared
+    @ObservedObject private var display = DisplaySettings.shared
     @State private var pointerPanel = false
     @Namespace private var pointerNS
     /// .compact = iPhone landscape: game surface expands, arrow keys appear.
     @Environment(\.verticalSizeClass) private var vSizeClass
-
+    // @State private var orientation = UIDevice.current.orientation
+    
     enum JITStatus {
         case unknown
         case testing
@@ -878,8 +1302,11 @@ struct ContentView: View {
          * two-column selection behaviour. */
         NavigationStack {
             Group {
-                if vSizeClass == .compact {
-                    landscapeBody
+                // if orientation.isLandscape {
+                if display.immersive || vSizeClass == .compact {
+                    // landscapeBody
+					MadeiraUIViewController()
+						.ignoresSafeArea()
                 } else {
                     portraitBody
                 }
@@ -890,12 +1317,24 @@ struct ContentView: View {
             // a fresh placeholder only re-parents the same CAMetalLayer.
             .navigationTitle("Madeira")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarHidden(vSizeClass == .compact)
+            // .navigationBarHidden(orientation.isLandscape)
+            .navigationBarHidden(display.immersive || vSizeClass == .compact)
             .onAppear {
                 jit_install_trap_handler()
                 entitlements = EntitlementStatus.check()
                 logEntitlementStatus()
             }
+            .statusBarHidden(display.immersive)
+            .persistentSystemOverlays(display.immersive ? .hidden : .automatic)
+            .onChange(of: display.immersive) { _, enabled in
+                TouchControlsHost.attach()
+                logStore.log(enabled ? "Immersive mode enabled" : "Controls restored",
+                             level: .info)
+            }
+            // fix iPadOS rotation :sob: 
+            // .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+            //    self.orientation = UIDevice.current.orientation
+            // }
         }
     }
 
@@ -971,13 +1410,23 @@ struct ContentView: View {
     /// happens in MetalBackedView); ALL controls live in the pillarbox
     /// bars left/right of the game — the window-level surface would cover
     /// anything drawn over the game area itself. No header/log/nav chrome.
+	@State private var isPresenting = true
     private var landscapeBody: some View {
         GeometryReader { geo in
             let gameW = min(geo.size.width, geo.size.height * 4.0 / 3.0)
             let barW = max((geo.size.width - gameW) / 2.0, 44)
-            ZStack {
+        	ZStack {
                 Color.black
-                MadeiraMetalView()
+				MadeiraMetalView()
+				//.fullScreenCover(isPresented: $isPresenting, content: { MadeiraMetalView() })
+				// MadeiraViewController()
+            	    .onAppear { TouchControlsHost.attach() }
+            		.onReceive(NotificationCenter.default.publisher(
+                    	for: UIDevice.orientationDidChangeNotification)) { _ in
+                		TouchControlsHost.attach()
+                    }
+					// .ignoresSafeArea()
+					// .statusBarHidden()
                 // Controls removed for now (ml586): game-only landscape.
                 // The FPS readout stays, pinned in the right pillarbox bar —
                 // the window-level surface covers anything drawn over the
@@ -991,9 +1440,14 @@ struct ContentView: View {
                     .frame(width: barW)
                 }
             }
-        }
+			// .frame(maxWidth: .infinity)
+			// .frame(maxHeight: .infinity)
+		}
         .ignoresSafeArea()
+		// .statusBarHidden()
         .background(Color.black)
+		// .background(MadeiraViewController())
+		//.fullScreenCover(isPresented: $isPresenting, content: { MadeiraViewController() })
     }
 
     /// Hold-to-press key: VK down on touch, VK up on release — for keys
@@ -1131,7 +1585,6 @@ struct ContentView: View {
             logStore.log("  Tip: Use GetMoreRam to inject extended-virtual-addressing", level: .info)
         }
     }
-
     private var actionButtons: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
@@ -1139,6 +1592,14 @@ struct ContentView: View {
                     enableJITViaStikDebug()
                 }
                 .buttonStyle(.borderedProminent)
+                
+                 Button("Full Screen") {
+                    display.immersive = true
+					// MetalHostingController.shared.lockPointer()
+					// MetalViewController.shared.lockPointer()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.indigo)
 
                 Button("Steam Testing") {
                     // Steam S3 first boot: virtual desktop (Steam needs a
@@ -1155,7 +1616,7 @@ struct ContentView: View {
                     // render), -console (Steam's own log → our stderr). Steam
                     // WILL try to self-update through our GnuTLS stack — that
                     // attempt is itself an informative S0 re-test.
-                    let deskW = 1024, deskH = 768
+                    let deskW = 1366, deskH = 1024
                     // ml589: find Steam and (re)write the launch batch. Returns
                     // false — having logged why — when there is nothing to run.
                     guard prepareSteamLaunch() else { return }
@@ -1427,8 +1888,9 @@ struct ContentView: View {
                     // Known risk: if shellwindows_init beats services.exe's
                     // RPC_Init, OpenSCManager fails → watch whether that
                     // fails fast or hits the RaiseException→CS wedge again.
+                    // let deskW = 1366, deskH = 1024
                     // ml1127: `desktop-size = WxH` in madeira.cfg; 960x540 otherwise.
-                    var deskW = 960, deskH = 540
+                    var deskW = 1366, deskH = 1024
                     if let txt = MadeiraConfig.get("desktop-size") {
                         let p = txt.lowercased().split(separator: "x").compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
                         if p.count == 2, p[0] >= 640, p[1] >= 360, p[0] <= 3840, p[1] <= 2160 { deskW = p[0]; deskH = p[1] }
@@ -2619,7 +3081,7 @@ enum ControlAction: Codable, Equatable, Hashable {
     case joystickWASD        // renders as a stick, posts W/A/S/D
     case joystickArrows      // renders as a stick, posts the arrow keys
     case keyboardToggle      // raises the iOS keyboard, as in portrait
-    case pad(String)         // ml1930: touch gamepad action, preserving saved layout names.
+    case pad(String)         // ml645: Xbox button, fed to XInput slot 0 (GamepadBridge)
 
     /// The four keys a stick drives, up/right/down/left. nil for non-sticks.
     var stickKeys: [Int32]? {
@@ -2630,8 +3092,11 @@ enum ControlAction: Codable, Equatable, Hashable {
         }
     }
     var isPad: Bool { if case .pad = self { return true }; return false }
-    var padName: String? { if case .pad(let name) = self { return name }; return nil }
-    var isPadStick: Bool { padName == "LS" || padName == "RS" }
+   // /// LS / RS: rendered as a stick, drives an analog XInput thumbstick.
+   // var padStick: GamepadBridge.TouchStick? {
+   //     if case .pad(let n) = self { return GamepadBridge.isTouchStick(n) }
+   //     return nil
+   // }
 
     var label: String {
         switch self {
@@ -2730,13 +3195,23 @@ final class TouchControlsModel: ObservableObject {
     /// included, and ml643's "is it the root view?" test therefore rejected every
     /// touch in the window. Nothing responded, and edit mode — whose branch
     /// captured everything — could never be entered to mask it.
-    func hitsInteractive(_ p: CGPoint, in bounds: CGRect) -> Bool {
-        // Top bar: two 44pt buttons 10pt apart in play mode, centred, 10pt down.
+    // func hitsInteractive(_ p: CGPoint, in bounds: CGRect) -> Bool {
+        // // Top bar: two 44pt buttons 10pt apart in play mode, centred, 10pt down.
+    func hitsTopBar(_ p: CGPoint, in bounds: CGRect) -> Bool {
+        // Two standard buttons, plus immersive-exit and edit-only add buttons.
         // Padded generously; a few points of slop costs nothing and a missed tap
         // costs a build.
-        let barW: CGFloat = 2 * 44 + 10
-        if CGRect(x: bounds.midX - barW / 2 - 10, y: 0,
-                  width: barW + 20, height: 68).contains(p) { return true }
+        // let barW: CGFloat = 2 * 44 + 10
+        // if CGRect(x: bounds.midX - barW / 2 - 10, y: 0,
+        //          width: barW + 20, height: 68).contains(p) { return true }
+        let count = 2 + (DisplaySettings.shared.immersive ? 1 : 0) + (editing ? 1 : 0)
+        let barW = CGFloat(count) * 44 + CGFloat(max(count - 1, 0)) * 10
+        return CGRect(x: bounds.midX - barW / 2 - 10, y: 0,
+                      width: barW + 20, height: 68).contains(p)
+    }
+
+    func hitsInteractive(_ p: CGPoint, in bounds: CGRect) -> Bool {
+        if hitsTopBar(p, in: bounds) { return true }
         guard visible else { return false }
         for c in controls {
             let r = Self.baseDiameter * CGFloat(c.scale) / 2
@@ -2760,8 +3235,15 @@ final class ControlsWindow: UIWindow {
         // Edit mode owns the whole screen: drags and the scale pinch must not
         // leak through and swing the camera while you are arranging buttons.
         if m.editing { return super.hitTest(point, with: event) }
-        // Portrait draws nothing here, so it must consume nothing.
-        guard bounds.width > bounds.height else { return nil }
+        // // Portrait draws nothing here, so it must consume nothing.
+        // guard bounds.width > bounds.height else { return nil }
+        // Immersive mode can be entered while the device is portrait. In that
+        // case only the recovery bar consumes input; the rest stays click-through.
+        if bounds.width <= bounds.height {
+            guard DisplaySettings.shared.immersive,
+                  m.hitsTopBar(point, in: bounds) else { return nil }
+            return super.hitTest(point, with: event)
+        }
         guard m.hitsInteractive(point, in: bounds) else { return nil }
         return super.hitTest(point, with: event)
     }
@@ -2785,7 +3267,7 @@ enum TouchControlsHost {
             w.windowLevel = .normal + 101
             w.backgroundColor = .clear
             w.isHidden = false        // deliberately never made key
-            let host = UIHostingController(rootView: TouchControlsOverlay())
+            let host = MetalUIHostingController(rootView: TouchControlsOverlay())
             host.view.backgroundColor = .clear
             w.rootViewController = host
             window = w
@@ -2798,6 +3280,7 @@ enum TouchControlsHost {
 
 struct TouchControlsOverlay: View {
     @ObservedObject private var m = TouchControlsModel.shared
+    @ObservedObject private var display = DisplaySettings.shared
     @State private var pinchBase: Double?
 
     var body: some View {
@@ -2815,29 +3298,26 @@ struct TouchControlsOverlay: View {
                     if m.editing, let i = m.index(of: m.selected) {
                         MappingPanel(control: m.controls[i], screen: geo.size)
                     }
+                } else if display.immersive {
+                    topBar
                 }
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
             .contentShape(Rectangle())
-            .gesture(scalePinch, including: m.editing ? .all : .subviews)
-            .onAppear { configureGamepad(landscape: landscape) }
-            .onChange(of: geo.size) { _, _ in configureGamepad(landscape: landscape) }
-            .onChange(of: m.controls) { _, _ in configureGamepad(landscape: landscape) }
-            .onChange(of: m.visible) { _, _ in configureGamepad(landscape: landscape) }
-            .onChange(of: m.editing) { _, _ in configureGamepad(landscape: landscape) }
-            .onDisappear { GamepadInput.shared.configureTouch(controls: []) }
+            .gesture(scalePinch)
         }
         .ignoresSafeArea()
     }
 
-    private func configureGamepad(landscape: Bool) {
-        let ids = landscape && m.visible && !m.editing
-            ? m.controls.filter { $0.action.padName.map(TouchPadAction.supported) ?? false }.map(\.id) : []
-        GamepadInput.shared.configureTouch(controls: Set(ids))
-    }
-
     private var topBar: some View {
         HStack(spacing: 10) {
+            if display.immersive {
+                glassButton("arrow.down.right.and.arrow.up.left") {
+                    m.editing = false
+                    m.selected = nil
+                    display.immersive = false
+                }
+            }
             glassButton("gamecontroller", dim: !m.visible) { m.visible.toggle() }
             glassButton(m.editing ? "checkmark" : "pencil") {
                 m.editing.toggle()
@@ -2854,6 +3334,7 @@ struct TouchControlsOverlay: View {
                 }
                 .transition(.opacity.combined(with: .scale))
             }
+			// Text(String(currentLock))
         }
         .padding(.top, 10)
         .animation(.easeInOut(duration: 0.22), value: m.editing)
@@ -2910,21 +3391,16 @@ struct TouchControlButton: View {
     @State private var isDown = false
     @State private var dragBase: CGPoint?
     @State private var stickDir: Int = -1
-    @State private var padVector = CGSize.zero
 
     private var diameter: CGFloat { TouchControlsModel.baseDiameter * CGFloat(control.scale) }
-    private var isStick: Bool { control.action.stickKeys != nil || control.action.isPadStick }
+    private var isStick: Bool { control.action.stickKeys != nil }
+    // private var isStick: Bool { control.action.stickKeys != nil || control.action.padStick != nil }
     private var isSelected: Bool { m.editing && m.selected == control.id }
 
     var body: some View {
         ZStack {
-            if control.action.isPadStick {
-                GlassShape(circle: true)
-                Circle().fill(.white.opacity(isDown ? 0.55 : 0.25))
-                    .frame(width: diameter * 0.42, height: diameter * 0.42)
-                    .offset(x: padVector.width * diameter * 0.29, y: padVector.height * diameter * 0.29)
-                Text(control.action.label).font(.caption).foregroundStyle(.white.opacity(0.8))
-            } else if control.action.stickKeys != nil {
+            if control.action.stickKeys != nil {
+            // if isStick {
                 // Reuse the portrait pad's face so both look and animate the
                 // same; scale it to whatever size this control was pinched to.
                 JoystickFace(held: isDown, dir: stickDir, alwaysExpanded: true)
@@ -2936,7 +3412,9 @@ struct TouchControlButton: View {
                 Text(control.action.label)
                     .font(.system(size: diameter * (control.action.label.count > 2 ? 0.22 : 0.34),
                                   weight: .medium))
-                    .foregroundStyle(.white.opacity(isDown ? 1.0 : 0.85))
+                    .foregroundStyle(.white.opacity(control.action.isPad ? 0.45
+                                                    : (isDown ? 1.0 : 0.85)))
+                    // .foregroundStyle(.white.opacity(isDown ? 1.0 : 0.85))
             }
         }
         .frame(width: diameter, height: diameter)
@@ -2968,19 +3446,6 @@ struct TouchControlButton: View {
                 .offset(x: 8, y: -8)
             }
         }
-        .overlay {
-            if let action = control.action.padName, !m.editing {
-                TouchPadSurface(control: control.id, action: action) { vector, down in
-                    padVector = vector; isDown = down
-                }
-            }
-        }
-        .onDisappear { if control.action.isPad { padVector = .zero; isDown = false } }
-        .onChange(of: m.editing) { _, _ in if control.action.isPad { padVector = .zero; isDown = false } }
-        .onChange(of: screen) { _, _ in if control.action.isPad { padVector = .zero; isDown = false } }
-        .onChange(of: control.action) { old, new in
-            if old.isPad || new.isPad { padVector = .zero; isDown = false }
-        }
         .position(x: CGFloat(control.nx) * screen.width,
                   y: CGFloat(control.ny) * screen.height)
         .gesture(
@@ -2996,6 +3461,9 @@ struct TouchControlButton: View {
                     } else if let q = control.action.stickKeys {
                         isDown = true
                         applyStick(snap(v.translation), q)
+                    // } else if let stick = control.action.padStick {
+                    //    isDown = true
+                    //    applyPadStick(stick, v.translation)
                     } else if !isDown {
                         isDown = true
                         press(true)
@@ -3006,12 +3474,14 @@ struct TouchControlButton: View {
                     if let q = control.action.stickKeys {
                         applyStick(-1, q)          // release every held direction
                         isDown = false
+                    // } else if let stick = control.action.padStick {
+                    //    applyPadStick(stick, nil)  // spring back to centre
+                    //    isDown = false
                     } else if isDown {
                         isDown = false
                         press(false)
                     }
-                },
-            including: control.action.isPad && !m.editing ? .subviews : .all
+                }
         )
     }
 
@@ -3050,6 +3520,25 @@ struct TouchControlButton: View {
         stickDir = next
     }
 
+    /// Analog thumbstick. Full deflection at the control's rim; screen y grows
+    /// downward, XInput's upward. The 8-way dir only animates the knob.
+    // private func applyPadStick(_ stick: GamepadBridge.TouchStick, _ t: CGSize?) {
+    //    guard let t else {
+    //        GamepadBridge.shared.setTouchStick(stick, x: 0, y: 0)
+    //        stickDir = -1
+    //        return
+    //    }
+    //    let r = diameter / 2
+    //    var x = Double(t.width / r), y = Double(-t.height / r)
+    //    let len = (x * x + y * y).squareRoot()
+    //    if len > 1 { x /= len; y /= len }
+    //    if len < 0.12 { x = 0; y = 0 }              // same feel as the key sticks' deadzone
+    //    GamepadBridge.shared.setTouchStick(stick, x: x, y: y)
+    //    let next = snap(t)
+    //    if stickDir == -1, next != -1 { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
+    //    stickDir = next
+    // }
+
     /// Haptic on the DOWN edge only — a held movement key would otherwise buzz
     /// continuously for as long as you walk.
     private func press(_ down: Bool) {
@@ -3066,7 +3555,9 @@ struct TouchControlButton: View {
         case .none, .joystickWASD, .joystickArrows:
             break                                              // sticks drive themselves
         case .pad:
-            break     // TouchPadSurface owns pad presses and cancellation.
+            break     // ml645: no XInput yet — deliberately inert, and labelled so
+        // case .pad(let name):
+        //    GamepadBridge.shared.setTouchButton(name, down: down)   // LS/RS handled as sticks
         }
     }
 }
@@ -3204,10 +3695,13 @@ struct MappingPanel: View {
 
     private var controllerTab: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Controller controls feed XInput player 1. LS and RS are analogue sticks; "
-                 + "LT and RT are full-press triggers. Touch and physical controls can be used together.")
+            Text("XInput isn't wired up yet. These save with your layout but do "
+                 + "nothing when pressed — controller support lands with the Wine HID stack.")
+            // Text("Sends to XInput player 1, alongside any connected controller. "
+            //     + "LS / RS become analog sticks. Games using DirectInput only won't see it.")
                 .font(.system(size: 11))
                 .foregroundStyle(.orange.opacity(0.95))
+                // .foregroundStyle(.white.opacity(0.6))
                 .fixedSize(horizontal: false, vertical: true)
             section("Face", [("A", .pad("A")), ("B", .pad("B")), ("X", .pad("X")), ("Y", .pad("Y"))])
             section("D-pad", [("D↑", .pad("D↑")), ("D↓", .pad("D↓")),
@@ -3245,6 +3739,7 @@ struct MappingPanel: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.55)
                 .foregroundStyle(.white.opacity(action.isPad ? 0.55 : 1.0))
+                // .foregroundStyle(.white)
                 .frame(maxWidth: .infinity, minHeight: 30)
                 .background(RoundedRectangle(cornerRadius: 7)
                     .fill(.white.opacity(on ? 0.36 : 0.12)))
