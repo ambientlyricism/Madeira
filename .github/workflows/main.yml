@@ -72,7 +72,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: app/Madeira/x86_64-vcruntime
-          key: vcruntime-17-${{ env.CACHE_V }}
+          key: vcruntime2-17-${{ env.CACHE_V }}
 
       - name: MSVC runtime DLLs
         if: steps.vcr.outputs.cache-hit != 'true'
@@ -147,7 +147,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: toolchains/llvm-mingw-20260421-ucrt-macos-universal
-          key: mingw-20260421-${{ env.CACHE_V }}
+          key: mingw2-20260421-${{ env.CACHE_V }}
 
       - name: llvm-mingw
         if: steps.tc.outputs.cache-hit != 'true'
@@ -178,7 +178,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: wine/build-macos
-          key: wine-7817e22-${{ env.CACHE_V }}
+          key: wine2-7817e22-${{ env.CACHE_V }}
 
       # NOTE: a plain `make` CANNOT succeed here. dlls/win32u/win32u.so is
       # the macOS HOST .so, and the fork's patched bitblt.c references
@@ -238,7 +238,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: toolchains/gnutls-ios
-          key: gnutls-6.3.0-3.10.1-3.8.9-${{ env.CACHE_V }}
+          key: gnutls2-6.3.0-3.10.1-3.8.9-${{ env.CACHE_V }}
 
       - name: GnuTLS stack
         if: steps.gnutls.outputs.cache-hit != 'true'
@@ -252,7 +252,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/freetype-ios/build
-          key: freetype-2133-${{ env.CACHE_V }}
+          key: freetype2-2133-${{ env.CACHE_V }}
 
       - name: FreeType for iOS
         if: steps.ft.outputs.cache-hit != 'true'
@@ -270,7 +270,7 @@ jobs:
             build/win32u-unix/obj
             app/Madeira/libntdll_unix.a
             app/Madeira/libwin32u_unix.a
-          key: wineunix-7817e22-${{ env.CACHE_V }}
+          key: wineunix2-7817e22-${{ env.CACHE_V }}
 
       - name: Wine unix libs (ntdll, win32u)
         if: steps.wineunix.outputs.cache-hit != 'true'
@@ -293,7 +293,7 @@ jobs:
           path: |
             build/wineserver/obj
             app/Madeira/libwineserver.a
-          key: wineserver-7817e22-${{ env.CACHE_V }}
+          key: wineserver2-7817e22-${{ env.CACHE_V }}
 
       - name: Seed wineserver base archive
         if: steps.wsrv.outputs.cache-hit != 'true'
@@ -366,7 +366,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: FEX/build-ios
-          key: fex-053c385-caspalstub-${{ env.CACHE_V }}
+          key: fex2-053c385-caspalstub-${{ env.CACHE_V }}
 
       # FEX fork bug: IosLogUnimplementedCASPAL (Arm64.cpp) sits OUTSIDE
       # every #ifdef FEX_IOS_HOST in that file, yet calls Win32 APIs —
@@ -465,7 +465,7 @@ jobs:
             toolchains/llvm-project
             toolchains/llvm-ios-build
             toolchains/llvm-host
-          key: llvm-1507-ios-pruned-${{ env.CACHE_V }}
+          key: llvm2-1507-ios-pruned-${{ env.CACHE_V }}
 
       - name: LLVM 15.0.7 for iOS
         if: steps.llvm.outputs.cache-hit != 'true'
@@ -531,7 +531,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/dxmt-ios/shader-headers
-          key: shaders-b4b89f0-${{ env.CACHE_V }}
+          key: shaders2-b4b89f0-${{ env.CACHE_V }}
 
       - name: Generate airconv shader headers
         if: steps.shaders.outputs.cache-hit != 'true'
@@ -569,7 +569,7 @@ jobs:
             build/dxmt-ios/obj
             app/Madeira/libdxmt_combined.a
             app/Madeira/aarch64-windows
-          key: dxmt-b4b89f0-${{ env.CACHE_V }}
+          key: dxmt2-b4b89f0-${{ env.CACHE_V }}
 
       - name: DXMT
         if: steps.dxmt.outputs.cache-hit != 'true'
