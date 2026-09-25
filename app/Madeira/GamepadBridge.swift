@@ -81,7 +81,7 @@ final class GamepadBridge {
                else {
                   self.key = MadeiraKeys.virtualKey(hid: code) ?? Int32(0)
                }
-               winios_post_key(key, pressed ? 1 : 0)
+               winios_post_key(self.key, pressed ? 1 : 0)
       }
          
    }
