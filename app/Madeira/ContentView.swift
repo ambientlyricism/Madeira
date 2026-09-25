@@ -655,7 +655,6 @@ final class MetalBackedView: UIView {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard desktopMode else {
             guard let t = touches.first else { return }
-			guard !GamepadBridge.shared.MouseActive() else {return}
             let (x, y) = mapTouch(t)
             winios_post_touch_down(x, y)
             return
@@ -698,9 +697,9 @@ final class MetalBackedView: UIView {
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+		guard !GamepadBridge.shared.MouseActive() else {return}
         guard desktopMode else {
             guard let t = touches.first else { return }
-			guard !GamepadBridge.shared.MouseActive() else {return}
             let (x, y) = mapTouch(t)
             winios_post_touch_move(x, y)
             return
