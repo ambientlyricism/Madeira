@@ -193,7 +193,7 @@ struct FPSOverlay: View {
     // @State private var ecoOn = madeira_get_eco() != 0
     private var ecoPill: some View {
         Text("ECO")
-            .// foregroundColor(ecoOn ? .black : .green)
+            // .foregroundColor(ecoOn ? .black : .green)
             .padding(.horizontal, 5)
             .padding(.vertical, 1)
             // .background(ecoOn ? Color.green : Color.clear)
