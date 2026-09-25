@@ -66,7 +66,7 @@ final class GamepadBridge {
                //   return
                // 
                let code = Int(value.rawValue)
-               let key = MadeiraKeys.virtualKey(hid: code) ?? Int32(0)
+               key = MadeiraKeys.virtualKey(hid: code) ?? Int32(0)
                if code == 0x7B {
                   key = 0x25
                }
