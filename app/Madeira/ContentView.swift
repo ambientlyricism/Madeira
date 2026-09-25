@@ -760,6 +760,7 @@ final class MetalBackedView: UIView {
             let iy = Int32(max(-30000, min(30000, relCarryY)))
             relCarryX -= CGFloat(ix)
             relCarryY -= CGFloat(iy)
+			guard !GamepadBridge.shared.MouseActive() else {return}
             if ix != 0 || iy != 0 { winios_pointer(ix, iy, F_MOVE, 0) }
             return
         }
@@ -2584,6 +2585,7 @@ struct ContentView: View {
             // Reports its decision either way. A gate that stays silent when it
             // declines to run is indistinguishable from one that never executed,
             // which cost a device run to work out.
+			/*:
             if let d = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
                 let raw = MadeiraConfig.get("d3d12")   /* ml1095 */
                 let val = raw ?? ""
@@ -2604,7 +2606,7 @@ struct ContentView: View {
                 } else {
                     logStore.log("madeira-d3d12: gate off (madeira.cfg d3d12 \(raw == nil ? "unset" : "= '\(val)'"))", level: .debug)
                 }
-            }
+            } */
 
             // ml821: coalesced remote messages. Documents/madeira-remote-batch.txt
             // == "1" makes the pre-submission flush send many buffer ranges per
