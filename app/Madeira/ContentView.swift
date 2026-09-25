@@ -447,6 +447,7 @@ final class MetalHostView: UIView {
     var metalLayer: CAMetalLayer { return layer as! CAMetalLayer }
     override init(frame: CGRect) {
         super.init(frame: frame)
+		GamepadEventClaim.install(on: self)
         isUserInteractionEnabled = false   // touches fall through to SwiftUI
         backgroundColor = .black
         contentScaleFactor = UIScreen.main.scale
@@ -509,6 +510,7 @@ final class MetalBackedView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+		GamepadEventClaim.install(on: self)
         // Multi-touch REQUIRED: with it off, a fast double-tap's second
         // touch (landing before the first lift is processed) is silently
         // swallowed — drag-arm never fired (2026-07-06). Two-finger
@@ -517,7 +519,10 @@ final class MetalBackedView: UIView {
         self.isUserInteractionEnabled = true
         self.backgroundColor = .clear
     }
-    required init?(coder: NSCoder) { super.init(coder: coder) }
+    required init?(coder: NSCoder) {	   
+        super.init(coder: coder)	
+        GamepadEventClaim.install(on: self)	
+    }
 
     // Visibility-stall postmortem (2026-07-03): the intermittent "presents
     // count but the screen stays black until a bg/fg or screenshot" state
@@ -3081,7 +3086,7 @@ enum ControlAction: Codable, Equatable, Hashable {
     case joystickWASD        // renders as a stick, posts W/A/S/D
     case joystickArrows      // renders as a stick, posts the arrow keys
     case keyboardToggle      // raises the iOS keyboard, as in portrait
-    case pad(String)         // ml645: Xbox button, fed to XInput slot 0 (GamepadBridge)
+    case pad(String)         // ml1930: touch gamepad action, preserving saved layout names.
 
     /// The four keys a stick drives, up/right/down/left. nil for non-sticks.
     var stickKeys: [Int32]? {
@@ -3092,6 +3097,8 @@ enum ControlAction: Codable, Equatable, Hashable {
         }
     }
     var isPad: Bool { if case .pad = self { return true }; return false }
+	var padName: String? { if case .pad(let name) = self { return name }; return nil }	   // /// LS / RS: rendered as a stick, drives an analog XInput thumbstick.
+    var isPadStick: Bool { padName == "LS" || padName == "RS" }
    // /// LS / RS: rendered as a stick, drives an analog XInput thumbstick.
    // var padStick: GamepadBridge.TouchStick? {
    //     if case .pad(let n) = self { return GamepadBridge.isTouchStick(n) }
@@ -3211,7 +3218,13 @@ final class TouchControlsModel: ObservableObject {
     }
 
     func hitsInteractive(_ p: CGPoint, in bounds: CGRect) -> Bool {
-        if hitsTopBar(p, in: bounds) { return true }
+        // if hitsTopBar(p, in: bounds) { return true }
+		// Top bar: two 44pt buttons 10pt apart in play mode, centred, 10pt down.
+        // Padded generously; a few points of slop costs nothing and a missed tap
+        // costs a build.
+        let barW: CGFloat = 2 * 44 + 10
+        if CGRect(x: bounds.midX - barW / 2 - 10, y: 0,
+                  width: barW + 20, height: 68).contains(p) { return true }
         guard visible else { return false }
         for c in controls {
             let r = Self.baseDiameter * CGFloat(c.scale) / 2
@@ -3236,7 +3249,7 @@ final class ControlsWindow: UIWindow {
         // leak through and swing the camera while you are arranging buttons.
         if m.editing { return super.hitTest(point, with: event) }
         // // Portrait draws nothing here, so it must consume nothing.
-        // guard bounds.width > bounds.height else { return nil }
+        guard bounds.width > bounds.height else { return nil }
         // Immersive mode can be entered while the device is portrait. In that
         // case only the recovery bar consumes input; the rest stays click-through.
         if bounds.width <= bounds.height {
@@ -3304,10 +3317,22 @@ struct TouchControlsOverlay: View {
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .top)
             .contentShape(Rectangle())
-            .gesture(scalePinch)
-        }
-        .ignoresSafeArea()
+            .gesture(scalePinch, including: m.editing ? .all : .subviews)
+            .onAppear { configureGamepad(landscape: landscape) }	
+            .onChange(of: geo.size) { _, _ in configureGamepad(landscape: landscape) }	
+            .onChange(of: m.controls) { _, _ in configureGamepad(landscape: landscape) }	
+            .onChange(of: m.visible) { _, _ in configureGamepad(landscape: landscape) }	
+            .onChange(of: m.editing) { _, _ in configureGamepad(landscape: landscape) }	
+            .onDisappear { GamepadInput.shared.configureTouch(controls: []) }	
+        }	        
+        .ignoresSafeArea()	      
     }
+
+	 private func configureGamepad(landscape: Bool) {	
+        let ids = landscape && m.visible && !m.editing	
+            ? m.controls.filter { $0.action.padName.map(TouchPadAction.supported) ?? false }.map(\.id) : []	
+        GamepadInput.shared.configureTouch(controls: Set(ids))	
+    }	
 
     private var topBar: some View {
         HStack(spacing: 10) {
@@ -3391,15 +3416,23 @@ struct TouchControlButton: View {
     @State private var isDown = false
     @State private var dragBase: CGPoint?
     @State private var stickDir: Int = -1
+	@State private var padVector = CGSize.zero
 
     private var diameter: CGFloat { TouchControlsModel.baseDiameter * CGFloat(control.scale) }
-    private var isStick: Bool { control.action.stickKeys != nil }
-    // private var isStick: Bool { control.action.stickKeys != nil || control.action.padStick != nil }
+    // private var isStick: Bool { control.action.stickKeys != nil }
+    private var isStick: Bool { control.action.stickKeys != nil || control.action.padStick != nil }
     private var isSelected: Bool { m.editing && m.selected == control.id }
 
     var body: some View {
         ZStack {
-            if control.action.stickKeys != nil {
+			if control.action.isPadStick {	           
+                GlassShape(circle: true)	       
+                Circle().fill(.white.opacity(isDown ? 0.55 : 0.25))	
+                    .frame(width: diameter * 0.42, height: diameter * 0.42)	
+                    .offset(x: padVector.width * diameter * 0.29, y: padVector.height * diameter * 0.29)	
+                Text(control.action.label).font(.caption).foregroundStyle(.white.opacity(0.8))	
+            } 
+			else if control.action.stickKeys != nil {
             // if isStick {
                 // Reuse the portrait pad's face so both look and animate the
                 // same; scale it to whatever size this control was pinched to.
@@ -3412,9 +3445,9 @@ struct TouchControlButton: View {
                 Text(control.action.label)
                     .font(.system(size: diameter * (control.action.label.count > 2 ? 0.22 : 0.34),
                                   weight: .medium))
-                    .foregroundStyle(.white.opacity(control.action.isPad ? 0.45
-                                                    : (isDown ? 1.0 : 0.85)))
-                    // .foregroundStyle(.white.opacity(isDown ? 1.0 : 0.85))
+                    // .foregroundStyle(.white.opacity(control.action.isPad ? 0.45
+                    //                                : (isDown ? 1.0 : 0.85)))
+                    .foregroundStyle(.white.opacity(isDown ? 1.0 : 0.85))
             }
         }
         .frame(width: diameter, height: diameter)
@@ -3445,6 +3478,19 @@ struct TouchControlButton: View {
                 .buttonStyle(.plain)
                 .offset(x: 8, y: -8)
             }
+        }
+		.overlay {	
+            if let action = control.action.padName, !m.editing {	
+                TouchPadSurface(control: control.id, action: action) { vector, down in	
+                    padVector = vector; isDown = down	
+                }	
+            }	
+        }	
+        .onDisappear { if control.action.isPad { padVector = .zero; isDown = false } }	
+        .onChange(of: m.editing) { _, _ in if control.action.isPad { padVector = .zero; isDown = false } }	
+        .onChange(of: screen) { _, _ in if control.action.isPad { padVector = .zero; isDown = false } }	
+        .onChange(of: control.action) { old, new in	
+            if old.isPad || new.isPad { padVector = .zero; isDown = false }	
         }
         .position(x: CGFloat(control.nx) * screen.width,
                   y: CGFloat(control.ny) * screen.height)
@@ -3481,7 +3527,8 @@ struct TouchControlButton: View {
                         isDown = false
                         press(false)
                     }
-                }
+                },
+            including: control.action.isPad && !m.editing ? .subviews : .all
         )
     }
 
@@ -3555,7 +3602,9 @@ struct TouchControlButton: View {
         case .none, .joystickWASD, .joystickArrows:
             break                                              // sticks drive themselves
         case .pad:
-            break     // ml645: no XInput yet — deliberately inert, and labelled so
+            break     // TouchPadSurface owns pad presses and cancellation.	
+			
+			// ml645: no XInput yet — deliberately inert, and labelled so
         // case .pad(let name):
         //    GamepadBridge.shared.setTouchButton(name, down: down)   // LS/RS handled as sticks
         }
@@ -3695,10 +3744,12 @@ struct MappingPanel: View {
 
     private var controllerTab: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("XInput isn't wired up yet. These save with your layout but do "
-                 + "nothing when pressed — controller support lands with the Wine HID stack.")
+            // Text("XInput isn't wired up yet. These save with your layout but do "
+            //     + "nothing when pressed — controller support lands with the Wine HID stack.")
             // Text("Sends to XInput player 1, alongside any connected controller. "
             //     + "LS / RS become analog sticks. Games using DirectInput only won't see it.")
+			Text("Controller controls feed XInput player 1. LS and RS are analogue sticks; "
+                 + "LT and RT are full-press triggers. Touch and physical controls can be used together.")
                 .font(.system(size: 11))
                 .foregroundStyle(.orange.opacity(0.95))
                 // .foregroundStyle(.white.opacity(0.6))
