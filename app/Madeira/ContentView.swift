@@ -753,6 +753,7 @@ final class MetalBackedView: UIView {
          * by dragging RIGHT. That is the same sign as a mouse. Negate both terms
          * for content-drag (finger-follows-world) feel. */
         if InputSettings.shared.relative {
+			guard !GamepadBridge.shared.MouseActive() else {return}
             let sens = CGFloat(InputSettings.shared.sensRel)
             relCarryX += dx * sens
             relCarryY += dy * sens
@@ -760,7 +761,6 @@ final class MetalBackedView: UIView {
             let iy = Int32(max(-30000, min(30000, relCarryY)))
             relCarryX -= CGFloat(ix)
             relCarryY -= CGFloat(iy)
-			guard !GamepadBridge.shared.MouseActive() else {return}
             if ix != 0 || iy != 0 { winios_pointer(ix, iy, F_MOVE, 0) }
             return
         }
