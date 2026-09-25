@@ -66,16 +66,16 @@ final class GamepadBridge {
                //   return
                // 
                let code = Int(value.rawValue)
-               if value == 0x7B {
+               if value.rawValue == 0x7B {
                   self.key = 0x25
                }
-               else if value == 0x7C {
+               else if value.rawValue == 0x7C {
                   self.key = 0x27
                }
-               else if value == 0x7D {
+               else if value.rawValue == 0x7D {
                   self.key = 0x28
                }
-               else if value == 0x7E {
+               else if value.rawValue == 0x7E {
                   self.key = 0x26
                }
                else {
