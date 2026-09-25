@@ -3421,7 +3421,7 @@ struct TouchControlButton: View {
 
     private var diameter: CGFloat { TouchControlsModel.baseDiameter * CGFloat(control.scale) }
     // private var isStick: Bool { control.action.stickKeys != nil }
-    private var isStick: Bool { control.action.stickKeys != nil || control.action.isPadStick != nil }
+    private var isStick: Bool { control.action.stickKeys != nil || control.action.isPadStick }
     private var isSelected: Bool { m.editing && m.selected == control.id }
 
     var body: some View {
