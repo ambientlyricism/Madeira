@@ -268,6 +268,7 @@ jobs:
           path: |
             build/ntdll-unix/obj
             build/win32u-unix/obj
+            build/wine-pe/obj
             app/Madeira/libntdll_unix.a
             app/Madeira/libwin32u_unix.a
           key: wineunix2-7817e22-${{ env.CACHE_V }}
@@ -278,6 +279,7 @@ jobs:
           set -euxo pipefail
           bash build/ntdll-unix/build.sh
           bash build/win32u-unix/build.sh
+          bash build/wine-pe/build-ntdll.sh
           ls -l app/Madeira/libntdll_unix.a app/Madeira/libwin32u_unix.a
 
       # build/wineserver/build.sh does NOT build wineserver from scratch —
