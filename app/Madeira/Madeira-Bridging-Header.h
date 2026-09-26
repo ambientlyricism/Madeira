@@ -32,6 +32,13 @@ void madeira_set_fence_mode(int mode);
 void madeira_set_vsync_locked(int locked);
 int madeira_get_vsync_locked(void);
 
+// ml1050: what the PANEL can do and what we asked it for, published from
+// Swift (only UIKit knows) so the native [frame] line can print the
+// quantisation grid every present snaps to. panel_hz = the display's own
+// maximum, intent_hz = the CADisplayLink rate currently requested (0 = no
+// intent armed). Both are diagnostics; nothing branches on them.
+void madeira_set_display_max_fps(int panel_hz, int intent_hz);
+
 /* ml526: startup phase timeline (Winios.m) */
 void winios_phase(const char *name);
 
