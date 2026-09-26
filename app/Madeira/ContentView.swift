@@ -1625,6 +1625,14 @@ struct ContentView: View {
                     // ml589: find Steam and (re)write the launch batch. Returns
                     // false — having logged why — when there is nothing to run.
                     guard prepareSteamLaunch() else { return }
+                    // Steam's images are all relocatable (steam.exe loaded at
+                    // 0x122c00000, steamwebhelper at 0x12a450000), so the
+                    // 0x140000000 window kept for fixed-base games only splits
+                    // the low gap. With it held the iPhone 18 Pro could place
+                    // just a 592MB pool, which ran out loading steamwebhelper
+                    // ("[jit-pool] EXHAUSTED"), leaving the child's ntdll
+                    // non-executable and the app dead. Unsplit, 896MB fits.
+                    setenv("MADEIRA_NO_EXE_WINDOW", "1", 1)
                     // ml590 STEP 1 (one-run phase check, NOT a timing measurement):
                     // arm the ml578 sock-wire probe. It answers exactly one
                     // question — does today's ~1s CM failure reach the same TLS
@@ -2873,6 +2881,30 @@ struct ContentView: View {
             ("C:\\Program Files (x86)\\Steam", "\(prefix)/drive_c/Program Files (x86)/Steam"),
             ("C:\\Program Files\\Steam",       "\(prefix)/drive_c/Program Files/Steam"),
         ]
+
+        // CI IPAs carry a 64-bit Steam folder at Madeira.app/Steam
+        // (scripts/fetch-steam.sh). Install it into the prefix on first use:
+        // Steam writes config, logs and updates into its own directory, so it
+        // cannot run from the read-only bundle. Copied under a temporary name
+        // and renamed, so an interrupted copy is never mistaken for an install.
+        let bundledSteam = Bundle.main.bundlePath + "/Steam"
+        if !candidates.contains(where: { fm.fileExists(atPath: "\($0.1)/steam.exe") }),
+           fm.fileExists(atPath: "\(bundledSteam)/steam.exe") {
+            let dest = candidates[0].1
+            let staging = dest + ".partial"
+            logStore.log("Installing bundled Steam into the prefix...")
+            do {
+                try fm.createDirectory(atPath: (dest as NSString).deletingLastPathComponent,
+                                       withIntermediateDirectories: true)
+                try? fm.removeItem(atPath: staging)
+                try fm.copyItem(atPath: bundledSteam, toPath: staging)
+                try? fm.removeItem(atPath: dest)
+                try fm.moveItem(atPath: staging, toPath: dest)
+                logStore.log("Bundled Steam installed", level: .success)
+            } catch {
+                logStore.log("Could not install bundled Steam: \(error.localizedDescription)", level: .error)
+            }
+        }
 
         guard let (winDir, _) = candidates.first(where: {
             fm.fileExists(atPath: "\($0.1)/steam.exe")

@@ -191,9 +191,21 @@ enum StikJITHelper {
         func overlapsExeWindow(_ base: vm_address_t, _ len: vm_address_t) -> Bool {
             return base < exeWinBase + exeWinSize && base + len > exeWinBase
         }
-        let skipWindow = (ProcessInfo.processInfo.environment["MADEIRA_NO_EXE_WINDOW"].map { $0 != "0" } ?? false)
+        // getenv, not ProcessInfo.environment: Foundation snapshots the environment on first
+        // use, so a setenv made at launch time (the Steam button) was invisible to it and
+        // the window stayed held.
+        let skipWindow = getenv("MADEIRA_NO_EXE_WINDOW").map { String(cString: $0) != "0" } ?? false
+        LogStore.shared.log("executable window: \(skipWindow ? "SKIPPED (MADEIRA_NO_EXE_WINDOW)" : "wanted")")
         var windowHeld = false
-        if !skipWindow && madeira_early_window_base == UInt(exeWinBase) && madeira_early_window_size == UInt(exeWinSize) {
+        if skipWindow && madeira_early_window_base == UInt(exeWinBase) && madeira_early_window_size == UInt(exeWinSize) {
+            // The image-load constructor held the window unconditionally. Give it back, or it
+            // still splits the low gap and caps the pool exactly as if it were wanted (Steam on
+            // the iPhone 18 Pro: 498MB | window | 603MB -> a 592MB pool that ran out the moment
+            // steamwebhelper.exe loaded, while the unsplit gap holds 896MB).
+            vm_deallocate(mach_task_self_, exeWinBase, vm_size_t(exeWinSize))
+            unsetenv("WINE_IOS_EXE_WINDOW")
+            LogStore.shared.log("MADEIRA_NO_EXE_WINDOW: released the executable window [0x140000000,+128MB) so the pool can span it")
+        } else if !skipWindow && madeira_early_window_base == UInt(exeWinBase) && madeira_early_window_size == UInt(exeWinSize) {
             // ml1040: already held since image load (JITAllocator.c constructor).
             windowHeld = true
             setenv("WINE_IOS_EXE_WINDOW", String(format: "%lx:%lx", Int(exeWinBase), Int(exeWinSize)), 1)
@@ -332,7 +344,17 @@ enum StikJITHelper {
             // held, the placeholder's run merged with the free space below it and
             // the old test plugged the only hole that fit (every launch of ml1095
             // ended in the guest window). Plug only holes ending below the placeholder.
-            if earlyPoolBase != 0 && windowHeld {
+            // Plugging is only useful when a hole at or above the placeholder can
+            // hold the pool. When the placeholder came up short (an intruder sat
+            // above the window before this image loaded, e.g. 272MB placeholder,
+            // pool shrunk to the 490MB lower hole), the lower hole IS the only
+            // fit: plugging it pushed first-fit to 0x7000000000 on every attempt
+            // and the launch aborted. A pool below the window is valid (ml1135).
+            let upperFits = holes.contains { $0.base + $0.size > earlyPoolBase && $0.size >= vm_address_t(poolSize) }
+            if earlyPoolBase != 0 && windowHeld && !upperFits {
+                LogStore.shared.log("ml1040: no hole above the window fits the pool — leaving lower holes open")
+            }
+            if earlyPoolBase != 0 && windowHeld && upperFits {
                 for h in holes where h.base + h.size <= earlyPoolBase && h.size >= vm_address_t(poolSize) {
                     var a = h.base
                     if vm_allocate(mach_task_self_, &a, vm_size_t(h.size), 0 /* FIXED */) == KERN_SUCCESS && a == h.base {
@@ -354,7 +376,8 @@ enum StikJITHelper {
             let inGuestWindow = a + poolSize > guestLo && a < guestHi
             // ml1034: a pool covering 0x140000000 displaces a non-relocatable
             // main image, which is fatal later and unrecoverable.
-            let hitsExeWindow = overlapsExeWindow(vm_address_t(a), vm_address_t(poolSize))
+            // Only a window we are keeping for a fixed-base image needs protecting.
+            let hitsExeWindow = !skipWindow && overlapsExeWindow(vm_address_t(a), vm_address_t(poolSize))
             if a >= goodLow && !inGuestWindow && !hitsExeWindow {
                 rxPtrOpt = p
                 break
@@ -495,7 +518,7 @@ enum StikJITHelper {
         // it fires, the debugger handed back a range covering a window we held,
         // which should be impossible.
         let rxAddrV = vm_address_t(bitPattern: rxPtr)
-        if overlapsExeWindow(rxAddrV, vm_address_t(poolSize)) {
+        if !skipWindow && overlapsExeWindow(rxAddrV, vm_address_t(poolSize)) {
             LogStore.shared.log("ml1034: RX pool STILL overlaps the executable window despite reserving "
                 + "it first (windowHeld=\(windowHeld)) — a non-relocatable main image will be displaced",
                 level: .error)

@@ -1,0 +1,405 @@
+name: Build IPA
+
+# Builds every native chain from a clean checkout (docs/BUILDING.md) and
+# packages an UNSIGNED Madeira.ipa. No runtime stubs.
+
+on:
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: Xcode configuration (Debug is the one that runs games)
+        default: Debug
+        type: choice
+        options: [Debug, Release]
+      bundle_steam:
+        description: Bundle the 64-bit Steam client (scripts/fetch-steam.sh) into the app
+        default: true
+        type: boolean
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-ipa.yml"
+      - "scripts/ci/**"
+      - "scripts/fetch-steam.sh"
+      - "build/**"
+
+concurrency:
+  group: build-ipa-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Compiler cache (see the ccache steps). BASEDIR keeps cached paths
+  # relative so hits survive a different workspace path. The default
+  # compiler check (mtime+size) re-keys everything when Xcode changes.
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+  CCACHE_BASEDIR: ${{ github.workspace }}
+  CCACHE_MAXSIZE: 3G
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_INSTALL_CLEANUP: "1"
+  LLVM_VERSION: 15.0.7
+  FREETYPE_TAG: VER-2-13-3
+  CONFIGURATION: ${{ inputs.configuration || 'Debug' }}
+
+# contents: write lets the job create the release (the default token may be
+# read-only).
+permissions:
+  contents: write
+
+jobs:
+  ipa:
+    runs-on: macos-15
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      # Submodules by hand so FEX's test-binary repos and Catch2 (unused with
+      # BUILD_TESTING=OFF, and the bulk of the download) are skipped.
+      - name: Submodules
+        run: |
+          set -eux
+          git submodule update --init --depth 1 wine research/dxmt FEX
+          git -C wine submodule update --init --recursive --depth 1
+          git -C research/dxmt submodule update --init --recursive --depth 1
+          git -C FEX \
+            -c submodule.External/fex-posixtest-bins.update=none \
+            -c submodule.External/fex-gvisor-tests-bins.update=none \
+            -c submodule.External/fex-gcc-target-tests-bins.update=none \
+            -c submodule.External/Catch2.update=none \
+            submodule update --init --recursive --depth 1
+          git submodule status --recursive | grep -v '^-' | head -40
+
+      # ContentView.swift uses glassEffect (iOS 26 SDK), so Xcode 16 cannot
+      # compile the app. Pick the newest Xcode 26+ on the image.
+      - name: Select Xcode 26
+        run: |
+          set -eu
+          ls -d /Applications/Xcode*.app
+          X=$(ls -d /Applications/Xcode_2[6-9]*.app 2>/dev/null | sort -V | tail -1 || true)
+          [ -n "$X" ] || { echo "::error::No Xcode 26+ on this runner image"; exit 1; }
+          sudo xcode-select -s "$X/Contents/Developer"
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+          # DXMT's airconv shaders need the Metal compiler, a separate
+          # download since Xcode 26.
+          xcrun -sdk macosx metal --version 2>/dev/null \
+            || sudo xcodebuild -downloadComponent MetalToolchain
+          xcrun -sdk macosx metal --version
+
+      - name: Restore llvm-mingw
+        uses: actions/cache@v4
+        with:
+          path: ~/llvm-mingw
+          key: llvm-mingw-20240619-ucrt-macos-universal
+
+      - name: Host tools
+        run: |
+          set -eux
+          brew install ninja meson bison flex llvm ccache cmake pkg-config
+          echo "$(brew --prefix bison)/bin" >> "$GITHUB_PATH"
+          echo "$(brew --prefix flex)/bin"  >> "$GITHUB_PATH"
+          mkdir -p "$RUNNER_TEMP/bin"
+          ln -sf "$(brew --prefix llvm)/bin/llvm-objcopy" "$RUNNER_TEMP/bin/llvm-objcopy"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+          # FEX Scripts/aarch64_fit_native.py needs packaging (or pkg_resources)
+          # Homebrew Python is externally managed (PEP 668).
+          python3 -m pip install --user --break-system-packages packaging setuptools
+
+          LM="$HOME/llvm-mingw"
+          if [ ! -x "$LM/bin/aarch64-w64-mingw32-clang" ]; then
+            URL="https://github.com/mstorsjo/llvm-mingw/releases/download/20240619/llvm-mingw-20240619-ucrt-macos-universal.tar.xz"
+            curl -fL --retry 3 -o /tmp/llvm-mingw.tar.xz "$URL"
+            rm -rf "$LM" && mkdir -p "$LM"
+            tar -xJf /tmp/llvm-mingw.tar.xz -C "$LM" --strip-components=1
+          fi
+          test -x "$LM/bin/aarch64-w64-mingw32-clang"
+          echo "$LM/bin" >> "$GITHUB_PATH"
+          export PATH="$LM/bin:$PATH"
+          aarch64-w64-mingw32-clang --version | head -1
+          xcodebuild -version
+
+      # One cache entry per run; each run starts from the newest earlier one.
+      - name: Compiler cache
+        uses: actions/cache@v4
+        with:
+          path: .ccache
+          key: ccache-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: ccache-${{ runner.os }}-
+
+      - name: Route xcrun clang through ccache
+        run: |
+          set -eux
+          mkdir -p "$RUNNER_TEMP/ccache-bin"
+          cp scripts/ci/xcrun-ccache "$RUNNER_TEMP/ccache-bin/xcrun"
+          echo "$RUNNER_TEMP/ccache-bin" >> "$GITHUB_PATH"
+          ccache --zero-stats
+          ccache --show-config | grep -E "cache_dir|base_dir|max_size"
+
+      - name: Restore LLVM (iOS) cache
+        id: llvm-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            toolchains/llvm-project/llvm/include
+            toolchains/llvm-ios-build/include
+            toolchains/llvm-ios-build/lib/*.a
+          key: llvm-ios-${{ env.LLVM_VERSION }}-v1
+
+      - name: Build LLVM ${{ env.LLVM_VERSION }} for iOS
+        if: steps.llvm-cache.outputs.cache-hit != 'true'
+        run: |
+          set -eux
+          mkdir -p toolchains && cd toolchains
+          git clone --depth 1 --branch llvmorg-$LLVM_VERSION --filter=blob:none --sparse \
+              https://github.com/llvm/llvm-project.git llvm-project
+          git -C llvm-project sparse-checkout set llvm cmake third-party
+          sed -i '' 's/MATCHES "Darwin"/MATCHES "Darwin|iOS"/' llvm-project/llvm/cmake/modules/AddLLVM.cmake
+          COMMON=(-G Ninja -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD=
+                  -DLLVM_INCLUDE_TESTS=OFF -DLLVM_INCLUDE_BENCHMARKS=OFF -DLLVM_INCLUDE_EXAMPLES=OFF
+                  -DLLVM_INCLUDE_DOCS=OFF -DLLVM_ENABLE_ZLIB=OFF -DLLVM_ENABLE_ZSTD=OFF
+                  -DLLVM_ENABLE_TERMINFO=OFF -DLLVM_ENABLE_LIBXML2=OFF
+                  -DCMAKE_CXX_FLAGS=-Wno-enum-constexpr-conversion)
+          cmake -S llvm-project/llvm -B llvm-host-build "${COMMON[@]}"
+          ninja -C llvm-host-build llvm-tblgen
+          cmake -S llvm-project/llvm -B llvm-ios-build "${COMMON[@]}" \
+              -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_SYSROOT=iphoneos \
+              -DCMAKE_OSX_DEPLOYMENT_TARGET=17.0 \
+              -DLLVM_HOST_TRIPLE=arm64-apple-ios17.0 -DLLVM_DEFAULT_TARGET_TRIPLE=arm64-apple-ios17.0 \
+              -DLLVM_TARGET_ARCH=host -DLLVM_ENABLE_PROJECTS= \
+              -DLLVM_BUILD_TOOLS=OFF -DLLVM_INCLUDE_TOOLS=OFF -DLLVM_BUILD_UTILS=OFF -DLLVM_INCLUDE_UTILS=OFF \
+              -DLLVM_TABLEGEN="$PWD/llvm-host-build/bin/llvm-tblgen"
+          ninja -C llvm-ios-build
+          ls llvm-ios-build/lib/*.a | wc -l
+
+      - name: Save LLVM (iOS) cache
+        if: steps.llvm-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            toolchains/llvm-project/llvm/include
+            toolchains/llvm-ios-build/include
+            toolchains/llvm-ios-build/lib/*.a
+          key: llvm-ios-${{ env.LLVM_VERSION }}-v1
+
+      - name: Restore GnuTLS cache
+        id: gnutls-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: toolchains/gnutls-ios
+          key: gnutls-ios-${{ hashFiles('build/gnutls-ios/build.sh', 'build/gnutls-ios/src/SHA256SUMS') }}
+
+      - name: Build GnuTLS stack
+        if: steps.gnutls-cache.outputs.cache-hit != 'true'
+        run: bash build/gnutls-ios/build.sh
+
+      - name: Save GnuTLS cache
+        if: steps.gnutls-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: toolchains/gnutls-ios
+          key: gnutls-ios-${{ hashFiles('build/gnutls-ios/build.sh', 'build/gnutls-ios/src/SHA256SUMS') }}
+
+      - name: Build FreeType
+        run: |
+          set -eux
+          rm -rf research/freetype
+          git clone --depth 1 --branch "$FREETYPE_TAG" https://github.com/freetype/freetype.git research/freetype \
+            || git clone --depth 1 https://github.com/freetype/freetype.git research/freetype
+          test -d research/freetype
+          bash build/freetype-ios/build.sh
+
+      - name: Configure Wine (host headers)
+        run: |
+          set -eux
+          export PATH="$HOME/llvm-mingw/bin:$(brew --prefix bison)/bin:$(brew --prefix flex)/bin:$PATH"
+          which aarch64-w64-mingw32-clang
+
+          if [ ! -f wine/dlls/ntdll/arm64ec_x64_export_iat.c ]; then
+            printf '%s\n' '/* generated during PE build; empty for host configure */' \
+              > wine/dlls/ntdll/arm64ec_x64_export_iat.c
+          fi
+
+          # The fork includes build/madeira_cfg.h ahead of config.h on purpose
+          # (ml1122); makedep's include-order sanity check rejects that and
+          # configure then writes no Makefile. Drop the check in CI only.
+          sed -i '' 's/fatal_error( "%s must be included before other headers\\n", file->name );/;/' wine/tools/makedep.c
+          ! grep -q 'must be included before other headers\\n", file->name' wine/tools/makedep.c
+
+          mkdir -p wine/build-macos && cd wine/build-macos
+          set +e
+          ../configure --without-x --without-freetype --disable-tests --with-mingw=clang \
+            > "$GITHUB_WORKSPACE/wine-configure.log" 2>&1
+          cfg=$?
+          set -e
+          tail -40 "$GITHUB_WORKSPACE/wine-configure.log" || true
+          test -f include/config.h
+
+          if [ -f Makefile ]; then
+            make -j"$(sysctl -n hw.ncpu)" include/all || make -C include all || true
+          else
+            echo "::warning::Wine Makefile missing (makedep exit); using config.h only"
+            mkdir -p include
+            touch include/stamp-h
+          fi
+
+          cd .. && ln -sfn build-macos build-arm64ec
+          test -f build-macos/include/config.h
+          ls -la build-macos/include/config.h
+
+      - name: Build FEXCore
+        run: |
+          set -eux
+          # Ensure packaging is importable for FEX scripts
+          python3 -c "import packaging; print(packaging.__version__)"
+          python3 scripts/ci/patch-fex-ios.py
+          bash build/fex-ios/build.sh || {
+            # Keep going past the first failure so one run lists every error.
+            cmake --build FEX/build-ios --target FEXCore FEXCore_Base JemallocLibs -- -k 0 2>&1 \
+              | grep -E "error:|FAILED" | head -150
+            exit 1
+          }
+
+      - name: Build libntdll_unix.a
+        run: |
+          set -eux
+          export PATH="$HOME/llvm-mingw/bin:$(brew --prefix bison)/bin:$(brew --prefix flex)/bin:$PATH"
+          # server_ios.c's [xp] line reads rusage_info_v6.ri_page_wait_time_mach,
+          # which only newer SDKs than this runner's declare. If the SDK lacks
+          # it, log 0 for that one diagnostic column instead.
+          printf '#include <sys/resource.h>\nint f(struct rusage_info_v6 *r){return (int)r->ri_page_wait_time_mach;}\n' > "$RUNNER_TEMP/ru.c"
+          if ! xcrun -sdk iphoneos clang -arch arm64 -miphoneos-version-min=17.0 -c "$RUNNER_TEMP/ru.c" -o /dev/null 2>/dev/null; then
+            echo "::warning::SDK lacks ri_page_wait_time_mach; [xp] pgw column logs 0"
+            sed -i '' 's/XP_MS( ru.ri_page_wait_time_mach - pru.ri_page_wait_time_mach )/0.0/' build/ntdll-unix/server_ios.c
+            ! grep -q ri_page_wait_time_mach build/ntdll-unix/server_ios.c
+          fi
+          bash build/ntdll-unix/build.sh
+          test -s app/Madeira/libntdll_unix.a
+
+      - name: Build libwineserver.a
+        run: |
+          set -eux
+          export PATH="$HOME/llvm-mingw/bin:$(brew --prefix bison)/bin:$(brew --prefix flex)/bin:$PATH"
+          bash scripts/ci/build-wineserver-base.sh
+          bash build/wineserver/build.sh all
+          test -s app/Madeira/libwineserver.a
+
+      - name: Build libwin32u_unix.a
+        run: |
+          set -eux
+          export PATH="$HOME/llvm-mingw/bin:$(brew --prefix bison)/bin:$(brew --prefix flex)/bin:$PATH"
+          bash build/win32u-unix/build.sh
+          test -s app/Madeira/libwin32u_unix.a
+
+      - name: Build libdxmt_combined.a
+        run: |
+          set -eux
+          bash build/dxmt-ios/build.sh
+          xcrun -sdk iphoneos libtool -static -o build/dxmt-ios/libdxmt_combined.a \
+              build/dxmt-ios/obj/*.o toolchains/llvm-ios-build/lib/*.a
+          cp build/dxmt-ios/libdxmt_combined.a app/Madeira/
+          test -s app/Madeira/libdxmt_combined.a
+
+      - name: Build Madeira.app
+        run: |
+          set -eux
+          bash build/stage-licenses.sh || true
+          mkdir -p app/Madeira/x86_64-vcruntime
+          xcodebuild -project app/Madeira.xcodeproj -target Madeira \
+              -configuration "$CONFIGURATION" -sdk iphoneos \
+              SYMROOT="$PWD/app/build" \
+              CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" DEVELOPMENT_TEAM="" \
+              build > xcodebuild.log 2>&1 \
+            || { grep -E "error:|Undefined symbols|referenced from" -A3 xcodebuild.log | head -300; tail -50 xcodebuild.log; exit 1; }
+          tail -5 xcodebuild.log
+
+      # Pushes have no inputs, so an unset bundle_steam means "bundle".
+      # The app copies Madeira.app/Steam into C:\Program Files (x86)\Steam
+      # the first time "Steam Testing" is pressed (prepareSteamLaunch()).
+      - name: Fetch Steam client
+        if: format('{0}', inputs.bundle_steam) != 'false'
+        run: bash scripts/fetch-steam.sh "$RUNNER_TEMP/Steam"
+
+      - name: Package IPA
+        run: |
+          set -eux
+          APP="app/build/$CONFIGURATION-iphoneos/Madeira.app"
+          if [ -d "$RUNNER_TEMP/Steam" ]; then
+            rm -rf "$APP/Steam"
+            cp -R "$RUNNER_TEMP/Steam" "$APP/Steam"
+          fi
+          codesign --force --sign - --entitlements app/Madeira/Madeira.entitlements "$APP" || true
+          rm -rf ipa && mkdir -p ipa/Payload
+          cp -R "$APP" ipa/Payload/
+          (cd ipa && zip -qry -1 "../Madeira-$CONFIGURATION-unsigned.ipa" Payload)
+          ls -lh Madeira-*.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Madeira-${{ env.CONFIGURATION }}-ipa
+          path: Madeira-*.ipa
+          compression-level: 0
+
+      # Every successful build becomes a release tagged build-<run number> on
+      # the built commit. Only main builds are full releases (and "Latest");
+      # builds of other branches are published as prereleases.
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eux
+          TAG="build-${GITHUB_RUN_NUMBER}"
+          STEAM_NOTE="no Steam"
+          if [ -f "$RUNNER_TEMP/Steam/package/steam_client_win64.manifest" ]; then
+            STEAM_NOTE="Steam client $(sed -n 's/^[[:space:]]*"version"[[:space:]]*"\([0-9]*\)".*/\1/p' \
+              "$RUNNER_TEMP/Steam/package/steam_client_win64.manifest" | head -1)"
+          fi
+          PRERELEASE=""
+          [ "$GITHUB_REF" = "refs/heads/main" ] || PRERELEASE="--prerelease"
+          gh release create "$TAG" Madeira-*.ipa \
+              --target "$GITHUB_SHA" \
+              --title "Madeira $CONFIGURATION #${GITHUB_RUN_NUMBER} (${GITHUB_REF_NAME})" \
+              --notes "Unsigned $CONFIGURATION IPA from ${GITHUB_SHA::7} on ${GITHUB_REF_NAME}, ${STEAM_NOTE}. Sign it with your own Apple ID when sideloading. Built by ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+              $PRERELEASE
+
+      # Keep the newest KEEP_RELEASES build-* releases and delete the rest
+      # together with their tags. Releases with other tags (made by hand)
+      # are never touched.
+      - name: Delete old releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KEEP_RELEASES: 5
+        run: |
+          set -eu
+          gh release list --limit 1000 --json tagName,createdAt \
+              --jq '[.[] | select(.tagName | startswith("build-"))]
+                    | sort_by(.createdAt) | reverse
+                    | .['"$KEEP_RELEASES"':][] | .tagName' |
+          while read -r tag; do
+            echo "Deleting release $tag"
+            gh release delete "$tag" --cleanup-tag --yes
+          done
+
+      - name: Compiler cache stats
+        if: always()
+        run: ccache --show-stats || true
+
+      - name: Show compiler errors
+        if: failure()
+        run: |
+          for f in build/*/obj/*.err build/*/obj/err-*.txt; do
+            [ -s "$f" ] && { echo "::group::$f"; head -60 "$f"; echo "::endgroup::"; }
+          done
+          true
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            xcodebuild.log
+            wine-configure.log
+            build/*/obj/*.err
+            build/*/obj/err-*.txt
+            wine/build-macos/config.log
+          if-no-files-found: ignore
