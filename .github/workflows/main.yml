@@ -309,7 +309,6 @@ jobs:
           set -euxo pipefail
           bash build/ntdll-unix/build.sh
           bash build/win32u-unix/build.sh
-          bash build/wine-pe/build-ntdll.sh
           ls -l app/Madeira/libntdll_unix.a app/Madeira/libwin32u_unix.a
 
       # build/wineserver/build.sh does NOT build wineserver from scratch —
