@@ -437,6 +437,60 @@ extern void wine_log_set_file(const char *path);
 
 static pthread_t g_wine_thread;
 static int g_wine_running = 0;
+
+/* Session exit report for the library front end. ntdll's process start and
+ * common exit wrapper (build/ntdll-unix/server_ios.c) call the two hooks below
+ * with the program's image base name (ASCII, at most 63 characters). Nothing
+ * here keeps or logs a name: only counters and the last error status.
+ *
+ * g_crash_exit: the last program that ended with an NTSTATUS error (0xC...)
+ * in this session, so the library can say the game stopped instead of just
+ * returning. Launcher and helper images are not programs the user ran.
+ * MADEIRA_EXIT_REPORT=0 turns the record off. */
+static uint64_t g_crash_exit = 0;
+void wine_exit_status_reset(void) {
+    __atomic_store_n(&g_crash_exit, 0, __ATOMIC_RELEASE);
+}
+static int madeira_exit_is_helper(const char *image) {
+    static const char *const helpers[] = { "services.exe",
+        "winedevice.exe", "explorer.exe", "plugplay.exe", "rpcss.exe", "svchost.exe", "conhost.exe",
+        "cmd.exe", "rundll32.exe", "wineboot.exe", "start.exe", "tabtip.exe", "crashpad_handler.exe" };
+    for (size_t i = 0; i < sizeof(helpers) / sizeof(helpers[0]); i++)
+        if (!strcasecmp(image, helpers[i])) return 1;
+    return 0;
+}
+int wine_crash_exit_status(uint32_t *status) {
+    uint64_t value = __atomic_load_n(&g_crash_exit, __ATOMIC_ACQUIRE);
+    if (!(value >> 32)) return 0;
+    if (status) *status = (uint32_t)value;
+    return 1;
+}
+/* Programs (not launcher/helper images) started and still running in this
+ * session. Counters only. */
+static int g_programs_started = 0, g_programs_live = 0;
+void wine_process_did_start(const char *image) {
+    if (!image || madeira_exit_is_helper(image)) return;
+    __atomic_add_fetch(&g_programs_started, 1, __ATOMIC_ACQ_REL);
+    __atomic_add_fetch(&g_programs_live, 1, __ATOMIC_ACQ_REL);
+}
+int wine_programs_started(void) { return __atomic_load_n(&g_programs_started, __ATOMIC_ACQUIRE); }
+int wine_programs_live(void) { return __atomic_load_n(&g_programs_live, __ATOMIC_ACQUIRE); }
+void wine_programs_reset(void) {
+    __atomic_store_n(&g_programs_started, 0, __ATOMIC_RELEASE);
+    __atomic_store_n(&g_programs_live, 0, __ATOMIC_RELEASE);
+}
+void wine_process_did_exit(const char *image, int status) {
+    if (image && !madeira_exit_is_helper(image)) {
+        int live = __atomic_load_n(&g_programs_live, __ATOMIC_ACQUIRE);
+        while (live > 0 && !__atomic_compare_exchange_n(&g_programs_live, &live, live - 1, 0,
+                                                        __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)) {}
+    }
+    if (image && (uint32_t)status >= 0xC0000000u && !madeira_exit_is_helper(image)) {
+        const char *off = getenv("MADEIRA_EXIT_REPORT");
+        if (!off || off[0] != '0')
+            __atomic_store_n(&g_crash_exit, (UINT64_C(1) << 32) | (uint32_t)status, __ATOMIC_RELEASE);
+    }
+}
 static char *g_prefix_path = NULL;
 
 /***********************************************************************

@@ -5261,11 +5261,47 @@ void *madeira_current_peb( void )
     return teb ? teb->Peb : NULL;
 }
 
+/* The app's session exit report (WineProcessBridge.m) counts the programs a
+ * session started and records the last one that ended with an error. Both
+ * hooks get the image's base name only, and only when it is plain ASCII that
+ * fits: a truncated or non-ASCII name must never be mistaken for a known
+ * helper image. No guest strings are logged here. */
+static BOOL ios_process_image_name( char *name, unsigned int size )
+{
+    PEB *peb = NtCurrentTeb() ? NtCurrentTeb()->Peb : NULL;
+    RTL_USER_PROCESS_PARAMETERS *params = peb ? peb->ProcessParameters : NULL;
+    unsigned int i, start = 0, length, used = 0;
+
+    if (!params || !params->ImagePathName.Buffer) return FALSE;
+    length = params->ImagePathName.Length / sizeof(WCHAR);
+    for (i = 0; i < length; i++)
+        if (params->ImagePathName.Buffer[i] == '\\' || params->ImagePathName.Buffer[i] == '/') start = i + 1;
+    if (length - start >= size) return FALSE;
+    for (i = start; i < length; i++)
+    {
+        WCHAR c = params->ImagePathName.Buffer[i];
+        if (!c || c > 127) return FALSE;
+        name[used++] = (char)c;
+    }
+    name[used] = 0;
+    return used != 0;
+}
+
+static void ios_notify_process_start( void )
+{
+    extern void wine_process_did_start( const char * ) __attribute__((weak));
+    char name[64];
+    if (wine_process_did_start && ios_process_image_name( name, sizeof(name) )) wine_process_did_start( name );
+}
+
 static void ios_notify_process_exit( int status )
 {
+    extern void wine_process_did_exit( const char *, int ) __attribute__((weak));
     extern void winios_process_exited( void *peb ) __attribute__((weak));
     PEB *peb = NtCurrentTeb() ? NtCurrentTeb()->Peb : NULL;
+    char name[64];
     if (winios_process_exited && peb) winios_process_exited( peb );   /* ml2000 */
+    if (wine_process_did_exit && ios_process_image_name( name, sizeof(name) )) wine_process_did_exit( name, status );
 }
 
 void process_exit_wrapper( int status )
@@ -5718,6 +5754,7 @@ void server_init_process_done(void)
      * madeira_fast_flush_pid() in ntdll/unix/sync.c for why that is a
      * correctness problem and not just a leak. */
     madeira_fast_flush_pid();
+    ios_notify_process_start();
 
     if (!get_device_info( initial_cwd, &info ) && (info.Characteristics & FILE_REMOVABLE_MEDIA))
         chdir( "/" );
