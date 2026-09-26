@@ -624,11 +624,11 @@ jobs:
           export SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
           cd research/dxmt
           rm -rf build-pe
-          meson setup research/dxmt/build-arm64ec research/dxmt -Dbuildtype=release -Dwine_build_path=../../wine/build-arm64ec --cross-file=research/dxmt/build-arm64ec-win.txt
-          ninja -C research/dxmt/build-arm64ec src/winemetal/winemetal.dll 
-          cp app/Madeira/arm64ec-windows/
+          meson setup --cross-file build-aarch64-win.txt --native-file build-osx.txt \
+            -Dwine_build_path=../../wine/build-macos build-pe
           meson compile -C build-pe
-          cp build-pe/src/d3d11/d3d11.dll \
+          cp build-pe/src/d3d12/d3d11.dl2 \
+             build-pe/src/d3d11/d3d11.dll \
              build-pe/src/dxgi/dxgi.dll \
              build-pe/src/winemetal/winemetal.dll \
              build-pe/src/d3d10/d3d10core.dll \
