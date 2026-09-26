@@ -188,102 +188,6 @@ jobs:
           key: freetype2-2133-${{ env.CACHE_V }}
 
       # ==============================================================
-      # FEX
-      # FEX_IOS_HOST: the fork gates its iOS externs (IosCbEntryLog,
-      # IosFfsBypassLog, IosJitReverseTranslate) behind this define while
-      # the code USING them is ungated — without it Core.cpp throws 14
-      # undeclared-identifier errors. FEX only appends to CMAKE_CXX_FLAGS,
-      # so passing it here is safe.
-      # ==============================================================
-
-      - name: Cache FEX build
-        id: fex
-        uses: actions/cache@v4
-        with:
-          path: FEX/build-ios
-          key: fex2-053c385-caspalstub-${{ env.CACHE_V }}
-
-      # FEX fork bug: IosLogUnimplementedCASPAL (Arm64.cpp) sits OUTSIDE
-      # every #ifdef FEX_IOS_HOST in that file, yet calls Win32 APIs —
-      # VirtualQuery / MEMORY_BASIC_INFORMATION / LPCVOID / MEM_IMAGE —
-      # left over from the author's ARM64EC-on-Windows work. It is a pure
-      # diagnostic that only fires on a misaligned CASP (which the comment
-      # above it says a correct guest cannot emit), so it is stubbed out.
-      - name: Patch FEX Arm64.cpp Win32 probe
-        run: |
-          set -euxo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path("FEX/FEXCore/Source/Utils/ArchHelpers/Arm64.cpp")
-          s = p.read_text()
-          sig = "static void IosLogUnimplementedCASPAL(uint32_t Size, uint64_t* GPRs, uint32_t AddressReg) {"
-          if "MADEIRA_CASPAL_STUB" in s:
-              print("already patched")
-              raise SystemExit(0)
-          i = s.find(sig)
-          if i == -1:
-              raise SystemExit("ERROR: IosLogUnimplementedCASPAL not found")
-          # end of function = first line that is exactly "}" at column 0
-          j = s.find("\n}\n", i)
-          if j == -1:
-              raise SystemExit("ERROR: could not find end of function")
-          stub = (sig + "\n"
-                  "  /* MADEIRA_CASPAL_STUB: original body used Win32 VirtualQuery,\n"
-                  "   * unavailable on iOS. Diagnostic only. */\n"
-                  "  (void)Size; (void)GPRs; (void)AddressReg;\n")
-          s = s[:i] + stub + s[j + 1:]
-          p.write_text(s)
-          print("stubbed IosLogUnimplementedCASPAL")
-          PY
-          grep -n -A4 "MADEIRA_CASPAL_STUB" FEX/FEXCore/Source/Utils/ArchHelpers/Arm64.cpp
-
-      - name: Configure FEX
-        if: steps.fex.outputs.cache-hit != 'true'
-        run: |
-          set -euxo pipefail
-          cmake -S FEX -B FEX/build-ios -G Ninja \
-            -DCMAKE_SYSTEM_NAME=iOS \
-            -DCMAKE_SYSTEM_PROCESSOR=arm64 \
-            -DCMAKE_OSX_SYSROOT="$(xcrun --sdk iphoneos --show-sdk-path)" \
-            -DCMAKE_OSX_ARCHITECTURES=arm64 \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET="$IOS_DEPLOYMENT_TARGET" \
-            -DCMAKE_MACOSX_BUNDLE=OFF \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
-            -DCMAKE_C_FLAGS="-DFEX_IOS_HOST=1" \
-            -DCMAKE_CXX_FLAGS="-DFEX_IOS_HOST=1" \
-            -DBUILD_TESTING=OFF \
-            -DBUILD_TESTS=False \
-            -DBUILD_THUNKS=OFF \
-            -DENABLE_VIXL_DISASSEMBLER=OFF \
-            -DENABLE_VIXL_SIMULATOR=OFF \
-            -DENABLE_CCACHE=OFF \
-            -DENABLE_LTO=False \
-            -DTUNE_CPU=none \
-            -DTUNE_ARCH=generic
-
-      - name: Build FEX
-        if: steps.fex.outputs.cache-hit != 'true'
-        run: |
-          set -uxo pipefail
-          cmake --build FEX/build-ios \
-            --target FEXCore FEXCore_Base JemallocLibs \
-            --parallel "$(sysctl -n hw.ncpu)" 2>&1 | tee /tmp/fex.log
-          rc=${PIPESTATUS[0]}
-          [ "$rc" -ne 0 ] && grep -n "error:" /tmp/fex.log | head -40
-          exit "$rc"
-
-      - name: Verify FEX libraries
-        run: |
-          set -euxo pipefail
-          for n in libFEXCore.a libFEXCore_Base.a libJemallocLibs.a \
-                   libfmt.a libcephes_128bit.a libxxhash.a libsoftfloat_3e.a; do
-            f="$(find FEX/build-ios -name "$n" -type f -print -quit)"
-            test -n "$f" || { echo "MISSING $n"; exit 1; }
-            lipo -info "$f"
-          done
-
-      # ==============================================================
       # WINE
       #
       # Directory targets are a trap: `make include` / `make dlls/ntdll`
@@ -479,6 +383,114 @@ jobs:
           command -v llvm-objcopy
           bash build/wineserver/build.sh
           ls -l app/Madeira/libwineserver.a
+          
+      # ==============================================================
+      # FEX
+      # FEX_IOS_HOST: the fork gates its iOS externs (IosCbEntryLog,
+      # IosFfsBypassLog, IosJitReverseTranslate) behind this define while
+      # the code USING them is ungated — without it Core.cpp throws 14
+      # undeclared-identifier errors. FEX only appends to CMAKE_CXX_FLAGS,
+      # so passing it here is safe.
+      # ==============================================================
+
+      - name: Cache FEX build
+        id: fex
+        uses: actions/cache@v4
+        with:
+          path: FEX/build-ios
+          key: fex-${{ steps.revisions.outputs.fex }}-caspalstub-rpmguard-${{ env.CACHE_V }}
+
+      # FEX fork bug: IosLogUnimplementedCASPAL (Arm64.cpp) sits OUTSIDE
+      # every #ifdef FEX_IOS_HOST in that file, yet calls Win32 APIs —
+      # VirtualQuery / MEMORY_BASIC_INFORMATION / LPCVOID / MEM_IMAGE —
+      # left over from the author's ARM64EC-on-Windows work. It is a pure
+      # diagnostic that only fires on a misaligned CASP (which the comment
+      # above it says a correct guest cannot emit), so it is stubbed out.
+      - name: Patch FEX Arm64.cpp Win32 probe
+        run: |
+          set -euxo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("FEX/FEXCore/Source/Utils/ArchHelpers/Arm64.cpp")
+          s = p.read_text()
+          sig = "static void IosLogUnimplementedCASPAL(uint32_t Size, uint64_t* GPRs, uint32_t AddressReg) {"
+          if "MADEIRA_CASPAL_STUB" in s:
+              print("already patched")
+              raise SystemExit(0)
+          i = s.find(sig)
+          if i == -1:
+              raise SystemExit("ERROR: IosLogUnimplementedCASPAL not found")
+          # end of function = first line that is exactly "}" at column 0
+          j = s.find("\n}\n", i)
+          if j == -1:
+              raise SystemExit("ERROR: could not find end of function")
+          stub = (sig + "\n"
+                  "  /* MADEIRA_CASPAL_STUB: original body used Win32 VirtualQuery,\n"
+                  "   * unavailable on iOS. Diagnostic only. */\n"
+                  "  (void)Size; (void)GPRs; (void)AddressReg;\n")
+          s = s[:i] + stub + s[j + 1:]
+          p.write_text(s)
+          print("stubbed IosLogUnimplementedCASPAL")
+          PY
+          grep -n -A4 "MADEIRA_CASPAL_STUB" FEX/FEXCore/Source/Utils/ArchHelpers/Arm64.cpp
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("FEX/FEXCore/Source/Utils/AllocatorHooks.cpp")
+          s = p.read_text()
+          old = "size_t malloc_usable_size(void* ptr) {\n  IOS_RPM_GUARD();\n#ifdef __APPLE__"
+          new = "size_t malloc_usable_size(void* ptr) {\n#ifdef __APPLE__"
+          if old not in s:
+              raise SystemExit("ERROR: FEX fallback guard block not found")
+          p.write_text(s.replace(old, new, 1))
+          print("removed rpm guard from non-rpmalloc fallback")
+          PY
+          grep -n -A4 "size_t malloc_usable_size" FEX/FEXCore/Source/Utils/AllocatorHooks.cpp
+
+      - name: Configure FEX
+        if: steps.fex.outputs.cache-hit != 'true'
+        run: |
+          set -euxo pipefail
+          cmake -S FEX -B FEX/build-ios -G Ninja \
+            -DCMAKE_SYSTEM_NAME=iOS \
+            -DCMAKE_SYSTEM_PROCESSOR=arm64 \
+            -DCMAKE_OSX_SYSROOT="$(xcrun --sdk iphoneos --show-sdk-path)" \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="$IOS_DEPLOYMENT_TARGET" \
+            -DCMAKE_MACOSX_BUNDLE=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+            -DCMAKE_C_FLAGS="-DFEX_IOS_HOST=1" \
+            -DCMAKE_CXX_FLAGS="-DFEX_IOS_HOST=1" \
+            -DBUILD_TESTING=OFF \
+            -DBUILD_TESTS=False \
+            -DBUILD_THUNKS=OFF \
+            -DENABLE_VIXL_DISASSEMBLER=OFF \
+            -DENABLE_VIXL_SIMULATOR=OFF \
+            -DENABLE_CCACHE=OFF \
+            -DENABLE_LTO=False \
+            -DTUNE_CPU=none \
+            -DTUNE_ARCH=generic
+
+      - name: Build FEX
+        if: steps.fex.outputs.cache-hit != 'true'
+        run: |
+          set -uxo pipefail
+          cmake --build FEX/build-ios \
+            --target FEXCore FEXCore_Base JemallocLibs \
+            --parallel "$(sysctl -n hw.ncpu)" 2>&1 | tee /tmp/fex.log
+          rc=${PIPESTATUS[0]}
+          [ "$rc" -ne 0 ] && grep -n "error:" /tmp/fex.log | head -40
+          exit "$rc"
+
+      - name: Verify FEX libraries
+        run: |
+          set -euxo pipefail
+          for n in libFEXCore.a libFEXCore_Base.a libJemallocLibs.a \
+                   libfmt.a libcephes_128bit.a libxxhash.a libsoftfloat_3e.a; do
+            f="$(find FEX/build-ios -name "$n" -type f -print -quit)"
+            test -n "$f" || { echo "MISSING $n"; exit 1; }
+            lipo -info "$f"
+          done
 
       # ==============================================================
       # LLVM 15 for iOS — LAST of the heavy stages, because everything
