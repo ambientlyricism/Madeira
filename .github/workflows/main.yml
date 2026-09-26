@@ -310,6 +310,37 @@ jobs:
       # author never builds that target. `make -k` keeps going and still
       # produces the two things actually consumed: the PE static libs
       # (winecrt0, for DXMT's meson) and the widl-generated headers.
+      - name: Patch Wine ARM64EC-only include for dependency build
+        run: |
+          set -euxo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("wine/dlls/ntdll/loader.c")
+          s = p.read_text()
+          needle = '#include "arm64ec_x64_export_iat.c"'
+          if needle not in s:
+              raise SystemExit("ERROR: expected missing ARM64EC include not found")
+          s = s.replace(needle, "/* skipped in the ARM64 dependency-only build */", 1)
+          p.write_text(s)
+          print("removed absent ARM64EC-only include from dependency build")
+          p = Path("wine/dlls/ntdll/unix/sync.c")
+          s = p.read_text()
+          old = '#include "../../../../build/madeira_cfg.h"   /* ml1122: before the Wine headers, which ban strncpy by macro */\n#include "config.h"'
+          new = '#include "config.h"\n#include "../../../../build/madeira_cfg.h"   /* ml1122: before the Wine headers, which ban strncpy by macro */'
+          if old not in s:
+              raise SystemExit("ERROR: unexpected Wine sync.c include block")
+          p.write_text(s.replace(old, new, 1))
+          print("reordered sync.c includes for Wine makedep")
+          p = Path("build/ntdll-unix/server_ios.c")
+          s = p.read_text()
+          needle = "XP_MS( ru.ri_page_wait_time_mach - pru.ri_page_wait_time_mach )"
+          if needle not in s:
+              raise SystemExit("ERROR: expected unsupported page-wait diagnostic not found")
+          s = s.replace(needle, "0.0 /* unavailable in Xcode 16.4 SDK */", 1)
+          p.write_text(s)
+          print("disabled unavailable page-wait diagnostic for Xcode 16.4")
+          PY
+
       - name: Build Wine (PE libs + generated headers)
         if: steps.winecache.outputs.cache-hit != 'true'
         run: |
