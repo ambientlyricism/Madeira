@@ -610,6 +610,7 @@ jobs:
           path: |
             research/dxmt/build-pe
             build/dxmt-ios/obj
+            build/madeira-d3d12/obj
             app/Madeira/libdxmt_combined.a
             app/Madeira/aarch64-windows
           key: dxmt2-b4b89f0-${{ env.CACHE_V }}
