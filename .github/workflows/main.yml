@@ -627,6 +627,7 @@ jobs:
           meson setup --cross-file build-aarch64-win.txt --native-file build-osx.txt \
             -Dwine_build_path=../../wine/build-macos build-pe
           meson compile -C build-pe
+          mkdir -p ../../build/dxmt-ios/pe-out
           cp build-pe/src/d3d11/d3d11.dll \
              build-pe/src/dxgi/dxgi.dll \
              build-pe/src/winemetal/winemetal.dll \
