@@ -574,7 +574,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/dxmt-ios/shader-headers
-          key: shaders2-b4b89f0-${{ env.CACHE_V }}
+          key: shaders-${{ steps.revisions.outputs.dxmt }}-${{ env.CACHE_V }}
 
       - name: Generate airconv shader headers
         if: steps.shaders.outputs.cache-hit != 'true'
@@ -610,10 +610,9 @@ jobs:
           path: |
             research/dxmt/build-pe
             build/dxmt-ios/obj
-            build/madeira-d3d12/obj
-            app/Madeira/libdxmt_combined.a
-            app/Madeira/aarch64-windows
-          key: dxmt2-b4b89f0-${{ env.CACHE_V }}
+            build/dxmt-ios/libdxmt_combined.a
+            build/dxmt-ios/pe-out
+          key: dxmt-${{ steps.revisions.outputs.dxmt }}-${{ hashFiles('build/dxmt-ios/**/*.c', 'build/dxmt-ios/**/*.cpp', 'build/dxmt-ios/**/*.mm', 'build/dxmt-ios/**/*.h', 'build/dxmt-ios/**/*.sh') }}-${{ env.CACHE_V }}
 
       - name: DXMT
         if: steps.dxmt.outputs.cache-hit != 'true'
@@ -632,7 +631,7 @@ jobs:
              build-pe/src/dxgi/dxgi.dll \
              build-pe/src/winemetal/winemetal.dll \
              build-pe/src/d3d10/d3d10core.dll \
-             ../../app/Madeira/aarch64-windows/
+             ../../build/dxmt-ios/pe-out/
           cd ../../build/dxmt-ios
           ./build.sh
           cd ../../build/madeira-d3d12
@@ -641,6 +640,17 @@ jobs:
           xcrun -sdk iphoneos libtool -static -o libdxmt_combined.a \
             obj/*.o ../../toolchains/llvm-ios-build/lib/*.a
           cp libdxmt_combined.a ../../app/Madeira/
+
+      - name: Stage DXMT outputs
+        run: |
+          set -euxo pipefail
+          test -f build/dxmt-ios/libdxmt_combined.a
+          for dll in d3d11.dll dxgi.dll winemetal.dll d3d10core.dll; do
+            test -f "build/dxmt-ios/pe-out/$dll"
+          done
+          cp build/dxmt-ios/libdxmt_combined.a app/Madeira/libdxmt_combined.a
+          cp build/dxmt-ios/pe-out/*.dll app/Madeira/aarch64-windows/
+          ls -lh app/Madeira/libdxmt_combined.a app/Madeira/aarch64-windows/{d3d11.dll,dxgi.dll,winemetal.dll,d3d10core.dll}
 
       - name: Verify all linked libraries
         run: |
