@@ -126,7 +126,7 @@ final class GamepadBridge {
             }
             
             mouseInput.mouseMovedHandler = {(_ mouse: GCMouseInput, _ deltaX: Float, _ deltaY: Float) -> Void in
-                let sens: Float = 1*Float(Resolution.shared.res/1024)
+                let sens: Float = 1*Float(Resolution.shared.res.x/1024)
                 // let currentScreenScale = window.screen?.backingScaleFactor ?? 1.0
                 // let viewportScale = renderer?.viewportScale ?? 1.0
                 // let frameSize = metalView.frame.size
