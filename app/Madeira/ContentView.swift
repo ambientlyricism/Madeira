@@ -783,7 +783,7 @@ final class MetalBackedView: UIView {
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-		guard !GamepadBridge.shared.MouseActive() else {return}
+		// guard !GamepadBridge.shared.MouseActive() else {return}
         guard desktopMode else {
             guard let t = touches.first else { return }
             let (x, y) = mapTouch(t)
@@ -825,7 +825,7 @@ final class MetalBackedView: UIView {
     }
 
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-		guard !GamepadBridge.shared.MouseActive() else {return}
+		// guard !GamepadBridge.shared.MouseActive() else {return}
         guard desktopMode else {
             guard let t = touches.first else { return }
             let (x, y) = mapTouch(t)
