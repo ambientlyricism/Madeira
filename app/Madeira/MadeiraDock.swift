@@ -18,11 +18,6 @@ enum DockPerformancePolicy {
         max(512, (512...1152).contains(pressureFloorMB) ? pressureFloorMB : 0)
     }
 
-    /// ml2000: the pool size that follows a session which ran a pool of `usedMB` dry.
-    static func poolAfterPressure(usedMB: Int) -> Int {
-        usedMB < 896 ? 896 : 1152
-    }
-
     static func needsDesktopRestart(compactPoolMB: Int, explicit: Int?, desktop: Bool, dock: Bool) -> Bool {
         explicit == nil && desktop && !dock && compactPoolMB > 0 && compactPoolMB < 896
     }

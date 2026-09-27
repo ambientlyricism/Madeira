@@ -6,7 +6,8 @@ size, madeira.cfg pool and the pressure record stubbed, together with JITPoolPol
 explicit madeira.cfg pool > remembered size or the 896 MB default, raised to the pressure
 floor; the session pool; the remembered size with and without MADEIRA_POOL_STICKY_MAX; the
 pressure step (896, then 1152); that the session records its size for the next run; and the
-Windows Steam client / first-run setup rules (SteamPoolPolicy: ml1420, ml1540, ml1570).
+Windows Steam client / first-run setup rules (SteamPoolPolicy: ml1420, ml1540, ml1570) and
+Madeira Dock's compact pool (DockPerformancePolicy, ml1880).
 Needs a Swift toolchain (SWIFTC, default swiftc).
 """
 from pathlib import Path
@@ -18,6 +19,9 @@ root = Path(__file__).resolve().parents[2]
 helper = (root / 'app/Madeira/StikJITHelper.swift').read_text()
 content = (root / 'app/Madeira/ContentView.swift').read_text()
 policy = helper[helper.index('enum JITPoolPolicy {'):]
+dock = (root / 'app/Madeira/MadeiraDock.swift').read_text()
+dock_start = dock.index('enum DockPerformancePolicy {')
+policy += '\n' + dock[dock_start:dock.index('\n}', dock_start) + 2]
 
 early = helper[helper.index('static func prepareEarlyPool('):]
 early = early[early.index('earlyInFlight = true') + len('earlyInFlight = true'):
@@ -31,16 +35,22 @@ session = session[:session.index('StikJITHelper.allocatePool(poolSize: poolSizeM
 assert 'JITPoolPolicy.sessionPoolMB(explicit: explicitPoolMB,' in session
 assert 'pressureFloorMB: StikJITHelper.poolPressureFloorMB)' in session
 assert 'StikJITHelper.rememberSessionPool(sizeMB: poolSizeMB, explicit: explicitPoolMB != nil)' in session
+assert session.index('DockPerformancePolicy.compactSessionPoolMB(') < session.index('StikJITHelper.rememberSessionPool('), \
+    'a Dock session records its compact size for the next run'
 
 checks = r'''
 var rememberedPoolMB: Int? = nil
 var explicitPoolMB: Int? = nil
 var pressure = 0
 var steamPoolContext = SteamPoolPolicy.Context()
+typealias DockContext = (dock: Bool, compact: Bool, setupComplete: Bool, desktopReserved: Bool)
+let noDock: DockContext = (dock: false, compact: true, setupComplete: true, desktopReserved: false)
+var dockPoolContext = noDock
 func consumePoolPressure() -> Int { pressure }
 func earlyPool(remembered: Int?, explicit: Int?, pressureMB: Int,
-               steam: SteamPoolPolicy.Context = SteamPoolPolicy.Context()) -> (Int, String) {
+               steam: SteamPoolPolicy.Context = SteamPoolPolicy.Context(), dock: DockContext = noDock) -> (Int, String) {
     rememberedPoolMB = remembered; explicitPoolMB = explicit; pressure = pressureMB; steamPoolContext = steam
+    dockPoolContext = dock
 ''' + early + r'''
     return (sizeMB, source)
 }
@@ -75,6 +85,26 @@ func earlyPool(remembered: Int?, explicit: Int?, pressureMB: Int,
                      "explicit pool wins over the Steam rules")
         precondition(earlyPool(remembered: 512, explicit: nil, pressureMB: 1152, steam: steamLibrary).0 == 1152, "pressure floor")
         precondition(SteamPoolPolicy.earlyPoolMB(896, C(stickyMax: true, libraryUsesSteam: true, setupRule: true, clientAhead: true)) == nil)
+        // Madeira Dock (after the Steam rules)
+        let dockOn: DockContext = (dock: true, compact: true, setupComplete: true, desktopReserved: false)
+        precondition(earlyPool(remembered: 896, explicit: nil, pressureMB: 0, dock: dockOn) == (512, "Dock compact default, ml1880"))
+        precondition(earlyPool(remembered: 512, explicit: nil, pressureMB: 0, steam: steamLibrary, dock: dockOn)
+                     == (512, "Dock compact default, ml1880"), "compact wins over the client-library rule")
+        precondition(earlyPool(remembered: 512, explicit: nil, pressureMB: 896, dock: dockOn)
+                     == (896, "an earlier session ran the pool dry, ml2000"))
+        precondition(earlyPool(remembered: 512, explicit: 640, pressureMB: 1152, dock: dockOn) == (640, "madeira.cfg pool"))
+        var reserved = dockOn; reserved.desktopReserved = true
+        precondition(earlyPool(remembered: 512, explicit: nil, pressureMB: 0, dock: reserved).0 == 896, "desktop reserved")
+        precondition(earlyPool(remembered: 1152, explicit: nil, pressureMB: 0, dock: reserved).0 == 1152)
+        var rollback = dockOn; rollback.compact = false
+        precondition(earlyPool(remembered: 512, explicit: nil, pressureMB: 0, steam: steamLibrary, dock: rollback).0 == 896,
+                     "MADEIRA_DOCK_COMPACT_POOL=0")
+        var inSetup = dockOn; inSetup.setupComplete = false
+        precondition(earlyPool(remembered: 512, explicit: nil, pressureMB: 0, steam: setup, dock: inSetup)
+                     == (1152, "setup's Steam install and update, ml1570"), "setup keeps the largest pool")
+        precondition(DockPerformancePolicy.compactSessionPoolMB(pressureFloorMB: 0) == 512)
+        precondition(DockPerformancePolicy.compactSessionPoolMB(pressureFloorMB: 896) == 896)
+        precondition(P.rememberedMB(session: 512, explicit: false, previous: 0, sticky: true) == 512, "compact session recorded")
         // session pool
         precondition(P.sessionPoolMB(explicit: nil, pressureFloorMB: 0) == 896)
         precondition(P.sessionPoolMB(explicit: nil, pressureFloorMB: 1152) == 1152)
@@ -89,7 +119,7 @@ func earlyPool(remembered: Int?, explicit: Int?, pressureMB: Int,
         // pressure step
         precondition(P.afterPressure(usedMB: 512) == 896 && P.afterPressure(usedMB: 895) == 896)
         precondition(P.afterPressure(usedMB: 896) == 1152 && P.afterPressure(usedMB: 1152) == 1152)
-        print("PASS: early/session pool sizing, sticky and last-session memory, explicit override, pressure floor, Steam client/setup rules")
+        print("PASS: early/session pool sizing, sticky and last-session memory, explicit override, pressure floor, Steam client/setup rules, Dock compact pool")
     }
 }
 '''

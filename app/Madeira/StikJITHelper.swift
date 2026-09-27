@@ -200,6 +200,13 @@ enum StikJITHelper {
                 || FileManager.default.fileExists(atPath: steamExe.path))
     }
 
+    /// The inputs of DockPerformancePolicy.earlyPoolMB for this app run.
+    static var dockPoolContext: (dock: Bool, compact: Bool, setupComplete: Bool, desktopReserved: Bool) {
+        (dock: MadeiraDock.enabled, compact: MadeiraConfig.flag("MADEIRA_DOCK_COMPACT_POOL"),
+         setupComplete: UserDefaults.standard.bool(forKey: OnboardingRules.doneKey),
+         desktopReserved: UserDefaults.standard.bool(forKey: desktopPoolKey))
+    }
+
     /// Install the SIGTRAP fallback (skip a stray BRK, x0 = 0) once no debugger
     /// is attached -- but only before any Wine session was set up, because
     /// Wine installs and owns its own SIGTRAP handler from then on. Retried
@@ -233,15 +240,15 @@ enum StikJITHelper {
             sizeMB = raised.mb; source = raised.reason
         }
         // ml1880: with Madeira Dock on and setup done, the early pool is compact (512 MB) unless
-        // a desktop session asked for more for this run. MADEIRA_DOCK_COMPACT_POOL=0 keeps 896.
-        let compactSelected = MadeiraDock.enabled && MadeiraConfig.flag("MADEIRA_DOCK_COMPACT_POOL")
-            && UserDefaults.standard.bool(forKey: OnboardingRules.doneKey)
-            && explicitPoolMB == nil && !UserDefaults.standard.bool(forKey: desktopPoolKey)
+        // a desktop session asked for more for this run (DockPerformancePolicy); an explicit pool
+        // and the pressure floor still apply. MADEIRA_DOCK_COMPACT_POOL=0 keeps the sizes above.
+        let dockPool = dockPoolContext
+        let compactSelected = dockPool.dock && dockPool.compact && dockPool.setupComplete
+            && explicitPoolMB == nil && !dockPool.desktopReserved
         let pressureMB = consumePoolPressure()
         sizeMB = DockPerformancePolicy.earlyPoolMB(legacy: sizeMB, explicit: explicitPoolMB,
-            dock: MadeiraDock.enabled, compact: MadeiraConfig.flag("MADEIRA_DOCK_COMPACT_POOL"),
-            setupComplete: UserDefaults.standard.bool(forKey: OnboardingRules.doneKey),
-            desktopReserved: UserDefaults.standard.bool(forKey: desktopPoolKey), pressureMB: pressureMB)
+            dock: dockPool.dock, compact: dockPool.compact, setupComplete: dockPool.setupComplete,
+            desktopReserved: dockPool.desktopReserved, pressureMB: pressureMB)
         if compactSelected { source = "Dock compact default, ml1880" }
         if pressureMB > 0 && sizeMB == pressureMB && explicitPoolMB == nil {
             source = "an earlier session ran the pool dry, ml2000"

@@ -92,17 +92,21 @@ can install and boot the regular desktop client as a fallback.
 - **Compact JIT pool.** A Dock session has no desktop client/CEF fan-out
   (device sessions used about 230 MB of code), so with Dock on and setup done
   the early pool is 512 MB instead of 896 MB, raised to the floor an earlier
-  dry pool set (`madeira-pool-pressure.txt`). A desktop session in the same
-  app run stops before Wine starts and reserves 896 MB for the next run (the
-  pool cannot grow once the debugger has detached). An explicit `pool` in
-  madeira.cfg always wins.
+  dry pool set (`madeira-pool-pressure.txt`). The Dock session's own pool is
+  the same compact size, and that is the size it records for the next run's
+  early pool. A desktop session in the same app run stops before Wine starts
+  and reserves 896 MB for the next run (the pool cannot grow once the debugger
+  has detached). An explicit `pool` in madeira.cfg always wins; during
+  first-run setup the Steam rules (docs/STEAM.md) keep the larger pool.
 - **Diagnostics.** A Dock session keeps frame and memory telemetry but turns
   the per-call D3D9 census off by default (over 32,000 calls per frame were
   counted); `MADEIRA_D3D9_CENSUS=1`, `MADEIRA_DIAG` or `MADEIRA_D3D9_LAST`
   keep it.
 - **32-bit heaps.** A Dock session turns on the bounded 32-bit heap policies
-  (`MADEIRA_HEAP_COMPACT`, `_COMBINED`, `_RECLAIM`) and their statistics; each
-  can be set to 0.
+  (`MADEIRA_HEAP_COMPACT`, `_COMBINED`, `_RECLAIM`), their statistics
+  (`MADEIRA_HEAP_STATS`) and the CPU and address-space diagnostics
+  (`MADEIRA_CPU_DIAGNOSTICS`, `MADEIRA_VA_DIAGNOSTICS`); each can be set to 0
+  and none is set outside Dock.
 
 ## Switches
 
@@ -126,7 +130,7 @@ can install and boot the regular desktop client as a fallback.
 
 Log tags: `[madeira-dock]`, `[dock-handoff]`, `[dock-report]`, `[dock-status]`,
 `[dock-installers]`, `[dock-ceg]`, `[dock-session]`, `[dock-pool]`,
-`[dock-heap]`, `[dock-setup]`, `[dock-arguments]`. None contains a token,
+`[dock-heap]`, `[dock-diagnostics]`, `[dock-setup]`, `[dock-arguments]`. None contains a token,
 account name or path to the transfer.
 
 ## Tests
@@ -134,7 +138,8 @@ account name or path to the transfer.
 `build/host-tests/check-dock-report.py` (report parser and messages, rejection
 of non-numeric and private fields), `check-dock-path.py` (the transfer path
 through Wine's own resolver), `check-dock-performance.py` (pool and diagnostic
-policy, desktop-reservation persistence), `check-dock-runtime.py` (exit hooks,
+policy, desktop-reservation persistence, the heap and diagnostic defaults),
+`check-pool-sizing.py` (the compact pool with the PR 1 and Steam pool rules), `check-dock-runtime.py` (exit hooks,
 image-address reuse), and the Dock contract cases in `check-steam-library.py`,
 `check-steam-native.py` and `check-onboarding.py` (`dock_contract.py` loads the
 public contract for them).

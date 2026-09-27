@@ -2405,8 +2405,9 @@ struct ContentView: View {
                getenv("MADEIRA_D3D9_CENSUS") == nil {
                 setenv("MADEIRA_D3D9_CENSUS", value, 0)
             }
-            // ml1940: a Dock session bounds 32-bit Wine heap growth and combines full reserve /
-            // commit requests (64-bit heaps ignore these). Each stays overridable with =0.
+            // ml1940/ml1950: a Dock session bounds 32-bit Wine heap growth, combines full reserve /
+            // commit requests and reclaims empty heap regions (64-bit heaps ignore these), with
+            // heap, CPU and address-space statistics in the log. Each stays overridable with =0.
             if dock {
                 setenv("MADEIRA_HEAP_COMPACT", "1", 0)
                 setenv("MADEIRA_HEAP_COMBINED", "1", 0)
@@ -2415,6 +2416,7 @@ struct ContentView: View {
                 setenv("MADEIRA_CPU_DIAGNOSTICS", "1", 0)
                 setenv("MADEIRA_VA_DIAGNOSTICS", "1", 0)
                 logStore.log("[dock-heap] ml1940 compact=\(getenv("MADEIRA_HEAP_COMPACT").map { String(cString: $0) } ?? "0") census=\(getenv("MADEIRA_D3D9_CENSUS").map { String(cString: $0) } ?? "default")")
+                logStore.log("[dock-diagnostics] ml1950 combined=\(getenv("MADEIRA_HEAP_COMBINED").map { String(cString: $0) } ?? "0") reclaim=\(getenv("MADEIRA_HEAP_RECLAIM").map { String(cString: $0) } ?? "0") heap=\(getenv("MADEIRA_HEAP_STATS").map { String(cString: $0) } ?? "0") cpu=\(getenv("MADEIRA_CPU_DIAGNOSTICS").map { String(cString: $0) } ?? "0") va=\(getenv("MADEIRA_VA_DIAGNOSTICS").map { String(cString: $0) } ?? "0")")
             }
 
             // Step 1: Allocate JIT pool (BRK suspends entire process)
