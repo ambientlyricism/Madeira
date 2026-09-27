@@ -442,7 +442,7 @@ final class CursorPos: ObservableObject {
 
 final class Resolution: ObservableObject {
     static let shared = Resolution()
-    @Published var res = CGPoint(x: 1366, y: 1024)
+    @Published var res = CGPoint(x: 2732, y: 2048)
     private init() {}
 }
 /*:
@@ -1640,7 +1640,7 @@ struct ContentView: View {
                     // render), -console (Steam's own log → our stderr). Steam
                     // WILL try to self-update through our GnuTLS stack — that
                     // attempt is itself an informative S0 re-test.
-                    let deskW = 1366, deskH = 1024
+                    let deskW = 2732, deskH = 2048
                     // ml589: find Steam and (re)write the launch batch. Returns
                     // false — having logged why — when there is nothing to run.
                     guard prepareSteamLaunch() else { return }
@@ -1922,7 +1922,7 @@ struct ContentView: View {
                     // fails fast or hits the RaiseException→CS wedge again.
                     // let deskW = 1366, deskH = 1024
                     // ml1127: `desktop-size = WxH` in madeira.cfg; 960x540 otherwise.
-                    var deskW = 1366, deskH = 1024
+                    var deskW = 2732, deskH = 2048
                     if let txt = MadeiraConfig.get("desktop-size") {
                         let p = txt.lowercased().split(separator: "x").compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
                         if p.count == 2, p[0] >= 640, p[1] >= 360, p[0] <= 3840, p[1] <= 2160 { deskW = p[0]; deskH = p[1] }
