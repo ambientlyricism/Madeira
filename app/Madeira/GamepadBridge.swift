@@ -144,7 +144,7 @@ final class GamepadBridge {
                 else {
                    self.MouseMoving = false
                 }
-                winios_pointer(Int32(cursor.position.x), Int32(cursor.position.y), 0x0001 | 0x8000, 0)
+                winios_pointer(Int32(self.cursor.position.x), Int32(self.cursor.position.y), 0x0001 | 0x8000, 0)
             }
             mouseInput.scroll.valueChangedHandler = {
                 (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
