@@ -767,3 +767,83 @@ DXMT's `winemetal`/`d3d11`/`dxgi`/`d3d10core`/`d3d9`.
 | `i386-windows/xolehlp.dll` | 217088 | `f73f3989e45dacd49384e0c967e53433324698a9506d0c9fbede7a69dda81cc6` | Wine | cfc6c90 (2026-09-16) |
 | `i386-windows/xpsprint.dll` | 32768 | `381cd3d80f9722fa179389db29d59dffb1929fc277153c2fb292481b95239a95` | Wine | cfc6c90 (2026-09-16) |
 | `i386-windows/xpssvcs.dll` | 28672 | `e03094a2bec34a764c7f937b2b438a23d90b7defe541e0df4107223f3ef9e3c3` | Wine | cfc6c90 (2026-09-16) |
+
+## Code pages (`nls/`)
+
+Upstream ships 12 of Wine's NLS files, 4 of them code-page tables; a program
+that converts text in any other code page (`MultiByteToWideChar` with CP 932,
+936, 949, 950, 1250, 1251, 866 and so on) fails with `ERROR_INVALID_PARAMETER`,
+because there is no table to map. These are the other 64 `c_*.nls` code-page
+tables, so the bundle has all 68 that Wine has. They are data, not built code: each is byte-identical to the file of the
+same name in Wine's source tree (`nls/` of `willfaust/wine` `madeira-lgpl`,
+generated upstream by `tools/make_unicode`), LGPL-2.1-or-later like the rest of
+Wine, and the app picks them up through the existing `nls` folder reference.
+
+64 files, 5521536 bytes.
+
+| File | Bytes | SHA-256 |
+|---|---:|---|
+| `nls/c_037.nls` | 66082 | `b9d410d973dbb040a8a7bb23898ed92c205d7e1d249bfdb0965239b97b5cffdf` |
+| `nls/c_10000.nls` | 66082 | `20128ffdabfca32cc5a5a06d101a1b3316764ee282cc1193bf0e0cc2828931b2` |
+| `nls/c_10001.nls` | 162850 | `f21285f5ee89a6d8f5355674c9e6566a064244360637bd3999baa2f726cd60bf` |
+| `nls/c_10002.nls` | 195618 | `fd781bd60164ea47af46321d5f4a1fcf087b92882b8d3dbbc1f82cebba651874` |
+| `nls/c_10003.nls` | 177698 | `ba6f053caaee7e51d1d41e72bddd689a785d25764843f38028b71fab1cbbbdbf` |
+| `nls/c_10004.nls` | 66082 | `431c4180e16b8efc43bedd2ead895c164e0763a64ea9fd1ef3a3ae083008a2a1` |
+| `nls/c_10005.nls` | 66082 | `71908c06025486f16959abad8cf6937af02c8839cdb9e543c055ffccb2ee2e23` |
+| `nls/c_10006.nls` | 66082 | `e7d833ec0360efd24b9e397d5cd90df8eb20fb026edc4f7e094b83d344b85466` |
+| `nls/c_10007.nls` | 66082 | `a856107538c7c7f6f8e31f33cabc9a52f5ecd2a984e94a34780e676cb692a750` |
+| `nls/c_10008.nls` | 173602 | `254037ddb9f782fbb6cb8066e7539bfd69668a2fc5f889adf3b520920910190a` |
+| `nls/c_10010.nls` | 66082 | `58f88a47a96e99aae5a4d5b2ab494953630facf0c53bc0f6a958b294f8a691d1` |
+| `nls/c_10017.nls` | 66082 | `a9d08101018e60e6ef34822e7689aed54c79bbf64fec7dadc81522fd553dd974` |
+| `nls/c_10021.nls` | 66082 | `641fafbacdb8d0e6fd9be7c834bed252ff3094f79384f0ad3d1162061bbc9cff` |
+| `nls/c_10029.nls` | 66082 | `22b18b7bca17d3131f2959a8b6b3615ff868cf697c06ac1d564549fe19c3aed6` |
+| `nls/c_10079.nls` | 66082 | `3b615693f00a038e80e300497ab39bc1ae2685ee1d3a0d9ea6430c134c727269` |
+| `nls/c_10081.nls` | 66082 | `69b3dac9104ec586758ca7d0767a53dcf314b033222eb7e3759bac32fe313e2f` |
+| `nls/c_10082.nls` | 66082 | `576b82b42f226ffc93a520b79a2bce500ec092b511ff011f2d4ae1b727767f1e` |
+| `nls/c_1026.nls` | 66082 | `ea6e5ef1cb5f7ec613fd82fa8088b8055bbdc94e003ac80bc32612fcb4f65ee1` |
+| `nls/c_1250.nls` | 66082 | `99ddf78fd740d5d73871f377b003245d7e21f6df6d1fc8bd729b17cfc0533b4f` |
+| `nls/c_1251.nls` | 66082 | `0a290fd64ff2f5176ff0582b2dad396bbf6636d408e061fae7158dd89606928b` |
+| `nls/c_1253.nls` | 66082 | `a9543da84c7fc172a0523ae1f9f6122f36cd29d60c7a5390e97c09d574774793` |
+| `nls/c_1254.nls` | 66082 | `70756e5f20fe0e095e319b3c021a92a8a311847249e13f3ee88804cecc1df747` |
+| `nls/c_1255.nls` | 66082 | `d25f2cbf67dc8932811799c003981d6ccf479b476f612382021af3cef6113a48` |
+| `nls/c_1256.nls` | 66082 | `66f87b8e30c4e72f861993f48f5f34387663545a4cd23ad3e0dd9ed146467639` |
+| `nls/c_1257.nls` | 66082 | `6ee5c098f01433e56fd92bc66d8d5530946ad1dcee96998e09e9b6df05e7d611` |
+| `nls/c_1258.nls` | 66082 | `f1966c599370dac14cea80810075b260eaa4b97689c47f6317e5a4ec30c23496` |
+| `nls/c_1361.nls` | 189986 | `b43c800d6087589c47b86a27a7c8d1d5a665c1854321db0468b0a7cec5677fbe` |
+| `nls/c_20866.nls` | 66082 | `b2c0873fc150b83fe8656cf9058e29d73bea332bb2a46977d0499eadaf8c7c7f` |
+| `nls/c_20932.nls` | 180770 | `df9370898e537bf89ebedf2a5d5e8e036c081b8cfee43e9776ed23366bec1815` |
+| `nls/c_20949.nls` | 177698 | `0e4c5d943a12c5b4ba0924e51f41fd4d9216c76c905d1b37fe5a4e0915436fbd` |
+| `nls/c_21866.nls` | 66082 | `b53104a08f5e468ec95140ba243008796d9ef7e4b8595fc75bb2541859299113` |
+| `nls/c_28592.nls` | 66082 | `b2d095492bcfb35edc67329ea0a233b8f8d1b83fa72269204eb09522ae70ccc1` |
+| `nls/c_28593.nls` | 66082 | `9effe3c56b0cf721aaf55769050fb4a80c74e553819053d00363ed3b39d15451` |
+| `nls/c_28594.nls` | 66082 | `3b23903cae75b7f29f87b5ec774cb3d9095e6f1464c6421e8fb3f50335dfbce2` |
+| `nls/c_28595.nls` | 66082 | `00619caa1f9f9d1087cb5b3884eaec39f468d0a7a0056972666ff6bdbdae8faf` |
+| `nls/c_28596.nls` | 66082 | `cd1018cfaaca3ee8d5e22548360c259be7b5d6678fde1cb773ba3bdaa63857d3` |
+| `nls/c_28597.nls` | 66082 | `7c9bf3b6ccec261fa9678d3c5fe7281572562964d6cf96c7fb257ca8c25d94b9` |
+| `nls/c_28598.nls` | 66082 | `e3085f4ea2409824fe0b076798cf4581200d310aecfad0cfa97549d2c5d774f0` |
+| `nls/c_28599.nls` | 66082 | `4ac9b6f3581cc8b66287bf3dee8cca83b25d59c7bc67bc51a81ea50f6e5c5636` |
+| `nls/c_28603.nls` | 66082 | `7c79e98c1cf6e1e1747715e7e32fc5745a8c800e366dac0c0bc281db2452970a` |
+| `nls/c_28605.nls` | 66082 | `c2e9947e4a539c9cee947138d17d72c34a058c79996f0f75491fe41234eca718` |
+| `nls/c_500.nls` | 66082 | `03d703f5762bcf9f5b4c004dfd8424db34755d269a35b713ea8cf26cc6bbe70b` |
+| `nls/c_708.nls` | 66082 | `5c2d5e62bd053152f31969bb4323a030a11b55c9ff4afa836b60f5d90ea95846` |
+| `nls/c_720.nls` | 66594 | `d9e798db57cc062d371f3c603eef419e474039d815696547fcd85308447d4f74` |
+| `nls/c_737.nls` | 66594 | `e263c7c51686a204417e8b670bb1525bae5dbf73407e678ba645b3f6f2e3e22f` |
+| `nls/c_775.nls` | 66594 | `6fd6b7909b8f1edb3afc69bdb16c69386be0030c422a78ec8be6b53a47985112` |
+| `nls/c_850.nls` | 66594 | `4fd63d67d0af5d5100b3c7d74666f260546e1a616c6bc88e76fff3bc10418d5b` |
+| `nls/c_852.nls` | 66594 | `9eb853fb35f516f5a4197f7e34a712ca5db852c974524f235576cc931cdc14e4` |
+| `nls/c_855.nls` | 66594 | `305dcd61cd4927de9c0ef31b0c264485bcf01c17f7d1be62d0da5629f49d014c` |
+| `nls/c_857.nls` | 66594 | `779387ebcde599b5ef2baddd334e14ee22c434908f3442ab48d37d4288ad0018` |
+| `nls/c_860.nls` | 66594 | `3552b06f620b97fe2d73c73545095e588a2d1c933dc05737150f68d5047df1b0` |
+| `nls/c_861.nls` | 66594 | `16e28d7abc9c3725890ac003fe89975140e7b21f6eed12b8724f9a9ff3dcf2bc` |
+| `nls/c_862.nls` | 66594 | `ef58d3c30db095356941330ed149bb64389e8c01351a0e508a3d4d381c039469` |
+| `nls/c_863.nls` | 66594 | `6ad5df3fadd63110aea28956752e82bb1cbaa0d399d19b91d9e2b3f04f1ac660` |
+| `nls/c_864.nls` | 66594 | `e284c65e736440349cfef5f682c6a2fb4efdef36355439e371f65ae92a0b8ddf` |
+| `nls/c_865.nls` | 66594 | `aaf5f50a46f3663360f36646841ffb4046334774eb132cea098a9a7388502fdc` |
+| `nls/c_866.nls` | 66594 | `cee909945319045f0258f006ac37fbc76c77ca0682e5a5197c4de3948e6eb71b` |
+| `nls/c_869.nls` | 66594 | `8d33517dd0892b4730ff8e1d32157ce7c33fba463ac52be34b261a33c5436934` |
+| `nls/c_874.nls` | 66594 | `42ec3c5825a9d59009470c1aeba338e7c3ae7ba6c59d1e9e1efa7cac73116299` |
+| `nls/c_875.nls` | 66082 | `edc40c7c4bd6684b64a288885ced286331a0577c392e2bf5e2c627106e05b13b` |
+| `nls/c_932.nls` | 162850 | `dab57ece81509bb4d9f1d8df5c39e7b2ffaffda0a2d6e1028ddf822a04315d10` |
+| `nls/c_936.nls` | 196642 | `29f6633ee0df301fb6cc659f3941be9fcc1d9f6e633c7df24864c6d5b462f5a0` |
+| `nls/c_949.nls` | 196642 | `5962daff7400af816266f0eab942b5d6c3fb5603be1055911c80325f68600b26` |
+| `nls/c_950.nls` | 196642 | `ab1f87a022ccc5e6d063520a652a7cf1d0a3ac3c3dd1faf18285490a70b9b688` |
