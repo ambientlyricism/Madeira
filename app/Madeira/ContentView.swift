@@ -434,6 +434,17 @@ final class JoyUIHostingController: UIHostingController<JoystickPadOverlay> {
     }
 }
 
+final class CursorPos: ObservableObject {
+    static let shared = CursorPos()
+    @Published var position = CGPoint(x: 480, y: 270)
+    private init() {}
+}
+
+final class Resolution: ObservableObject {
+    static let shared = Resolution()
+    @Published var position = CGPoint(x: 1366, y: 1024)
+    private init() {}
+}
 
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
@@ -612,7 +623,7 @@ final class MetalBackedView: UIView {
     // Cursor position lives here (desktop px); wine + the rendered arrow
     // follow via winios_pointer / winios_cursor_move.
     // ==================================================================
-    private static var cursor = CGPoint(x: 480, y: 270)
+    @ObservedObject private static var cursor = CursorPos.shared()
     private var lastPanPoint = CGPoint.zero
     private var touchStartPoint = CGPoint.zero
     private var touchStartTime: TimeInterval = 0
@@ -645,7 +656,7 @@ final class MetalBackedView: UIView {
         return i
     }
     private func postPointer(_ flags: UInt32, data: Int32 = 0) {
-        winios_pointer(Int32(Self.cursor.x), Int32(Self.cursor.y), flags, UInt32(bitPattern: data))
+        winios_pointer(Int32(cursor.position.x), Int32(cursor.position.y), flags, UInt32(bitPattern: data))
     }
     private func avgPoint(_ touches: [UITouch]) -> CGPoint {
         var x: CGFloat = 0, y: CGFloat = 0
@@ -775,15 +786,15 @@ final class MetalBackedView: UIView {
         let sens = CGFloat(InputSettings.shared.sensAbs)   // desktop px per view pt
         let maxX = CGFloat(envInt("MADEIRA_SCREEN_W", 1024) - 1)
         let maxY = CGFloat(envInt("MADEIRA_SCREEN_H", 768) - 1)
-        Self.cursor.x = min(max(Self.cursor.x + dx * sens, 0), maxX)
-        Self.cursor.y = min(max(Self.cursor.y + dy * sens, 0), maxY)
+        cursor.position.x = min(max(cursor.position.x + dx * sens, 0), maxX)
+        cursor.position.y = min(max(cursor.position.y + dy * sens, 0), maxY)
         // Self.cursor.x = GamepadBridge.shared.GCMouseInputX()
         // Self.cursor.y = GamepadBridge.shared.GCMouseInputY()
         postPointer(F_MOVE | F_ABS)
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-		guard !GamepadBridge.shared.MouseActive() else {return}
+		// guard !GamepadBridge.shared.MouseActive() else {return}
         guard desktopMode else {
             guard let t = touches.first else { return }
             let (x, y) = mapTouch(t)
@@ -825,7 +836,7 @@ final class MetalBackedView: UIView {
     }
 
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-		guard !GamepadBridge.shared.MouseActive() else {return}
+		// guard !GamepadBridge.shared.MouseActive() else {return}
         guard desktopMode else {
             guard let t = touches.first else { return }
             let (x, y) = mapTouch(t)
