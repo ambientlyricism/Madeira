@@ -448,9 +448,9 @@ final class Resolution: ObservableObject {
 /*:
 final class ScaledRes: UIWindow { 
 	@Environment(\.displayScale) private var displayScale
-	func getRes: Float() { 
+	func getRes() -> CGFloat { 
 		let res = view.window.windowScene.screen*displayScale
-		return Resolution.shared.res/res
+		return Resolution.shared.res.x/res
 	}
 }*/
 
