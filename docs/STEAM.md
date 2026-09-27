@@ -158,6 +158,14 @@ while the installer runs (it refuses a non-empty folder) and merged back after.
 The setup's session gets the largest JIT pool, and Madeira asks for a restart
 before the first game (one Wine session per app run).
 
+**JIT pool.** The early pool is taken at app start and kept for the whole app
+run, so the Steam rules raise it before any session starts (never over an
+explicit madeira.cfg `pool`): at least 896 MB when the library has entries that
+start through the Windows Steam client (with `MADEIRA_POOL_STICKY_MAX`), or when
+setup is pending, a client was chosen before or `steam.exe` is installed; 1152 MB
+while first-run setup is not finished. The log names the rule on the
+`[jit-early]` line.
+
 ## Switches
 
 `env.NAME = 0` in `Documents/madeira.cfg` (or `NAME=0` in `madeira-env.txt`).
@@ -188,7 +196,7 @@ All default on unless noted.
 | `MADEIRA_STEAM_BACKGROUND_QOS`, `MADEIRA_STEAM_HELPER_BACKGROUND` | every client thread stays interactive |
 | `MADEIRA_STEAM_WEBHELPER_FREEZE`, `MADEIRA_STEAM_FREEZE_WATCHDOG` | the web helper keeps running / is never released |
 | `MADEIRA_STEAM_INSTALL_KEEPALIVE`, `MADEIRA_STEAM_INSTALL_MOVE_ASIDE` | installer session without services.exe / folder left in place |
-| `MADEIRA_POOL_SETUP_896` | setup's session gets the normal pool |
+| `MADEIRA_POOL_SETUP_896` | setup, a chosen client or an installed `steam.exe` no longer raise the early JIT pool |
 | `MADEIRA_LIBRARY_STEAM_BUTTON` | (default **off**) `=1` shows a Steam button in the library |
 | `MADEIRA_STEAM_TRACE` | (default **off**) `=1` protocol-level `[steam-trace]` lines, no credentials or payloads |
 

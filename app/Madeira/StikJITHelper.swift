@@ -162,6 +162,20 @@ enum StikJITHelper {
         LogStore.shared.log("[jit-early] ml1420 next run's early pool \(remembered)MB (session \(sizeMB)MB, previous \(previous)MB)")
     }
 
+    /// The inputs of SteamPoolPolicy for this app run (none apply without MADEIRA_STEAM).
+    static var steamPoolContext: SteamPoolPolicy.Context {
+        guard MadeiraConfig.flag("MADEIRA_STEAM") else { return SteamPoolPolicy.Context() }
+        let steamExe = LibraryModel.drive.appendingPathComponent("Program Files (x86)/Steam/steam.exe")
+        return SteamPoolPolicy.Context(
+            stickyMax: MadeiraConfig.flag("MADEIRA_POOL_STICKY_MAX"),
+            libraryUsesSteam: LibraryModel.shared.entries.contains { $0.usesSteam },
+            setupRule: MadeiraConfig.flag("MADEIRA_POOL_SETUP_896"),
+            setupPending: MadeiraConfig.flag("MADEIRA_ONBOARDING")
+                && !UserDefaults.standard.bool(forKey: OnboardingRules.doneKey),
+            clientAhead: UserDefaults.standard.string(forKey: "madeiraSteamClient") != nil
+                || FileManager.default.fileExists(atPath: steamExe.path))
+    }
+
     /// Install the SIGTRAP fallback (skip a stray BRK, x0 = 0) once no debugger
     /// is attached -- but only before any Wine session was set up, because
     /// Wine installs and owns its own SIGTRAP handler from then on. Retried
@@ -189,13 +203,10 @@ enum StikJITHelper {
         var source = "default"
         if let mb = rememberedPoolMB { sizeMB = mb; source = "recent sessions, ml1420" }
         if let mb = explicitPoolMB { sizeMB = mb; source = "madeira.cfg pool" }
-        // ml1570: first-run setup's one session runs Steam's installer, the client's self-update
-        // AND the restarted client with its web helper; a device log ran 896 MB dry there ("EXEC
-        // ALLOC FAILED ... no free carve AND no budget", the client died). Until setup is done the
-        // early pool is the largest allowed size. MADEIRA_POOL_SETUP_896=0 turns this off.
-        if explicitPoolMB == nil, sizeMB < 1152, MadeiraConfig.flag("MADEIRA_STEAM"), MadeiraConfig.flag("MADEIRA_ONBOARDING"),
-           MadeiraConfig.flag("MADEIRA_POOL_SETUP_896"), !UserDefaults.standard.bool(forKey: OnboardingRules.doneKey) {
-            sizeMB = 1152; source = "setup's Steam install and update, ml1570"
+        // ml1420/ml1540/ml1570: the Windows Steam client and first-run setup raise the early
+        // pool (SteamPoolPolicy); an explicit madeira.cfg pool still wins.
+        if explicitPoolMB == nil, let raised = SteamPoolPolicy.earlyPoolMB(sizeMB, steamPoolContext) {
+            sizeMB = raised.mb; source = raised.reason
         }
         let pressureMB = consumePoolPressure()
         if explicitPoolMB == nil && pressureMB > sizeMB {
@@ -1096,5 +1107,51 @@ enum JITPoolPolicy {
     static func rememberedMB(session: Int, explicit: Bool, previous: Int, sticky: Bool) -> Int {
         guard sticky, !explicit, validMB.contains(previous), previous > session else { return session }
         return previous
+    }
+}
+
+/// Early-pool rules for the Windows Steam client and first-run setup, free of
+/// UIKit and file access so check-pool-sizing.py compiles them. They only raise
+/// the pool, never above 1152 MB, and never over an explicit madeira.cfg `pool`
+/// (StikJITHelper.steamPoolContext supplies the inputs).
+///
+///   ml1420  an entry that starts through the Windows Steam client runs a desktop
+///           session, and the early pool is kept for the whole app run, so a
+///           library that has one starts with at least 896 MB (a smaller
+///           remembered size ran the client's session dry). Behind
+///           MADEIRA_POOL_STICKY_MAX, like the rest of the recent-session memory.
+///   ml1540  a new install goes straight into setup, whose first session installs
+///           and runs the client and its self-update; a device log ran a 512 MB
+///           pool dry there and the desktop froze. With setup pending, a client
+///           chosen before or steam.exe installed: at least 896 MB.
+///   ml1570  setup's one session runs the installer, the client's self-update AND
+///           the restarted client with its web helper; a device log ran 896 MB dry
+///           there ("EXEC ALLOC FAILED ... no free carve AND no budget", the client
+///           died). Until setup is done: 1152 MB.
+///
+/// MADEIRA_POOL_SETUP_896=0 turns off ml1540 and ml1570.
+enum SteamPoolPolicy {
+    struct Context {
+        var stickyMax = false         // MADEIRA_POOL_STICKY_MAX
+        var libraryUsesSteam = false  // an entry starts through the Windows Steam client
+        var setupRule = false         // MADEIRA_POOL_SETUP_896
+        var setupPending = false      // first-run setup (MADEIRA_ONBOARDING) not finished
+        var clientAhead = false       // a client was chosen before, or steam.exe is installed
+    }
+
+    /// The raised size and the rule that set it, or nil when no rule applies.
+    static func earlyPoolMB(_ current: Int, _ c: Context) -> (mb: Int, reason: String)? {
+        var raised: (mb: Int, reason: String)?
+        var mb = current
+        if mb < 896, c.stickyMax, c.libraryUsesSteam {
+            mb = 896; raised = (mb, "library has Windows Steam client entries, ml1420")
+        }
+        if mb < 896, c.setupRule, c.setupPending || c.clientAhead {
+            mb = 896; raised = (mb, "setup or a Steam client ahead, ml1540")
+        }
+        if mb < 1152, c.setupRule, c.setupPending {
+            mb = 1152; raised = (mb, "setup's Steam install and update, ml1570")
+        }
+        return raised
     }
 }

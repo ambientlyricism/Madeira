@@ -54,8 +54,9 @@ assert 'OnboardingModel.restartAdvised, OnboardingModel.restartPromptEnabled, en
 assert '.alert("Restart Madeira", isPresented: $restartAlert)' in onboarding, 'done page asks for the restart'
 jit = (app / 'StikJITHelper.swift').read_text()
 assert 'MADEIRA_POOL_SETUP_896' in jit and '!UserDefaults.standard.bool(forKey: OnboardingRules.doneKey)' in jit, 'setup session gets the 896 MB pool'
+assert 'SteamPoolPolicy.earlyPoolMB(sizeMB, steamPoolContext)' in jit, 'prepareEarlyPool applies the Steam rules (compiled by check-pool-sizing.py)'
 # ml1570: setup's session gets the largest pool; the finish button is tappable over a session.
-assert 'sizeMB = 1152; source = "setup' in jit, 'setup session gets 1152 MB'
+assert 'mb = 1152; raised = (mb, "setup' in jit, 'setup session gets 1152 MB'
 assert 'library.finishButtonRect.contains(point)' in content, 'controls window lets the finish button through'
 assert 'LibraryModel.shared.finishButtonRect = frame.insetBy' in onboarding and 'MADEIRA_SETUP_BUTTON_HITTEST' in onboarding, 'finish button publishes its frame'
 
