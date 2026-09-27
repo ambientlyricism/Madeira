@@ -623,7 +623,7 @@ final class MetalBackedView: UIView {
     // Cursor position lives here (desktop px); wine + the rendered arrow
     // follow via winios_pointer / winios_cursor_move.
     // ==================================================================
-    private static var cursor = CursorPos.shared
+    private var cursor = CursorPos.shared
     private var lastPanPoint = CGPoint.zero
     private var touchStartPoint = CGPoint.zero
     private var touchStartTime: TimeInterval = 0
@@ -656,7 +656,7 @@ final class MetalBackedView: UIView {
         return i
     }
     private func postPointer(_ flags: UInt32, data: Int32 = 0) {
-        winios_pointer(Int32(cursor.position.x), Int32(cursor.position.y), flags, UInt32(bitPattern: data))
+        winios_pointer(Int32(self.cursor.position.x), Int32(self.cursor.position.y), flags, UInt32(bitPattern: data))
     }
     private func avgPoint(_ touches: [UITouch]) -> CGPoint {
         var x: CGFloat = 0, y: CGFloat = 0
@@ -786,8 +786,8 @@ final class MetalBackedView: UIView {
         let sens = CGFloat(InputSettings.shared.sensAbs)   // desktop px per view pt
         let maxX = CGFloat(envInt("MADEIRA_SCREEN_W", 1024) - 1)
         let maxY = CGFloat(envInt("MADEIRA_SCREEN_H", 768) - 1)
-        cursor.position.x = min(max(cursor.position.x + dx * sens, 0), maxX)
-        cursor.position.y = min(max(cursor.position.y + dy * sens, 0), maxY)
+        self.cursor.position.x = min(max(self.cursor.position.x + dx * sens, 0), maxX)
+        self.cursor.position.y = min(max(self.cursor.position.y + dy * sens, 0), maxY)
         // Self.cursor.x = GamepadBridge.shared.GCMouseInputX()
         // Self.cursor.y = GamepadBridge.shared.GCMouseInputY()
         postPointer(F_MOVE | F_ABS)
