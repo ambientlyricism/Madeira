@@ -114,7 +114,7 @@ final class GamepadBridge {
     var sy : Int32 = 0
     var MouseMoving = false
     var MouseClicking = false
-    private var cursor = CursorPos.shared
+    private static var cursor = CursorPos.shared
     
     func registerMouse(_ mouseDevice: GCMouse) {
         self.MouseMoving = false
