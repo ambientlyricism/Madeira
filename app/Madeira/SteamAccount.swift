@@ -159,6 +159,7 @@ final class SteamAccountModel: ObservableObject {
 
     func start() {
         guard Self.enabled, !started else { return }
+        MadeiraDock.cleanup()
         started = true
         if let tokens = session.tokenStore.loadTokens() {
             accountName = tokens.accountName
@@ -209,6 +210,8 @@ final class SteamAccountModel: ObservableObject {
                 SteamLog.event("[steam-account] ml1340 logged off for game session")
             }
         } else {
+            session.dockOwnsConnection = false
+            MadeiraDock.cleanup()
             let resume = resumeAfterSession.sorted()
             resumeAfterSession.removeAll()
             for id in resume { install(id) }
@@ -233,6 +236,30 @@ final class SteamAccountModel: ObservableObject {
     }
 
     // MARK: Sign-in
+
+    /// ml1830: stop native activity before giving the same login to Valve's
+    /// guest client. The token is read from Keychain only after quiescing.
+    func prepareDock(_ entry: LibraryEntry) async throws {
+        guard Self.enabled, phase == .signedIn, !inSession, let appID = entry.steamAppID else {
+            throw LibraryError.message("Sign in to Steam in Madeira before starting Dock.")
+        }
+        try MadeiraDock.validate(entry)
+        inSession = true
+        session.dockOwnsConnection = true
+        do {
+            await holdForSteamInstall()
+            await session.disconnectGracefully()
+            try Task.checkCancellation()
+            guard phase == .signedIn, let tokens = session.tokenStore.loadTokens() else {
+                throw LibraryError.message("Steam sign-in is no longer available. Sign in again.")
+            }
+            try MadeiraDock.writeHandoff(account: tokens.accountName, token: tokens.refreshToken, appID: appID)
+            SteamLog.event("[madeira-dock] ml1830 native connection closed; one-use sign-in ready")
+        } catch {
+            sessionChanged(active: false)
+            throw error
+        }
+    }
 
     func beginQR() {
         cancelSignIn()
@@ -318,6 +345,7 @@ final class SteamAccountModel: ObservableObject {
     }
 
     func signOut() {
+        MadeiraDock.cleanup()
         for id in Array(downloads.keys) { pause(id) }
         session.logout()
         try? FileManager.default.removeItem(at: Self.cacheURL)
@@ -558,6 +586,23 @@ final class SteamAccountModel: ObservableObject {
         }
         LibraryModel.shared.upsertNativeSteam(entry)
         SteamLog.event("[steam-depot] ml1310 library entry app=\(game.id) exe-source=\(choice.source) bits=\(entry.bits)")
+    }
+
+    /// Recover provenance for entries saved before the default-argument field existed.
+    func restoreDefaultArguments(_ entry: LibraryEntry) -> LibraryEntry {
+        var result = entry
+        guard MadeiraConfig.flag("MADEIRA_DOCK_DEFAULT_ARGUMENTS"),
+              entry.steamDefaultArguments == nil, let appID = entry.steamAppID,
+              let folder = LibraryModel.steamInstallFolder(entry), let game = game(appID) else { return result }
+        let target = LibraryModel.drive.appendingPathComponent(entry.relativePath).standardizedFileURL.path.lowercased()
+        if let option = game.launch.first(where: {
+            ($0.type.isEmpty || $0.type == "default") && $0.arguments == entry.arguments &&
+                SteamPaths.safeRelative($0.executable.replacingOccurrences(of: "\\", with: "/"), under: folder)?.standardizedFileURL.path.lowercased() == target
+        }) {
+            result.steamDefaultArguments = option.arguments
+            SteamLog.event("[dock-arguments] ml1960 app=\(appID) imported-default=1")
+        }
+        return result
     }
 
     private func manifestSize(appID: Int) -> Int64? {
@@ -1195,4 +1240,14 @@ extension SteamAccountModel {
 
 extension SteamAccountModel {
     var hasActiveDownload: Bool { downloads.values.contains { $0.state == .active || $0.state == .queued } }
+}
+
+extension MadeiraDock {
+    /// ml1990: the game's install record has a non-empty CheckGuid block (per-user custom executables).
+    static func hasCustomExecutables(appID: Int) -> Bool {
+        let url = SteamInstallPaths.steamApps.appendingPathComponent("appmanifest_\(appID).acf")
+        guard let data = try? Data(contentsOf: url), data.count <= 1 << 20,
+              var parser = try? SteamKeyValues(data), let root = try? parser.read() else { return false }
+        return !(root["AppState"]?["CheckGuid"]?.fields.isEmpty ?? true)
+    }
 }

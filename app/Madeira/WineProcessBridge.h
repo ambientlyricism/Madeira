@@ -21,8 +21,15 @@ int wine_process_is_running(void);
 // The last program (not a launcher/helper image) that ended with an NTSTATUS
 // error in this session. Returns 1 and fills *status when there was one.
 int wine_crash_exit_status(uint32_t *status);
-// Forget the recorded exit status; called when a session begins.
+// Forget the recorded exit statuses; called when a session begins.
 void wine_exit_status_reset(void);
+// ml1900: prepare the existing prefix template without starting Wine or JIT
+// (Madeira Dock's native component setup). Caller must ensure neither a Wine
+// session nor wineserver is active.
+void madeira_seed_prefix_if_needed(const char *prefix_path);
+// Madeira Dock: the host's exit in this session, including a zero exit code.
+// Returns 1 and fills *status when it has exited.
+int wine_dock_exit_status(int *status);
 // Programs (not launcher/helper images) started / still running this session.
 int wine_programs_started(void);
 int wine_programs_live(void);

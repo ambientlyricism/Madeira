@@ -448,11 +448,15 @@ static int g_wine_running = 0;
  * returning. Launcher and helper images are not programs the user ran.
  * MADEIRA_EXIT_REPORT=0 turns the record off. */
 static uint64_t g_crash_exit = 0;
+/* ml1850: Madeira Dock's host exit status, published with its validity in one
+ * word (guest exits run off the main thread); a zero exit code is an event too. */
+static uint64_t g_dock_exit = 0;
 void wine_exit_status_reset(void) {
+    __atomic_store_n(&g_dock_exit, 0, __ATOMIC_RELEASE);
     __atomic_store_n(&g_crash_exit, 0, __ATOMIC_RELEASE);
 }
 static int madeira_exit_is_helper(const char *image) {
-    static const char *const helpers[] = { "steam.exe", "steamwebhelper.exe",
+    static const char *const helpers[] = { "dockhost.exe", "steam.exe", "steamwebhelper.exe",
         "steamservice.exe", "steamerrorreporter.exe", "steamerrorreporter64.exe", "services.exe",
         "winedevice.exe", "explorer.exe", "plugplay.exe", "rpcss.exe", "svchost.exe", "conhost.exe",
         "cmd.exe", "rundll32.exe", "wineboot.exe", "start.exe", "tabtip.exe", "crashpad_handler.exe" };
@@ -491,6 +495,16 @@ void wine_process_did_exit(const char *image, int status) {
         if (!off || off[0] != '0')
             __atomic_store_n(&g_crash_exit, (UINT64_C(1) << 32) | (uint32_t)status, __ATOMIC_RELEASE);
     }
+    if (!image || strcasecmp(image, "dockhost.exe")) return;
+    uint64_t expected = 0;
+    __atomic_compare_exchange_n(&g_dock_exit, &expected,
+        (UINT64_C(1) << 32) | (uint32_t)status, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
+}
+int wine_dock_exit_status(int *status) {
+    uint64_t value = __atomic_load_n(&g_dock_exit, __ATOMIC_ACQUIRE);
+    if (!(value >> 32)) return 0;
+    if (status) *status = (int32_t)(uint32_t)value;
+    return 1;
 }
 static char *g_prefix_path = NULL;
 
