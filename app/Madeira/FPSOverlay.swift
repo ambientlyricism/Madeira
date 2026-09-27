@@ -190,7 +190,7 @@ struct FPSOverlay: View {
     /// all of it before gameplay starts. ECO on = guest threads run at a low QoS
     /// class (efficiency cores, lower clocks): loading is slower but keeps the
     /// budget for gameplay. Turn it off once in game. Green = on.
-    // @State private var ecoOn = madeira_get_eco() != 0
+    @State private var ecoOn = madeira_get_eco() != 0
     private var ecoPill: some View {
         Text("ECO")
             .foregroundColor(ecoOn ? .black : .green)
