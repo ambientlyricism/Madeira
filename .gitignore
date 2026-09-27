@@ -45,6 +45,12 @@ build/dxmt-ios/shader-headers/
 build/dxmt-ios/libdxmt_unix.a
 build/dxmt-ios/libdxmt_combined.a
 
+# Host-test outputs (build/host-tests/build-*.sh, build/dxmt-tests/build-*-host-test.sh)
+build/host-tests/fastsync-cellrace
+build/host-tests/fastsync-semrace
+build/host-tests/fastsync-semrace-tsan
+build/dxmt-tests/out-host/
+
 # D3D11 triangle test — compiled DXBC shaders + host-side HLSL compiler
 build/d3d11-triangle/vs.dxbc
 build/d3d11-triangle/ps.dxbc
