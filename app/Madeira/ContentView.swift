@@ -440,6 +440,12 @@ final class CursorPos: ObservableObject {
     private init() {}
 }
 
+final class Resolution: ObservableObject {
+    static let shared = Resolution()
+    @Published var position = CGPoint(x: 1366, y: 1024)
+    private init() {}
+}
+
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
     // swapchain exactly once; if the host were recreated on view teardown
