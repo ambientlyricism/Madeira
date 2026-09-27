@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Split-lock and spin-probe regressions, from production source; no Wine, FEX JIT or device runs.
 
-1. Kill switches and log tags for these changes are present.
+1. Kill switches and log tags for these changes (and the D3D9 device-lock
+   diagnostics) are present.
 2. The Mach-thread forwarding predicate (signal_arm64_ios.c) claims exactly a
    split CASAL from FEX JIT code, and nothing when MADEIRA_SPLITLOCK_FEX=0.
 3. FEXCore's DoCAS16/32/64 split paths, extracted verbatim from Arm64.cpp,
@@ -19,6 +20,8 @@ sig = (root / "build/ntdll-unix/signal_arm64_ios.c").read_text()
 srv = (root / "build/ntdll-unix/server_ios.c").read_text()
 arm = (root / "FEX/FEXCore/Source/Utils/ArchHelpers/Arm64.cpp").read_text()
 wow = (root / "FEX/Source/Windows/WOW64/Module.cpp").read_text()
+d9 = (root / "research/dxmt/src/d3d9/d3d9_multithread.hpp").read_text()
+shim = (root / "research/dxmt/src/d3d9shim/d3d9shim_lock.c").read_text()
 
 
 def function(source, start):
@@ -37,6 +40,8 @@ for text, needles in [
     (sig, ["MADEIRA_SPLITLOCK_FEX", "[splitlock] ml2000", "ios_splitlock_forward_to_fex( insn,"]),
     (arm, ["MADEIRA_SPLITLOCK_ROLLBACK", "[splitlock] ml2000"]),
     (wow, ["MADEIRA_STRICT_SPLITLOCK", "CONFIG_STRICTINPROCESSSPLITLOCKS, \"1\"", "[splitlock] ml2000"]),
+    (d9, ["MADEIRA_D9_LOCK_DIAG", "MADEIRA_D9_LOCK_BACKOFF", "[d3d9-lock-spin] ml2000"]),
+    (shim, ["MADEIRA_D9_LOCK_DIAG", "MADEIRA_D9_LOCK_BACKOFF", "[d3d9-lock-spin] ml2000"]),
 ]:
     for n in needles:
         assert n in text, f"missing {n!r}"
@@ -194,4 +199,4 @@ with tempfile.TemporaryDirectory() as tmp:
     subprocess.run(["c++", "-std=c++20", "-O1", "-g", "-pthread", "-o", str(t / "cas"), str(t / "cas.cpp"), "-latomic"], check=True)
     subprocess.run([str(t / "cas")], check=True, env={**os.environ, "MADEIRA_SPLITLOCK_ROLLBACK": "1"})
     subprocess.run([str(t / "cas"), "upstream"], check=True, env={**os.environ, "MADEIRA_SPLITLOCK_ROLLBACK": "0"})
-print("PASS: split-lock / spin-probe checks")
+print("PASS: split-lock / spin-probe / d3d9-lock checks")
