@@ -77,6 +77,12 @@ func madeira_set_vsync_locked(_ mode: Int32) {}
 struct TouchControl: Codable, Equatable { var nx = 0.5 }
 enum LibraryError: LocalizedError { case message(String) }
 func env(_ name: String) -> String? { getenv(name).map { String(cString: $0) } }
+enum SteamPaths {
+    static func safeRelative(_ path: String, under root: URL) -> URL? { path.isEmpty ? nil : root.appendingPathComponent(path) }
+    static func validAppID(_ value: Int) -> Bool { value > 0 && UInt64(value) <= UInt64(UInt32.max) }
+}
+enum SteamFileError: Error { case invalid(String) }
+enum LibraryModel { static var drive = URL(fileURLWithPath: "/tmp/madeira-frontend-check") }
 '''
 swift += block(lib, 'struct LibraryEntry: Codable, Identifiable') + '\n'
 swift += '\n'.join(l for l in display.splitlines() if not l.startswith('import ')) + '\n'
@@ -282,7 +288,7 @@ check('wine_process_did_exit( name, status )' in block(server, 'static void ios_
       'ntdll reports each program exit with its status')
 check(re.search(r'if \(!c \|\| c > 127\) return FALSE;', server) is not None, 'non-ASCII image names are not reported')
 check('LibraryView(play: launchLibraryEntry' in content, 'ContentView shows the library when it is the chosen interface')
-check('runWineFullSequence(profile: entry)' in content and 'profile.applyEnvironment()' in content,
+check('runWineFullSequence(profile: entry' in content and 'profile.applyEnvironment(' in content,
       'library launches use the shared launch path with the profile applied')
 check('Button("Use New Interface")' in content, 'the developer interface can switch back to the library')
 check('LibraryController.shared' in gamepad and 'library.ownsInput' in gamepad,
