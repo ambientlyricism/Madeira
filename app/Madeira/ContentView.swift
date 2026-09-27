@@ -442,7 +442,7 @@ final class CursorPos: ObservableObject {
 
 final class Resolution: ObservableObject {
     static let shared = Resolution()
-    @Published var position = CGPoint(x: 1366, y: 1024)
+    @Published var res = CGPoint(x: 1366, y: 1024)
     private init() {}
 }
 
