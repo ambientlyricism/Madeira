@@ -114,6 +114,7 @@ final class GamepadBridge {
     var sy : Int32 = 0
     var MouseMoving = false
     var MouseClicking = false
+    var MouseScrolling = false 
     private var cursor = CursorPos.shared
     
     func registerMouse(_ mouseDevice: GCMouse) {
@@ -150,6 +151,12 @@ final class GamepadBridge {
                 (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
                 // self.sy = self.sy+Int32(scrollY)
                 winios_pointer(0, 0, 0x0800, UInt32(bitPattern: Int32(scrollY)))
+                if deltaX != 0 || deltaY != 0 {
+                   self.MouseMoving = true
+                }
+                else {
+                   self.MouseMoving = false
+                }
             }
             mouseInput.leftButton.valueChangedHandler = {
                 (_ button: GCControllerButtonInput, _ value: Float, _ pressed: Bool) -> Void in
@@ -182,7 +189,7 @@ final class GamepadBridge {
        return self.delta.y
     }
     func MouseActive() -> Bool {
-       return self.MouseMoving || self.MouseClicking
+       return self.MouseMoving || self.MouseClicking || self.MouseScrolling
        // return self.MouseClicking
     }
 }
