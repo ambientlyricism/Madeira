@@ -23,6 +23,9 @@ dependency license texts are in `LICENSES/`. See "Why GPL-3.0-or-later" below.
 | **xxHash** | BSD-2-Clause | Static (`libxxhash.a`). |
 | **Cephes** | permissive (Moshier) | Static (`libcephes_128bit.a`), via FEX. |
 | **Berkeley SoftFloat 3e** | BSD-3-Clause | Static (`libsoftfloat_3e.a`), via FEX. |
+| **Zstandard educational decoder** | BSD-3-Clause or GPL-2.0 | BSD-3-Clause selected | `app/Madeira/SwiftSteam/zstd_edu.c/.h` (Meta Platforms). Decodes Steam's zstd content chunks. Madeira serializes its error-recovery wrapper across threads. Licence text in `LICENSES/ZSTD-BSD.txt`. |
+| **Steam client code (`app/Madeira/SwiftSteam/`)** | GPL-3.0-or-later | GPL-3.0-or-later | Derived from Jfishin's Madeira Steam client in [Jfishin/Madeira-source](https://github.com/Jfishin/Madeira-source) (a GPL-3.0-or-later fork of this repository; commit `c9cfb74`). Steam sign-in, owned-library, manifest, chunk-decryption and depot-download protocol code. Madeira left out that tree's Steam Cloud, launch-emulator and DRM-related parts and rewrote the download orchestration, logging and sign-in flow (see `docs/STEAM.md`). Each derived file carries an attribution header. No Valve or third-party Steam binaries are included. |
+| **liblzma** | Public domain / 0BSD | System library | Linked dynamically from the iOS SDK (`/usr/lib/liblzma.5.dylib`) for Steam's LZMA content chunks; nothing is bundled. |
 
 ## Why GPL-3.0-or-later
 
@@ -89,6 +92,9 @@ Do **not** assume that everything outside the submodules is original. It is not.
   fetched separately (see the open issue below).
 - `app/`, `tools/`, `scripts/` and `patches/` are largely original, but contain
   vendored and derived files too.
+- `app/Madeira/SwiftSteam/` is derived from Jfishin's Madeira Steam client
+  (GPL-3.0-or-later) and includes the BSD-licensed Zstandard educational
+  decoder.
 
 Rather than claim authorship of whole directories: **original Madeira-authored
 files that do not carry another license notice are licensed under

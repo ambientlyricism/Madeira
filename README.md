@@ -40,6 +40,13 @@ git clone --recurse-submodules <this repo>
 Note that `FEX`, `wine` and `research/dxmt` are submodules pointing at forks
 containing the iOS work; upstream clones will not build here.
 
+## Credits
+
+- The Steam client code in `app/Madeira/SwiftSteam/` (sign-in, owned library,
+  depot downloads) is derived from [Jfishin](https://github.com/Jfishin)'s
+  Madeira Steam work ([Madeira-source](https://github.com/Jfishin/Madeira-source),
+  GPL-3.0-or-later). Madeira adapted it; see [`docs/STEAM.md`](docs/STEAM.md).
+
 ## License
 
 **GPL-3.0-or-later** — see [`LICENSE`](LICENSE). Derivatives that are

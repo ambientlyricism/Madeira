@@ -21,8 +21,15 @@ Statically linked into the application binary:
   elects LGPL-3.0-or-later (LGPL-3.0.txt).
   Source tarballs and SHA-256 sums for GnuTLS, Nettle and GMP: the Madeira
   repository, build/gnutls-ios/src, built by build/gnutls-ios/build.sh.
+- Steam client code (app/Madeira/SwiftSteam in the Madeira repository):
+  derived from Jfishin's Madeira Steam client
+  (https://github.com/Jfishin/Madeira-source), GPL-3.0-or-later.
+- Zstandard educational decoder (Meta Platforms), used for Steam content:
+  BSD-3-Clause (ZSTD-BSD.txt).
 
 Dynamically loaded at runtime:
+- liblzma, the iOS system library (public domain / 0BSD), for Steam content;
+  nothing is bundled.
 - Apple Metal Shader Converter dynamic library: Apple proprietary, under the
   agreement in d3d12/METAL-SHADER-CONVERTER-AGREEMENT.txt (section 2.B:
   distribution solely for shader conversion). Its headers: Apache-2.0
