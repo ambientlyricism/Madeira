@@ -157,7 +157,7 @@ final class GamepadBridge {
                 else {
                    self.MouseScrolling = false
                 }
-                guard value.isFinite else { return }
+                guard scrollY.isFinite else { return }
                 winios_pointer(0, 0, 0x0800, UInt32(bitPattern: Int32(scrollY)))
             }
             mouseInput.leftButton.valueChangedHandler = {
