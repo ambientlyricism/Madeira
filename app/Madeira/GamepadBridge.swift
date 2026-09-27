@@ -150,7 +150,6 @@ final class GamepadBridge {
             mouseInput.scroll.valueChangedHandler = {
                 (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
                 // self.sy = self.sy+Int32(scrollY)   
-               else
                if scrollX != 0 || scrollY != 0 {
                    self.MouseScrolling = true
                 }
