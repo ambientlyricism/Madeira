@@ -445,6 +445,14 @@ final class Resolution: ObservableObject {
     @Published var res = CGPoint(x: 1366, y: 1024)
     private init() {}
 }
+/*:
+final class ScaledRes: UIWindow { 
+	@Environment(\.displayScale) private var displayScale
+	func getRes: Float() { 
+		let res = view.window.windowScene.screen*displayScale
+		return Resolution.shared.res/res
+	}
+}*/
 
 final class MetalHostView: UIView {
     // Process-lifetime singleton. The CAMetalLayer is registered with DXMT's
