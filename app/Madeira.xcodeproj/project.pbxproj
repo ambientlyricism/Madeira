@@ -65,6 +65,8 @@
 		A1000413 /* SteamInstallRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000413 /* SteamInstallRegistry.swift */; };
 		A1000414 /* SteamLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000414 /* SteamLibrary.swift */; };
 		A1000415 /* SteamStoreViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000415 /* SteamStoreViews.swift */; };
+		A1000440 /* MadeiraDock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000440 /* MadeiraDock.swift */; };
+		A1000441 /* SteamRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000441 /* SteamRuntime.swift */; };
 		A1000416 /* SwiftSteam/Auth/SteamAuthAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000416 /* SwiftSteam/Auth/SteamAuthAPI.swift */; };
 		A1000417 /* SwiftSteam/Auth/SteamCredentialAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000417 /* SwiftSteam/Auth/SteamCredentialAuth.swift */; };
 		A1000418 /* SwiftSteam/Auth/SteamQRAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000418 /* SwiftSteam/Auth/SteamQRAuth.swift */; };
@@ -163,6 +165,8 @@
 		A2000413 /* SteamInstallRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteamInstallRegistry.swift; sourceTree = "<group>"; };
 		A2000414 /* SteamLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteamLibrary.swift; sourceTree = "<group>"; };
 		A2000415 /* SteamStoreViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteamStoreViews.swift; sourceTree = "<group>"; };
+		A2000440 /* MadeiraDock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MadeiraDock.swift; sourceTree = "<group>"; };
+		A2000441 /* SteamRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteamRuntime.swift; sourceTree = "<group>"; };
 		A2000416 /* SwiftSteam/Auth/SteamAuthAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Auth/SteamAuthAPI.swift"; sourceTree = "<group>"; };
 		A2000417 /* SwiftSteam/Auth/SteamCredentialAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Auth/SteamCredentialAuth.swift"; sourceTree = "<group>"; };
 		A2000418 /* SwiftSteam/Auth/SteamQRAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Auth/SteamQRAuth.swift"; sourceTree = "<group>"; };
@@ -258,6 +262,8 @@
 				A2000413 /* SteamInstallRegistry.swift */,
 				A2000414 /* SteamLibrary.swift */,
 				A2000415 /* SteamStoreViews.swift */,
+				A2000440 /* MadeiraDock.swift */,
+				A2000441 /* SteamRuntime.swift */,
 				A2000416 /* SwiftSteam/Auth/SteamAuthAPI.swift */,
 				A2000417 /* SwiftSteam/Auth/SteamCredentialAuth.swift */,
 				A2000418 /* SwiftSteam/Auth/SteamQRAuth.swift */,
@@ -471,6 +477,8 @@
 				A1000413 /* SteamInstallRegistry.swift in Sources */,
 				A1000414 /* SteamLibrary.swift in Sources */,
 				A1000415 /* SteamStoreViews.swift in Sources */,
+				A1000440 /* MadeiraDock.swift in Sources */,
+				A1000441 /* SteamRuntime.swift in Sources */,
 				A1000416 /* SwiftSteam/Auth/SteamAuthAPI.swift in Sources */,
 				A1000417 /* SwiftSteam/Auth/SteamCredentialAuth.swift in Sources */,
 				A1000418 /* SwiftSteam/Auth/SteamQRAuth.swift in Sources */,

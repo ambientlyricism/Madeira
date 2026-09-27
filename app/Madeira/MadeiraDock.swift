@@ -12,6 +12,12 @@ enum DockPerformancePolicy {
         return max(desktopReserved ? max(896, legacy) : 512, floor)
     }
 
+    /// ml1880: a Dock session's pool without an explicit madeira.cfg `pool`: compact,
+    /// raised to the floor an earlier dry pool set (JITPoolPolicy.sessionPoolMB otherwise).
+    static func compactSessionPoolMB(pressureFloorMB: Int) -> Int {
+        max(512, (512...1152).contains(pressureFloorMB) ? pressureFloorMB : 0)
+    }
+
     /// ml2000: the pool size that follows a session which ran a pool of `usedMB` dry.
     static func poolAfterPressure(usedMB: Int) -> Int {
         usedMB < 896 ? 896 : 1152

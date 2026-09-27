@@ -106,6 +106,30 @@ enum StikJITHelper {
 
     private static var earlyInFlight = false
 
+    // ml1880: an early Dock pool cannot grow after debugger detach. If the user
+    // chooses desktop Steam instead, reserve its normal capacity for the next
+    // app run and stop before Wine starts. Explicit pool overrides still win.
+    private static let desktopPoolKey = "madeiraDockDesktopPoolNextRun"
+    private static let poolPolicyLock = NSLock() // never held across debugger allocation
+    private static var compactPoolSizeMB = 0 // protected by poolPolicyLock
+    static func rememberCompactPool(sizeMB: Int, selected: Bool) {
+        poolPolicyLock.lock()
+        if selected && sizeMB < 896 { compactPoolSizeMB = sizeMB }
+        poolPolicyLock.unlock()
+        if sizeMB >= 896 { UserDefaults.standard.removeObject(forKey: desktopPoolKey) }
+    }
+    static func reserveDesktopPoolIfNeeded(desktop: Bool, dock: Bool) -> Bool {
+        guard poolReady else { return false }
+        poolPolicyLock.lock()
+        let compactMB = compactPoolSizeMB
+        poolPolicyLock.unlock()
+        guard DockPerformancePolicy.needsDesktopRestart(compactPoolMB: compactMB,
+                explicit: explicitPoolMB, desktop: desktop, dock: dock) else { return false }
+        UserDefaults.standard.set(true, forKey: desktopPoolKey)
+        LogStore.shared.log("[dock-pool] ml1880 desktop held: compact pool=\(compactMB)MB; next run reserves desktop capacity")
+        return true
+    }
+
     // ml2000: Wine writes Documents/madeira-pool-pressure.txt (the pool size in MB)
     // when a session runs the early pool dry; the pool cannot grow in that app run.
     // The next run takes one step more (512 -> 896 -> 1152) and keeps it as a floor.
@@ -208,14 +232,25 @@ enum StikJITHelper {
         if explicitPoolMB == nil, let raised = SteamPoolPolicy.earlyPoolMB(sizeMB, steamPoolContext) {
             sizeMB = raised.mb; source = raised.reason
         }
+        // ml1880: with Madeira Dock on and setup done, the early pool is compact (512 MB) unless
+        // a desktop session asked for more for this run. MADEIRA_DOCK_COMPACT_POOL=0 keeps 896.
+        let compactSelected = MadeiraDock.enabled && MadeiraConfig.flag("MADEIRA_DOCK_COMPACT_POOL")
+            && UserDefaults.standard.bool(forKey: OnboardingRules.doneKey)
+            && explicitPoolMB == nil && !UserDefaults.standard.bool(forKey: desktopPoolKey)
         let pressureMB = consumePoolPressure()
-        if explicitPoolMB == nil && pressureMB > sizeMB {
-            sizeMB = pressureMB; source = "an earlier session ran the pool dry, ml2000"
+        sizeMB = DockPerformancePolicy.earlyPoolMB(legacy: sizeMB, explicit: explicitPoolMB,
+            dock: MadeiraDock.enabled, compact: MadeiraConfig.flag("MADEIRA_DOCK_COMPACT_POOL"),
+            setupComplete: UserDefaults.standard.bool(forKey: OnboardingRules.doneKey),
+            desktopReserved: UserDefaults.standard.bool(forKey: desktopPoolKey), pressureMB: pressureMB)
+        if compactSelected { source = "Dock compact default, ml1880" }
+        if pressureMB > 0 && sizeMB == pressureMB && explicitPoolMB == nil {
+            source = "an earlier session ran the pool dry, ml2000"
         }
         LogStore.shared.log("[jit-early] ml1330 trigger=\(trigger) allocating \(sizeMB)MB (\(source)) while the debugger is attached")
         DispatchQueue.global(qos: .userInitiated).async {
             let t0 = CFAbsoluteTimeGetCurrent()
             let pool = allocatePool(poolSize: sizeMB * 1024 * 1024)
+            if let pool { rememberCompactPool(sizeMB: pool.size / 1024 / 1024, selected: compactSelected) }
             if pool != nil { detachDebugger() }
             let seconds = CFAbsoluteTimeGetCurrent() - t0
             LogStore.shared.log(String(format: "[jit-early] ml1330 trigger=%@ pool=%@ size=%dMB seconds=%.2f detached=%d",

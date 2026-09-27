@@ -216,6 +216,9 @@ struct LibraryEntry: Codable, Identifiable {
     // ml1780: true lets the client run the game's one-time installs (DirectX, Visual C++,
     // PhysX...); otherwise Madeira marks them done before a client start.
     var steamRunInstallers: Bool?
+    // ml1970: true starts this game through the regular desktop Steam client even while
+    // Madeira Dock is on ("Steam (more usage)" under Start with); nil keeps Madeira Dock.
+    var steamDesktopLaunch: Bool?
     var usesSteam: Bool { steamSession != nil || (steamAppID != nil && (steamNative != true || steamClientLaunch == true)) }
     /// ml1490: the Windows Steam client is asked to start this game (-applaunch),
     /// so the Wine desktop shows only the client until the game's window is up.
@@ -232,8 +235,18 @@ struct LibraryEntry: Codable, Identifiable {
     }
 
     var launchArguments: String {
+        launchArguments(dock: MadeiraDock.routes(self))
+    }
+    func launchArguments(dock: Bool) -> String {
         if desktop == true { return "/desktop=shell,\(resolution) C:\\windows\\system32\\services.exe" }
         guard usesSteam else { return arguments }
+        if dock {
+            // ml1970: the game's pending one-time installs run first, in the same session.
+            if let script = MadeiraDock.installerScript {
+                return "/desktop=madeira,\(resolution) C:\\windows\\system32\\cmd.exe /c call \(script) & \"\(MadeiraDock.executable)\""
+            }
+            return "/desktop=madeira,\(resolution) \"\(MadeiraDock.executable)\""
+        }
         // ml1530: a Madeira session lasts while its first program or any program it started
         // runs. Steam's installer starts Steam.exe as it exits, and the session ended before
         // Steam.exe counted (device log: the installer's session closed 13.7 s in and took
@@ -301,6 +314,7 @@ struct LibraryEntry: Codable, Identifiable {
             else if !inToken { tokens += 1; inToken = true }
         }
         if usesSteam {
+            if MadeiraDock.routes(self) { try MadeiraDock.validate(self) }
             let client = steamNative == true ? (steamClientPath ?? "") : relativePath
             if steamNative == true && client.isEmpty {
                 throw LibraryError.message("Install the Windows Steam client (Settings › Windows Steam client), or start this game directly.")
@@ -316,9 +330,10 @@ struct LibraryEntry: Codable, Identifiable {
         guard !quoted, tokens <= 64 else { throw LibraryError.message("Use balanced double quotes and at most 64 launch arguments in total.") }
     }
 
-    /// Runs on the launch worker, before the JIT pool is taken.
-    func applyEnvironment() {
-        configureLaunch()
+    /// Runs on the launch worker, before the JIT pool is taken. `dock` is the
+    /// route chosen when the launch began (a Dock hand-off may already be prepared).
+    func applyEnvironment(dock: Bool? = nil) {
+        configureLaunch(dock: dock)
         setenv("FEX_X87REDUCEDPRECISION", reducedX87 ? "1" : "0", 1)
         if let cpuCount, cpuCount > 0 { setenv("MADEIRA_CPU_COUNT", String(cpuCount), 1) } else { unsetenv("MADEIRA_CPU_COUNT") }
         setenv("MADEIRA_FASTSYNC", fastSync ? "auto" : "0", 1)
@@ -330,12 +345,14 @@ struct LibraryEntry: Codable, Identifiable {
     }
 
     /// What the bridge starts. Set on the main thread before the session begins.
-    func configureLaunch() {
+    func configureLaunch(dock: Bool? = nil) {
+        let useDock = dock ?? MadeiraDock.routes(self)
+        MadeiraDock.configure(self, dock: useDock)
         // The Wine desktop and every Steam session (the client, its installer, a game
-        // it starts) run in a virtual desktop started by explorer.exe.
+        // it starts, Madeira Dock) run in a virtual desktop started by explorer.exe.
         let desktopSession = desktop == true || usesSteam
         setenv("MADEIRA_EXE", desktopSession ? "explorer.exe" : windowsPath, 1)
-        setenv("MADEIRA_ARGS", launchArguments, 1)
+        setenv("MADEIRA_ARGS", launchArguments(dock: useDock), 1)
         if desktopSession { setenv("MADEIRA_DESKTOP", "1", 1) } else { unsetenv("MADEIRA_DESKTOP") }
         // Every session's virtual monitor takes this entry's Resolution
         // (MADEIRA_SCREEN_W/H, source "knob"); for the Desktop entry and a Steam
@@ -427,6 +444,26 @@ final class LibraryModel: ObservableObject {
     private var launchDismissLogged = false
     /// ml1970: asks the library to close a details page held open during a launch.
     @Published var closeDetail = 0
+    @Published private(set) var dockLaunching = false
+    @Published private(set) var dockLaunchFailure: String?
+    private var dockExitObserved = false
+    private var programsGoneSince: Date?
+    private var dockSessionEnding = false
+    /// ml2000: a Dock session keeps its desktop after Madeira Dock exits, so a game that
+    /// ended (or crashed) left the library behind its last frame. Once the Dock host has
+    /// exited and every program started in this session has ended for 5 s, end the
+    /// session like Quit, keeping the exit report. MADEIRA_DOCK_END_WITH_GAME=0 keeps it.
+    private func endDockSessionAfterGame() {
+        guard dockLaunching, dockExitObserved, dockLaunchFailure == nil, !quitRequested, !dockSessionEnding,
+              MadeiraConfig.flag("MADEIRA_DOCK_END_WITH_GAME"), wine_programs_started() > 0 else { return }
+        guard wine_programs_live() == 0 else { programsGoneSince = nil; return }
+        let since = programsGoneSince ?? Date()
+        programsGoneSince = since
+        guard Date().timeIntervalSince(since) >= 5 else { return }
+        dockSessionEnding = true
+        LogStore.shared.log("[dock-session] ml2000 programs=\(wine_programs_started()) all ended; ending the session")
+        if wineserver_request_session_stop() != 0 { sessionMessage = "Game ended. Closing…"; menu = false }
+    }
     /// ml1490: a game started through the Windows Steam client keeps the
     /// starting screen over the Wine desktop until the game's window is up.
     private var steamHold: SteamLaunchHold?
@@ -723,7 +760,10 @@ final class LibraryModel: ObservableObject {
     static let restartMessage = "Restart Madeira to start another game: swipe Madeira away in the app switcher, then open it again."
     @Published var restartNotice: String?
 
-    func begin(_ entry: LibraryEntry) {
+    func begin(_ entry: LibraryEntry, dock: Bool = false) {
+        dockLaunching = dock
+        dockLaunchFailure = nil; dockExitObserved = false
+        programsGoneSince = nil; dockSessionEnding = false
         wine_exit_status_reset(); wine_programs_reset()
         quitRequested = false; pressureAtStart = StikJITHelper.poolPressureRecorded
         LibraryController.shared.configure(enabled: enabled, ownsInput: false)
@@ -762,6 +802,21 @@ final class LibraryModel: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in self?.poll() }
     }
     private func poll() {
+        if dockLaunching && !dockExitObserved && MadeiraConfig.flag("MADEIRA_DOCK_STATUS") {
+            var status: Int32 = 0
+            let ended = wine_dock_exit_status(&status) != 0
+            let report = MainActor.assumeIsolated { MadeiraDock.pollReport(force: ended) }
+            if ended || report.result != nil {
+                dockExitObserved = true
+                if !ended { status = Int32(report.result ?? 0) }
+                if launching || status != 0 {
+                    dockLaunchFailure = report.failure ?? "Madeira Dock exited before a game window appeared. Export the diagnostic log."
+                    LogStore.shared.log("[dock-status] ml1860 host-ended status=\(status) native=\(ended ? 1 : 0) starting=\(launching ? 1 : 0)", level: .error)
+                    MainActor.assumeIsolated { MadeiraDock.cleanup() }
+                }
+            }
+        }
+        endDockSessionAfterGame()
         if steamHold != nil {
             // ml1490: the desktop's own frames (the client's console and helper
             // windows) do not end this starting screen; the game's window does.
@@ -945,6 +1000,66 @@ final class LibraryModel: ObservableObject {
         return runs.count
     }
 
+    /// ml1970: a Madeira Dock start. Valve's client never evaluates install scripts on this route
+    /// (see DockInstallScripts), so Madeira does: runtimes its Wine provides are marked done, and
+    /// the other programs not yet recorded done go into a batch the session runs before the host.
+    /// "Run Steam's one-time installs" (steamRunInstallers) also queues the provided ones.
+    /// Only while no session runs. MADEIRA_DOCK_INSTALLERS=0 restores ml1780's marking.
+    static func prepareDockInstallers(_ entry: LibraryEntry) {
+        MadeiraDock.installerScript = nil
+        let app = entry.steamAppID ?? 0
+        let batchURL = drive.appendingPathComponent(MadeiraDock.installerScriptName)
+        try? FileManager.default.removeItem(at: batchURL)
+        guard let folder = steamInstallFolder(entry), let gameRelative = SteamPaths.relative(folder, drive: drive) else {
+            LogStore.shared.log("[dock-installers] ml1970 app=\(app) no install folder"); return
+        }
+        func windows(_ relative: String) -> String { "C:\\" + relative.replacingOccurrences(of: "/", with: "\\") }
+        let shared = folder.deletingLastPathComponent().appendingPathComponent("Steamworks Shared", isDirectory: true)
+        var found: [SteamInstallProcess] = []
+        var roots: [(URL, Int, String)] = [(folder, 1, windows(gameRelative))]
+        if let sharedRelative = SteamPaths.relative(shared, drive: drive) {
+            roots.append((shared.appendingPathComponent("_CommonRedist", isDirectory: true), 3, windows(sharedRelative)))
+        }
+        for (root, depth, installDir) in roots {
+            for file in SteamInstallScripts.scripts(folder: root, depth: depth) {
+                guard let data = try? Data(contentsOf: file) else { continue }
+                for process in DockInstallScripts.processes(script: data, installDir: installDir) where !found.contains(process) {
+                    found.append(process)
+                }
+            }
+        }
+        let runAll = entry.steamRunInstallers == true
+        let prefix = drive.deletingLastPathComponent()
+        let registry = [SteamInstallRun.Hive.machine: "system.reg", .user: "user.reg"].mapValues {
+            (try? String(contentsOf: prefix.appendingPathComponent($0), encoding: .utf8)) ?? ""
+        }
+        func done(_ run: SteamInstallRun) -> Bool { DockInstallScripts.marked(run, in: registry[run.hive] ?? "") }
+        func exists(_ windowsPath: String) -> Bool {
+            let relative = windowsPath.dropFirst(3).replacingOccurrences(of: "\\", with: "/")
+            guard let url = SteamPaths.safeRelative(relative, under: drive) else { return false }
+            return SteamPaths.existing(url, drive: drive) != nil
+        }
+        // A run is marked done up front only when every program in it is provided by Madeira.
+        var provided: [SteamInstallRun] = []
+        for process in found where !runAll && !provided.contains(process.run) {
+            if found.filter({ $0.run == process.run }).allSatisfy(DockInstallScripts.providedByMadeira) { provided.append(process.run) }
+        }
+        var written = 0
+        do { written = try SteamInstallScripts.mark(provided, prefix: prefix) }
+        catch { LogStore.shared.log("[dock-installers] ml1970 app=\(app) mark failed: \(error.localizedDescription)", level: .error) }
+        let pending = found.filter { !provided.contains($0.run) && !done($0.run) && exists($0.executable) }.prefix(8)
+        if !pending.isEmpty {
+            do {
+                try Data(DockInstallScripts.batch(Array(pending)).utf8).write(to: batchURL, options: .atomic)
+                MadeiraDock.installerScript = "C:\\" + MadeiraDock.installerScriptName
+            } catch {
+                LogStore.shared.log("[dock-installers] ml1970 app=\(app) batch write failed: \(error.localizedDescription)", level: .error)
+            }
+        }
+        LogStore.shared.log("[dock-installers] ml1970 app=\(app) programs=\(found.count) provided=\(provided.count) marked=\(written) " +
+                            "pending=\(pending.count) run-all=\(runAll ? 1 : 0) names=\(pending.map(\.run.name).joined(separator: ","))")
+    }
+
     /// Set by "Skip one-time installs": the library marks the installs once the session has ended.
     @Published var relaunchRequest: LibraryEntry?
     @Published private(set) var skippingInstallers = false
@@ -1016,7 +1131,15 @@ final class LibraryModel: ObservableObject {
         }
     }
     private func finish() {
-        if sawProcess, let report = exitReport() { error = report }
+        // The timer and session callbacks run on the main queue. Keep the
+        // credential-file lifecycle in that same isolation domain.
+        let dockError = MainActor.assumeIsolated {
+            let message = dockLaunching ? MadeiraDock.finishReport() : nil
+            MadeiraDock.cleanup()
+            return message
+        }
+        if let dockError { error = dockError } else if sawProcess, let report = exitReport() { error = report }
+        dockLaunching = false
         timer?.invalidate(); timer = nil
         SteamClientProgressModel.shared.stop()
         endSteamHold(reason: "session-ended")
@@ -2211,7 +2334,7 @@ struct LibraryHUD: View {
                 LibraryArtwork(entry: entry).frame(width: compact ? 90 : 120, height: compact ? 135 : 180)
                     .clipShape(RoundedRectangle(cornerRadius: 14)).shadow(radius: 20)
                 Text(entry.title).font(.title2.bold()).multilineTextAlignment(.center)
-                ProgressView().tint(.white)
+                if model.dockLaunchFailure == nil { ProgressView().tint(.white) }
                 // ml1510: the client's actual stage (connection and content logs) rather than one
                 // fixed line, with the time so far. MADEIRA_STEAM_LAUNCH_STAGES=0 leaves `stage`
                 // nil and restores the fixed text. ml1770: setup's Steam install, from the
@@ -2219,6 +2342,14 @@ struct LibraryHUD: View {
                 if onboarding.installSession, let stage = onboarding.setupStage {
                     Text(stage.text).foregroundStyle(.white.opacity(0.8)).multilineTextAlignment(.center)
                     Text(stage.detail).font(.caption).foregroundStyle(.white.opacity(0.55)).multilineTextAlignment(.center).frame(maxWidth: 360)
+                    elapsed
+                } else if let failure = model.dockLaunchFailure {
+                    Text("Madeira Dock stopped").font(.headline)
+                    Text(failure).font(.caption).multilineTextAlignment(.center).frame(maxWidth: 360)
+                    Button("Close session", systemImage: "stop.circle") { model.requestQuit() }
+                        .buttonStyle(.bordered).frame(minHeight: 44)
+                } else if model.dockLaunching {
+                    Text(dockStatus).foregroundStyle(.white.opacity(0.8)).multilineTextAlignment(.center)
                     elapsed
                 } else if model.steamHolding, let stage = steamProgress.progress?.stage {
                     Text(stage.text).foregroundStyle(.white.opacity(0.8)).multilineTextAlignment(.center)
@@ -2231,7 +2362,8 @@ struct LibraryHUD: View {
                                             : (model.launchSlow ? "Still starting…" : "Starting your game…")).foregroundStyle(.white.opacity(0.7))
                     elapsed
                 }
-                if let progress = steamProgress.progress, progress.active {
+                // ml1970: under Dock too, while Valve's client installs content the launch needs.
+                if !model.dockLaunching || MadeiraConfig.flag("MADEIRA_DOCK_PROGRESS"), let progress = steamProgress.progress, progress.active {
                     SteamClientProgressBanner(progress: progress).tint(.white).frame(maxWidth: 360)
                 }
                 Button(showLogs ? "Hide live log" : "Show live log", systemImage: "text.alignleft") {
@@ -2239,21 +2371,25 @@ struct LibraryHUD: View {
                 }.buttonStyle(.bordered).tint(.white).frame(minHeight: 44)
                 // ml1490: Steam's own windows stay behind this screen until the game opens.
                 if model.steamHolding {
-                    Button("Show Steam", systemImage: "macwindow") { model.showSteam() }
+                    Button(model.dockLaunching ? "Show desktop" : "Show Steam", systemImage: "macwindow") { model.showSteam() }
                         .buttonStyle(.bordered).tint(.white).frame(minHeight: 44)
-                        .accessibilityHint("Shows the Windows Steam client, for example to sign in")
+                        .accessibilityHint(model.dockLaunching ? "Shows the Windows desktop" : "Shows the Windows Steam client, for example to sign in")
                     // ml1780: the client is running the game's one-time installs; restart without them.
-                    if steamProgress.progress?.stage == .installers, model.activeEntry?.steamGameLaunch == true {
+                    if !model.dockLaunching, steamProgress.progress?.stage == .installers, model.activeEntry?.steamGameLaunch == true {
                         Button(model.skippingInstallers ? "Closing Steam…" : "Skip one-time installs", systemImage: "forward.end") {
                             model.skipSteamInstallers()
                         }
                         .buttonStyle(.bordered).tint(.white).frame(minHeight: 44).disabled(model.skippingInstallers)
                         .accessibilityHint("Closes Steam and marks DirectX, Visual C++ and similar installers as done")
                     }
-                    Text(model.steamAttention ? "Steam opened a window. It may need you, for example to sign in."
-                                              : "Steam's windows stay hidden until the game opens. If Steam needs you, for example to sign in, tap Show Steam.")
-                        .font(.caption).multilineTextAlignment(.center).foregroundStyle(.white.opacity(model.steamAttention ? 0.9 : 0.6))
-                        .frame(maxWidth: 360)
+                    // ml1990: no explanatory line under a Madeira Dock start; MADEIRA_DOCK_START_NOTE=1 shows it.
+                    if !model.dockLaunching || MadeiraConfig.flag("MADEIRA_DOCK_START_NOTE", fallback: false) {
+                        Text(model.dockLaunching ? "Madeira Dock uses your Steam sign-in to request access from Valve before launching the game."
+                                                 : model.steamAttention ? "Steam opened a window. It may need you, for example to sign in."
+                                                  : "Steam's windows stay hidden until the game opens. If Steam needs you, for example to sign in, tap Show Steam.")
+                            .font(.caption).multilineTextAlignment(.center).foregroundStyle(.white.opacity(model.steamAttention ? 0.9 : 0.6))
+                            .frame(maxWidth: 360)
+                    }
                 }
                 if model.launchSlow && !model.steamHolding {
                     Button("Show game view") { model.showGameView(reason: "button") }.frame(minHeight: 44)
@@ -2271,6 +2407,17 @@ struct LibraryHUD: View {
         }
         .frame(width: geo.size.width, height: available)
         .padding(.top, geo.safeAreaInsets.top).foregroundStyle(.white).transition(.opacity)
+    }
+    /// ml1970: what the Dock start is waiting for, from the host's numeric report.
+    private var dockStatus: String {
+        let report = MadeiraDock.pollReport()
+        if report.fields["launch-update-wait"] != nil && report.fields["launch-update-ready"] == nil {
+            return "Steam is installing content this game needs. The game starts when it finishes…"
+        }
+        if MadeiraDock.installerScript != nil && report.fields["probe-start-bits"] == nil {
+            return "Running this game's one-time installs…"
+        }
+        return model.launchSlow ? "Waiting for Madeira Dock…" : "Starting Madeira Dock…"
     }
     private var elapsed: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in

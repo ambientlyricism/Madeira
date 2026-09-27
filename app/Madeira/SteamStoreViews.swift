@@ -458,24 +458,37 @@ struct SteamEntrySection: View {
         Section {
             // ml1530: without a stored choice the default shows (startsWithClient); only a
             // change here stores one.
-            // ml1970: the game alone, or the Windows Steam client, which is only selectable
-            // while it is installed.
-            let steamReady = client.snapshot.client != nil
+            // ml1970: Madeira Dock (the default), the game alone, or regular Steam, which is only
+            // selectable while the regular desktop client is installed.
+            let dock = MadeiraDock.enabled
+            let steamReady = dock ? client.snapshot.desktopClient : client.snapshot.client != nil
             Picker("Start with", selection: Binding(get: { entry.steamStartMode }, set: { mode in
                 guard mode != .steam || steamReady else { return }
                 entry.setSteamStartMode(mode)
             })) {
+                if dock { Text("Madeira Dock").tag(SteamStartMode.dock) }
                 Text("The game").tag(SteamStartMode.game)
-                Text("Steam client").tag(SteamStartMode.steam)
+                Text(dock ? "Steam (more usage)" : "Steam client").tag(SteamStartMode.steam)
                     .disabled(!steamReady).selectionDisabled(!steamReady)
             }
-            if entry.steamStartMode == .steam && !steamReady {
-                Text("Install the Windows Steam client from Settings › Windows Steam client first, then sign in to it with the same account.")
+            switch entry.steamStartMode {
+            case .dock where client.snapshot.client == nil:
+                Text("Madeira Dock needs Steam's client components. Run setup again from Settings to prepare them.")
                     .font(.caption).foregroundStyle(.orange)
+            case .steam where !steamReady:
+                Text("Install regular Steam from Settings › Windows Steam client first, then sign in to it with the same account.")
+                    .font(.caption).foregroundStyle(.orange)
+            default:
+                if dock && !steamReady {
+                    Text("Steam (more usage) needs regular Steam, installed from Settings › Windows Steam client.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
             }
             // ml1780: Steam's one-time installs are marked done before a client start unless this is on.
+            // ml1970: under Madeira Dock, installs Madeira's Wine does not provide run once anyway;
+            // this also runs the DirectX / Visual C++ installers.
             if entry.startsWithClient {
-                Toggle("Run Steam's one-time installs",
+                Toggle(entry.steamStartMode == .dock ? "Also run DirectX and Visual C++ installers" : "Run Steam's one-time installs",
                        isOn: Binding(get: { entry.steamRunInstallers == true },
                                      set: { entry.steamRunInstallers = $0 ? true : nil }))
             }

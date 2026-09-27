@@ -1130,6 +1130,9 @@ struct ContentView: View {
     @State private var showFrontendRestart = false
     @State private var eulaPrompt: SteamEulaPrompt?   // ml1710
     @State private var eulaCleared: Set<Int> = []      // ml1710: apps checked this app run
+    /// A Madeira Dock start is preparing its hand-off (native connection closed, one-use
+    /// sign-in transfer written); no other launch may start meanwhile.
+    @State private var dockPreparing = false
 
     enum JITStatus {
         case unknown
@@ -2164,7 +2167,8 @@ struct ContentView: View {
     /// applies the entry's launch profile and runs the same full sequence as the
     /// developer interface's buttons.
     private func launchLibraryEntry(_ entry: LibraryEntry) {
-        guard wine_process_is_running() == 0, wineserver_is_running() == 0, library.current == nil else {
+        let entry = SteamAccountModel.shared.restoreDefaultArguments(entry)
+        guard !dockPreparing, wine_process_is_running() == 0, wineserver_is_running() == 0, library.current == nil else {
             library.error = "A session is already running."; return
         }
         // ml1540: setup's Steam install ran a session in this app run; a game needs a fresh run.
@@ -2223,7 +2227,11 @@ struct ContentView: View {
         }
         // ml1780: mark the game's one-time installs done before the client starts (no session runs
         // here, so the registry is on disk). MADEIRA_STEAM_SKIP_INSTALLERS=0 leaves them to the client.
-        if entry.steamGameLaunch, entry.steamRunInstallers != true, MadeiraConfig.flag("MADEIRA_STEAM_SKIP_INSTALLERS") {
+        // ml1970: a Madeira Dock start handles them itself (DockInstallScripts).
+        MadeiraDock.installerScript = nil
+        if entry.steamGameLaunch, MadeiraDock.routes(entry), MadeiraConfig.flag("MADEIRA_DOCK_INSTALLERS") {
+            LibraryModel.prepareDockInstallers(entry)
+        } else if entry.steamGameLaunch, entry.steamRunInstallers != true, MadeiraConfig.flag("MADEIRA_STEAM_SKIP_INSTALLERS") {
             LibraryModel.markSteamInstallers(entry, reason: "launch")
         }
         // ml1960: the install script's registry values (not its programs) are written before Wine starts.
@@ -2240,7 +2248,36 @@ struct ContentView: View {
             }
         }
         SteamLibraryModel.shared.stopScan()
-        entry.configureLaunch()
+        if MadeiraDock.routes(entry) {
+            dockPreparing = true
+            Task { @MainActor in
+                do {
+                    try await SteamAccountModel.shared.prepareDock(entry)
+                    guard StikJITHelper.readyToLaunch, wine_process_is_running() == 0,
+                          wineserver_is_running() == 0, library.current == nil else {
+                        throw LibraryError.message("The launch state changed. Enable JIT and try again.")
+                    }
+                    entry.configureLaunch(dock: true)
+                    // ml1990: the install record lists per-user custom executables (CEG); Dock asks
+                    // Valve's client to prepare them before it launches. MADEIRA_DOCK_CEG=0 never asks.
+                    let ceg = MadeiraConfig.flag("MADEIRA_DOCK_CEG") && MadeiraDock.hasCustomExecutables(appID: entry.steamAppID ?? 0)
+                    if ceg { setenv("MADEIRA_STEAM_HOST_CEG", "1", 1) } else { unsetenv("MADEIRA_STEAM_HOST_CEG") }
+                    LogStore.shared.log("[dock-ceg] ml1990 app=\(entry.steamAppID ?? 0) custom-executables=\(ceg ? 1 : 0)")
+                    library.begin(entry, dock: true)
+                    dockPreparing = false
+                    LogStore.shared.log("[madeira-dock] ml1830 starting bundled host; Valve must authenticate and authorize launch")
+                    runWineFullSequence(profile: entry, dock: true)
+                } catch {
+                    dockPreparing = false
+                    SteamAccountModel.shared.sessionChanged(active: false)
+                    MadeiraDock.cleanup()
+                    library.error = "Madeira Dock could not prepare the Steam session. " + error.localizedDescription
+                    LogStore.shared.log("[madeira-dock] ml1830 preparation failed; game not launched", level: .error)
+                }
+            }
+            return
+        }
+        entry.configureLaunch(dock: false)
         library.begin(entry)
         // ml1720: log Madeira's own Steam connection off before the Windows client signs in.
         // The library view's onChange does not fire when the game view replaces the library
@@ -2307,11 +2344,19 @@ struct ContentView: View {
     /// Full sequence: allocate JIT pool, start wineserver, start Wine.
     /// Debugger stays attached during PE loading so mprotect_exec can use BRK
     /// to prepare code pages. Detach happens after Wine finishes + recovery.
-    /// `profile` is a library entry whose launch profile applies to this run.
-    private func runWineFullSequence(profile: LibraryEntry? = nil) {
+    /// `profile` is a library entry whose launch profile applies to this run;
+    /// `dock` is set when it starts through Madeira Dock.
+    private func runWineFullSequence(profile: LibraryEntry? = nil, dock: Bool = false) {
         guard jit_check_debugged() else {
             logStore.log("JIT not enabled. Press 'Enable JIT' first.", level: .error)
             if profile != nil { LibraryModel.shared.launchFailed() }
+            return
+        }
+        // ml1880: an early compact Dock pool cannot grow after the debugger detached; a desktop
+        // session in the same run would run it dry. Reserve desktop capacity for the next run.
+        if StikJITHelper.reserveDesktopPoolIfNeeded(desktop: getenv("MADEIRA_DESKTOP") != nil, dock: dock) {
+            LibraryModel.shared.launchFailed()
+            LibraryModel.shared.error = "Opening the Windows desktop needs more memory reserved at startup. Close Madeira completely, reopen it, enable JIT, then open the desktop again."
             return
         }
         /* ml1095: one config file. Written once from any legacy madeira-*.txt. */
@@ -2345,8 +2390,31 @@ struct ContentView: View {
             // A library entry's launch profile (executable, arguments, x87
             // precision, synchronisation, reported cores, frame limit).
             if let profile {
-                profile.applyEnvironment()
-                logStore.log("[launch-route] library profile applied")
+                // ml1840: the route selected before the hand-off was prepared; never silently
+                // start desktop Steam after a Dock hand-off.
+                profile.applyEnvironment(dock: dock)
+                logStore.log("[launch-route] library profile applied route=\(dock ? "dock" : "profile")")
+            }
+            // ml1880: a Dock session keeps frame and memory telemetry but not the per-call D3D9
+            // census (>32k calls/frame observed). Explicit census, diagnostic or forensic requests
+            // keep it. MADEIRA_DOCK_LIGHT_DIAGNOSTICS=0 restores the census.
+            if let value = DockPerformancePolicy.censusDefault(dock: dock,
+                lightweight: MadeiraConfig.flag("MADEIRA_DOCK_LIGHT_DIAGNOSTICS"),
+                diagnostic: MadeiraConfig.flag("MADEIRA_DIAG", fallback: false),
+                forensic: MadeiraConfig.flag("MADEIRA_D3D9_LAST", fallback: false)),
+               getenv("MADEIRA_D3D9_CENSUS") == nil {
+                setenv("MADEIRA_D3D9_CENSUS", value, 0)
+            }
+            // ml1940: a Dock session bounds 32-bit Wine heap growth and combines full reserve /
+            // commit requests (64-bit heaps ignore these). Each stays overridable with =0.
+            if dock {
+                setenv("MADEIRA_HEAP_COMPACT", "1", 0)
+                setenv("MADEIRA_HEAP_COMBINED", "1", 0)
+                setenv("MADEIRA_HEAP_RECLAIM", "1", 0)
+                setenv("MADEIRA_HEAP_STATS", "1", 0)
+                setenv("MADEIRA_CPU_DIAGNOSTICS", "1", 0)
+                setenv("MADEIRA_VA_DIAGNOSTICS", "1", 0)
+                logStore.log("[dock-heap] ml1940 compact=\(getenv("MADEIRA_HEAP_COMPACT").map { String(cString: $0) } ?? "0") census=\(getenv("MADEIRA_D3D9_CENSUS").map { String(cString: $0) } ?? "default")")
             }
 
             // Step 1: Allocate JIT pool (BRK suspends entire process)
@@ -2440,11 +2508,20 @@ struct ContentView: View {
             // a typo here would otherwise move the VA floor with it.
             // An earlier session that ran the pool dry raises the default
             // (madeira-pool-pressure.txt, JITPoolPolicy); madeira.cfg pool wins.
+            // ml1880: a Dock session keeps explorer as a launcher but has no desktop
+            // Steam/CEF fan-out (device sessions used about 230 MB of code), so it
+            // starts compact: 512 MB, raised to the same pressure floor
+            // (DockPerformancePolicy). MADEIRA_DOCK_COMPACT_POOL=0 keeps the default.
             let explicitPoolMB = StikJITHelper.explicitPoolMB
-            let poolSizeMB = JITPoolPolicy.sessionPoolMB(explicit: explicitPoolMB,
-                                                         pressureFloorMB: StikJITHelper.poolPressureFloorMB)
+            let compactDock = dock && MadeiraConfig.flag("MADEIRA_DOCK_COMPACT_POOL")
+            let poolSizeMB = compactDock && explicitPoolMB == nil
+                ? DockPerformancePolicy.compactSessionPoolMB(pressureFloorMB: StikJITHelper.poolPressureFloorMB)
+                : JITPoolPolicy.sessionPoolMB(explicit: explicitPoolMB,
+                                              pressureFloorMB: StikJITHelper.poolPressureFloorMB)
             if let mb = explicitPoolMB {
                 logStore.log("JIT pool overridden to \(mb)MB via madeira.cfg pool")
+            } else if compactDock {
+                logStore.log("[dock-pool] ml1880 session pool \(poolSizeMB)MB (Dock compact default); MADEIRA_DOCK_COMPACT_POOL=0 restores desktop sizing")
             } else if poolSizeMB > JITPoolPolicy.defaultMB {
                 logStore.log("JIT pool \(poolSizeMB)MB: an earlier session ran the pool dry ([pool-pressure])")
             }
@@ -2618,6 +2695,7 @@ struct ContentView: View {
             logStore.log("Allocating \(poolSizeMB)MB JIT pool (BRK will suspend process)...")
             let t0 = CFAbsoluteTimeGetCurrent()
             let pool = StikJITHelper.allocatePool(poolSize: poolSizeMB * 1024 * 1024)
+            if let pool { StikJITHelper.rememberCompactPool(sizeMB: pool.size / 1024 / 1024, selected: compactDock) }
             let elapsed = CFAbsoluteTimeGetCurrent() - t0
             winios_phase("pool-ready")
             logStore.log("BRK suspension lasted \(String(format: "%.2f", elapsed))s")
