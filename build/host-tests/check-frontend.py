@@ -84,6 +84,8 @@ enum SteamPaths {
 enum SteamFileError: Error { case invalid(String) }
 enum LibraryModel { static var drive = URL(fileURLWithPath: "/tmp/madeira-frontend-check") }
 '''
+import dock_contract
+swift += dock_contract.source(root / 'app/Madeira').replace('import Foundation\nimport Glibc\n', '')
 swift += block(lib, 'struct LibraryEntry: Codable, Identifiable') + '\n'
 swift += '\n'.join(l for l in display.splitlines() if not l.startswith('import ')) + '\n'
 swift += block(lib, 'final class LibraryController: ObservableObject, @unchecked Sendable') + '\n'

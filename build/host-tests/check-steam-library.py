@@ -4,6 +4,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import dock_contract
 
 root = Path(__file__).resolve().parents[2]
 library = (root / 'app/Madeira/Library.swift').read_text()
@@ -23,6 +24,7 @@ func madeira_set_vsync_locked(_ mode: Int32) {}
 func winios_display_mode_changed(_ w: Int32, _ h: Int32) {}
 '''
 stubs = stubs.replace('MERGE_METHODS', library[library.index('    func mergeSteam('):library.index('    private func persist(')])
+stubs += dock_contract.source(root / 'app/Madeira')
 checks = r'''
 import Foundation
 import Glibc
@@ -35,6 +37,66 @@ func rejected(_ label: String, _ operation: () throws -> Void) throws {
 }
 @main struct Checks {
     static func main() async throws {
+        // ml1830: public contract and rollback. Fixture credentials are invented;
+        // these tests do not contact Steam or assert successful authentication.
+        let envelope = try MadeiraDock.envelope(account: "user", token: "a.b-c", steamID: 76561197960265729, appID: 123)
+        let expected = Data(Array("MDOCK001".utf8) + [1, 0, 0, 0, 1, 0, 16, 1, 123, 0, 0, 0, 4, 0, 5, 0] + Array("usera.b-c".utf8))
+        try require(envelope == expected, "one-use envelope matches versioned binary contract")
+        for id in [0, -1, Int(UInt32.max)] {
+            try rejected("invalid app identifier") { _ = try MadeiraDock.envelope(account: "user", token: "a.b-c", steamID: 76561197960265729, appID: id) }
+        }
+        for token in ["", "contains a space", "embedded\u{0}null", String(repeating: "a", count: 8193)] {
+            try rejected("invalid credential envelope") { _ = try MadeiraDock.envelope(account: "user", token: token, steamID: 76561197960265729, appID: 123) }
+        }
+        let payload = Data(#"{"sub":"76561197960265729"}"#.utf8).base64EncodedString().replacingOccurrences(of: "=", with: "")
+        let subject = try MadeiraDock.subject("e30." + payload + ".test")
+        try require(subject == 76561197960265729, "JWT subject used only for account selection")
+        for token in ["missing", "x.!.y", "x.e30.y", String(repeating: "a", count: 8193)] {
+            try rejected("invalid account metadata") { _ = try MadeiraDock.subject(token) }
+        }
+        var dockEntry = LibraryEntry(title: "Fixture", relativePath: "Steam/steamapps/common/Fixture/run.exe", bits: 64)
+        dockEntry.steamNative = true; dockEntry.steamClientLaunch = true; dockEntry.steamInstalled = true
+        dockEntry.steamAppID = 123; dockEntry.steamInstallPath = "Steam/steamapps/common/Fixture"; dockEntry.steamClientPath = "Steam/steam.exe"
+        setenv("MADEIRA_DOCK", "1", 1)
+        dockEntry.arguments = "-mode fixture";
+        try require(!MadeiraDock.supportsArguments(dockEntry), "unknown arguments are not silently discarded")
+        dockEntry.steamDefaultArguments = dockEntry.arguments
+        try require(MadeiraDock.supportsArguments(dockEntry), "imported default arguments use Valve's default launch")
+        let encodedEntry = try JSONEncoder().encode(dockEntry)
+        let decodedEntry = try JSONDecoder().decode(LibraryEntry.self, from: encodedEntry)
+        try require(decodedEntry.steamDefaultArguments == dockEntry.arguments, "argument provenance survives saving")
+        var legacyObject = try JSONSerialization.jsonObject(with: encodedEntry) as! [String: Any]
+        legacyObject.removeValue(forKey: "steamDefaultArguments")
+        let legacyEntry = try JSONDecoder().decode(LibraryEntry.self, from: JSONSerialization.data(withJSONObject: legacyObject))
+        try require(legacyEntry.steamDefaultArguments == nil && legacyEntry.arguments == dockEntry.arguments, "older library entry preserves arguments without inventing provenance")
+        dockEntry.arguments += " -custom"
+        try require(!MadeiraDock.supportsArguments(dockEntry), "edited default arguments are custom")
+        dockEntry.arguments = dockEntry.steamDefaultArguments!
+        setenv("MADEIRA_DOCK_DEFAULT_ARGUMENTS", "0", 1)
+        try require(!MadeiraDock.supportsArguments(dockEntry), "default argument rollback")
+        unsetenv("MADEIRA_DOCK_DEFAULT_ARGUMENTS")
+        dockEntry.arguments = ""
+        try require(MadeiraDock.routes(dockEntry) && dockEntry.launchArguments.contains("dockhost.exe"), "opt-in routes game through Dock")
+        try require(!dockEntry.launchArguments.contains("-applaunch") && !dockEntry.launchArguments.contains("a.b-c"), "command line has no token or desktop-client flags")
+        MadeiraDock.configure(dockEntry)
+        try require(String(cString: getenv("MADEIRA_STEAM_HOST_APPID")) == "123", "requested app configured")
+        try require(String(cString: getenv("MADEIRA_STEAM_HOST_LAUNCH")) == "1", "host launch enabled")
+        try require(SteamLaunchScene.owner("dockhost.exe") == .helper, "host console is not mistaken for game")
+        setenv("MADEIRA_DOCK", "0", 1)
+        try require(!MadeiraDock.routes(dockEntry) && dockEntry.launchArguments.contains("-applaunch"), "kill switch restores desktop route")
+        dockEntry.configureLaunch(dock: true)
+        try require(String(cString: getenv("MADEIRA_ARGS")).contains("dockhost.exe"), "selected Dock route survives later flag change")
+        try require(String(cString: getenv("MADEIRA_STEAM_HOST_PROBE")) == "1", "selected route preserves genuine host configuration")
+        setenv("MADEIRA_DOCK", "1", 1)
+        dockEntry.configureLaunch(dock: false)
+        try require(String(cString: getenv("MADEIRA_ARGS")).contains("-applaunch"), "selected desktop route remains consistent too")
+        setenv("MADEIRA_DOCK", "0", 1)
+        MadeiraDock.configure(dockEntry)
+        try require(String(cString: getenv("MADEIRA_STEAM_HOST_PROBE")) == "0", "rollback disables host")
+        unsetenv("MADEIRA_DOCK")
+        try require(MadeiraDock.enabled, "Dock is enabled by default")
+        // Remaining fixtures exercise the desktop client contract.
+        setenv("MADEIRA_DOCK", "0", 1)
         var parser = try SteamKeyValues(Data(#"// comment
         "LibraryFolders" { "0" { "path" "C:\\Steam" } "literal" "}" "quote" "a\"b" }
         "#.utf8))
