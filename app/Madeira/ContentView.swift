@@ -3144,6 +3144,16 @@ final class TouchControlsModel: ObservableObject {
     @Published var visible = true               { didSet { save() } }
     @Published var editing = false              // transient, never persisted
     @Published var selected: UUID?              // transient
+    /// One size for the whole layout (0.5...2), multiplying each control's own
+    /// pinch `scale`. A library entry keeps its own (Control size) and sets it
+    /// for its session; transient, so the developer interface stays at 1.
+    @Published var sizeScale: Double = 1.0
+
+    /// A control's drawn diameter. The view, the hit test and the mapping
+    /// panel's placement all use it, so the touch region and the pixels agree.
+    static func diameter(_ c: TouchControl) -> CGFloat {
+        baseDiameter * CGFloat(c.scale) * CGFloat(shared.sizeScale)
+    }
 
     private var loading = false
     private static var url: URL {
@@ -3194,7 +3204,7 @@ final class TouchControlsModel: ObservableObject {
                           width: barW + 20, height: 68).contains(p) { return true }
         guard visible else { return false }
         for c in controls {
-            let r = Self.baseDiameter * CGFloat(c.scale) / 2
+            let r = Self.diameter(c) / 2
             let cx = CGFloat(c.nx) * bounds.width
             let cy = CGFloat(c.ny) * bounds.height
             if hypot(p.x - cx, p.y - cy) <= r { return true }
@@ -3281,6 +3291,8 @@ struct TouchControlsOverlay: View {
                     if (m.visible || m.editing) && !library.blocksGameplayTouch {
                         ForEach(m.controls) { c in
                             TouchControlButton(control: c, screen: geo.size)
+                                // A library session's Control opacity; full while editing.
+                                .opacity(session && !m.editing ? library.opacity : 1)
                         }
                     }
                     if session && !m.editing { LibraryHUD() } else { topBar }
@@ -3385,7 +3397,7 @@ struct TouchControlButton: View {
     @State private var stickDir: Int = -1
     @State private var padVector = CGSize.zero
 
-    private var diameter: CGFloat { TouchControlsModel.baseDiameter * CGFloat(control.scale) }
+    private var diameter: CGFloat { TouchControlsModel.diameter(control) }
     private var isStick: Bool { control.action.stickKeys != nil || control.action.isPadStick }
     private var isSelected: Bool { m.editing && m.selected == control.id }
 
@@ -3587,7 +3599,7 @@ struct MappingPanel: View {
     private var layout: Placement {
         let cx = CGFloat(control.nx) * screen.width
         let cy = CGFloat(control.ny) * screen.height
-        let r  = TouchControlsModel.baseDiameter * CGFloat(control.scale) / 2
+        let r  = TouchControlsModel.diameter(control) / 2
         let gap: CGFloat = 14, edge: CGFloat = 8
 
         for size in [CGSize(width: 340, height: 236),
