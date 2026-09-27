@@ -126,7 +126,7 @@ final class GamepadBridge {
             }
             
             mouseInput.mouseMovedHandler = {(_ mouse: GCMouseInput, _ deltaX: Float, _ deltaY: Float) -> Void in
-                let sens: Float = 2.0
+                let sens: Float = 1.5
                 // let currentScreenScale = window.screen?.backingScaleFactor ?? 1.0
                 // let viewportScale = renderer?.viewportScale ?? 1.0
                 // let frameSize = metalView.frame.size
@@ -136,8 +136,8 @@ final class GamepadBridge {
                 // logger.trace("move cursor: cocoa (\(absolutePoint.x), \(absolutePoint.y)), native (\(newX), \(newY))")
                 // vmInput.sendMousePosition(buttonMask, absolutePoint: point, forMonitorID: vmDisplay?.monitorID ?? 0)
                 // vmDisplay?.cursor?.move(to: point) // required to show cursor on screen
-                self.cursor.position.x = self.cursor.position.x+CGFloat(deltaX*sens)
-                self.cursor.position.y = self.cursor.position.y-CGFloat(deltaY*sens)
+                self.cursor.position.x = min(max(self.cursor.position.x+CGFloat(deltaX*sens),0),ScreenRes.shared.res.x)
+                self.cursor.position.y = min(max(self.cursor.position.y-CGFloat(deltaY*sens),0),ScreenRes.shared.res.y)
                 self.delta = CGPoint(x: CGFloat(deltaX), y: CGFloat(deltaY))
                 if deltaX != 0 || deltaY != 0 {
                    self.MouseMoving = true
