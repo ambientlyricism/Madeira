@@ -1128,6 +1128,8 @@ struct ContentView: View {
     @ObservedObject private var library = LibraryModel.shared
     /// "Use New Interface" (actionButtons) applies at the next start.
     @State private var showFrontendRestart = false
+    @State private var eulaPrompt: SteamEulaPrompt?   // ml1710
+    @State private var eulaCleared: Set<Int> = []      // ml1710: apps checked this app run
 
     enum JITStatus {
         case unknown
@@ -1166,6 +1168,21 @@ struct ContentView: View {
             .toolbarBackground(.regularMaterial, for: .navigationBar)
             .toolbarBackground(library.enabled ? .visible : .automatic, for: .navigationBar)
             .navigationBarHidden(library.enabled ? library.current != nil : vSizeClass == .compact)
+            .sheet(item: $eulaPrompt) { prompt in
+                SteamEulaSheet(prompt: prompt,
+                               accept: { acceptEula(prompt) },
+                               cancel: {
+                                   eulaPrompt = nil; eulaCleared.remove(prompt.appID)
+                                   LogStore.shared.log("[steam-eula] ml1710 app \(prompt.appID) declined; launch cancelled")
+                               })
+            }
+            // ml1780: "Skip one-time installs" ended the session; mark the installs once
+            // Wine has fully stopped, then ask for a restart.
+            .onChange(of: library.relaunchRequest?.id) { _, id in
+                guard id != nil, let entry = library.relaunchRequest else { return }
+                library.relaunchRequest = nil
+                relaunchWhenStopped(entry, attempt: 0)
+            }
             // A second session cannot start in this process; offer to close Madeira.
             .alert("Restart Madeira", isPresented: Binding(get: { library.restartNotice != nil },
                                                             set: { if !$0 { library.restartNotice = nil } })) {
@@ -2150,6 +2167,11 @@ struct ContentView: View {
         guard wine_process_is_running() == 0, wineserver_is_running() == 0, library.current == nil else {
             library.error = "A session is already running."; return
         }
+        // ml1540: setup's Steam install ran a session in this app run; a game needs a fresh run.
+        if OnboardingModel.restartAdvised, OnboardingModel.restartPromptEnabled, entry.steamSession != "installer" {
+            LogStore.shared.log("[onboarding] ml1540 launch held until Madeira restarts")
+            library.error = OnboardingModel.restartMessage; return
+        }
         // One Wine session per app run (see LibraryModel.sessionsThisRun).
         if LibraryModel.sessionsThisRun > 0, MadeiraConfig.flag("MADEIRA_ONE_SESSION_PER_RUN") {
             LogStore.shared.log("[session-once] launch held: \(LibraryModel.sessionsThisRun) session(s) already ran in this app run")
@@ -2173,9 +2195,90 @@ struct ContentView: View {
         guard entry.windowsPath.utf8.count < 1024, entry.arguments.utf8.count < 1024 else {
             library.error = "The executable path or launch arguments are too long."; return
         }
+        // ml1710: answer the game's license agreements here, before the client starts, instead
+        // of inside the client window a -silent launch keeps hidden. Only games whose Steam app
+        // info lists an agreement that this prefix has not recorded ever see the sheet.
+        // MADEIRA_STEAM_EULA_NATIVE=0 leaves it to the client as before.
+        if entry.steamGameLaunch, let appID = entry.steamAppID, !eulaCleared.contains(appID),
+           MadeiraConfig.flag("MADEIRA_STEAM_EULA_NATIVE") {
+            // ml1720: the CLIENT's folder. relativePath is the game's executable for a native
+            // install, which put this check in the game's Binaries folder.
+            let steamRoot = LibraryModel.drive.appendingPathComponent(entry.steamClientRelativePath).deletingLastPathComponent()
+            eulaCleared.insert(appID)
+            library.error = nil
+            Task { @MainActor in
+                let eulas = await SteamAccountModel.shared.eulas(for: appID)
+                let missing = eulas.map { SteamEulaStore.missing(appID: appID, eulas: $0, steamRoot: steamRoot) } ?? []
+                LogStore.shared.log("[steam-eula] ml1720 app \(appID) listed=\(eulas?.count ?? -1) missing=\(missing.count) configs=\(SteamEulaStore.configFiles(steamRoot: steamRoot).count)")
+                if missing.isEmpty { launchLibraryEntry(entry) }
+                else {
+                    // ml1970: the held details page closes first so this sheet can present.
+                    library.closeDetail &+= 1
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                        eulaPrompt = SteamEulaPrompt(entry: entry, appID: appID, eulas: missing, steamRoot: steamRoot)
+                    }
+                }
+            }
+            return
+        }
+        // ml1780: mark the game's one-time installs done before the client starts (no session runs
+        // here, so the registry is on disk). MADEIRA_STEAM_SKIP_INSTALLERS=0 leaves them to the client.
+        if entry.steamGameLaunch, entry.steamRunInstallers != true, MadeiraConfig.flag("MADEIRA_STEAM_SKIP_INSTALLERS") {
+            LibraryModel.markSteamInstallers(entry, reason: "launch")
+        }
+        // ml1960: the install script's registry values (not its programs) are written before Wine starts.
+        if entry.steamGameLaunch, MadeiraConfig.flag("MADEIRA_STEAM_INSTALL_REGISTRY"),
+           let folder = LibraryModel.steamInstallFolder(entry) {
+            do {
+                let root = LibraryModel.drive.appendingPathComponent(entry.steamClientRelativePath).deletingLastPathComponent()
+                let count = try SteamInstallRegistry.prepare(folder: folder, drive: LibraryModel.drive, steamRoot: root)
+                logStore.log("[steam-registry] ml1960 app=\(entry.steamAppID ?? 0) values-written=\(count)")
+            } catch {
+                library.error = "Game installation setup failed. " + error.localizedDescription
+                logStore.log("[steam-registry] ml1960 preparation failed", level: .error)
+                return
+            }
+        }
+        SteamLibraryModel.shared.stopScan()
         entry.configureLaunch()
         library.begin(entry)
+        // ml1720: log Madeira's own Steam connection off before the Windows client signs in.
+        // The library view's onChange does not fire when the game view replaces the library
+        // first; the two sign-ins then replaced each other's session.
+        if entry.usesSteam { SteamAccountModel.shared.sessionChanged(active: true) }
         runWineFullSequence(profile: entry)
+    }
+
+    /// ml1780: waits (up to 15 s) for the ended session's Wine threads (the wineserver writes the
+    /// registry as it stops), then marks the installs. ml1790: no relaunch in this process (a
+    /// second session aborts in init_registry); Madeira asks for a restart.
+    private func relaunchWhenStopped(_ entry: LibraryEntry, attempt: Int) {
+        if wine_process_is_running() == 0, wineserver_is_running() == 0, library.current == nil {
+            let found = LibraryModel.markSteamInstallers(entry, reason: "skip")
+            LogStore.shared.log("[steam-installers] ml1790 skip marked app=\(entry.steamAppID ?? 0) entries=\(found) after=\(attempt * 500)ms")
+            library.restartNotice = found > 0
+                ? "The one-time installs are skipped. " + LibraryModel.restartMessage + " Then tap Play."
+                : "Madeira could not find this game's install script, so Steam will ask again. " + LibraryModel.restartMessage
+        } else if attempt < 30 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { relaunchWhenStopped(entry, attempt: attempt + 1) }
+        } else {
+            LogStore.shared.log("[steam-installers] ml1790 skip gave up: the session did not stop")
+            library.restartNotice = LibraryModel.restartMessage
+        }
+    }
+
+    /// ml1710: the user accepted in Madeira's sheet; record it where the client looks, then launch.
+    /// A failed write still launches: the client then asks as it always did.
+    private func acceptEula(_ prompt: SteamEulaPrompt) {
+        eulaPrompt = nil
+        do {
+            let files = try SteamEulaStore.record(appID: prompt.appID, eulas: prompt.eulas, steamRoot: prompt.steamRoot)
+            LogStore.shared.log("[steam-eula] ml1710 app \(prompt.appID) accepted \(prompt.eulas.map(\.id).joined(separator: ",")) recorded in \(files) file(s)")
+        } catch {
+            LogStore.shared.log("[steam-eula] ml1710 app \(prompt.appID) accepted but could not be recorded: \(error.localizedDescription)", level: .error)
+        }
+        // Let the sheet finish dismissing before the session takes the screen.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { launchLibraryEntry(prompt.entry) }
     }
 
     /// JIT was enabled earlier in this run but StikDebug has since gone and no
@@ -3231,7 +3334,8 @@ final class ControlsWindow: UIWindow {
         let library = LibraryModel.shared
         if library.current != nil {
             if library.menu || library.launching || library.menuButtonRect.contains(point) ||
-                (library.performance && library.performanceRect.contains(point)) {
+                (library.performance && library.performanceRect.contains(point)) ||
+                library.finishButtonRect.contains(point) {   // ml1570: setup's finish button
                 return super.hitTest(point, with: event)
             }
             guard m.hitsInteractive(point, in: bounds, topBar: false) else { return nil }

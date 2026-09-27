@@ -189,6 +189,14 @@ enum StikJITHelper {
         var source = "default"
         if let mb = rememberedPoolMB { sizeMB = mb; source = "recent sessions, ml1420" }
         if let mb = explicitPoolMB { sizeMB = mb; source = "madeira.cfg pool" }
+        // ml1570: first-run setup's one session runs Steam's installer, the client's self-update
+        // AND the restarted client with its web helper; a device log ran 896 MB dry there ("EXEC
+        // ALLOC FAILED ... no free carve AND no budget", the client died). Until setup is done the
+        // early pool is the largest allowed size. MADEIRA_POOL_SETUP_896=0 turns this off.
+        if explicitPoolMB == nil, sizeMB < 1152, MadeiraConfig.flag("MADEIRA_STEAM"), MadeiraConfig.flag("MADEIRA_ONBOARDING"),
+           MadeiraConfig.flag("MADEIRA_POOL_SETUP_896"), !UserDefaults.standard.bool(forKey: OnboardingRules.doneKey) {
+            sizeMB = 1152; source = "setup's Steam install and update, ml1570"
+        }
         let pressureMB = consumePoolPressure()
         if explicitPoolMB == nil && pressureMB > sizeMB {
             sizeMB = pressureMB; source = "an earlier session ran the pool dry, ml2000"

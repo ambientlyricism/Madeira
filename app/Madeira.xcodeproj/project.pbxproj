@@ -34,6 +34,7 @@
 		A1000040 /* prefix-template.tar.gz in Resources */ = {isa = PBXBuildFile; fileRef = A2000040 /* prefix-template.tar.gz */; };
 		A1000041 /* PrefixExtractor.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000041 /* PrefixExtractor.c */; };
 		A1000042 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000042 /* libz.tbd */; };
+		A1000430 /* liblzma.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000430 /* liblzma.tbd */; };
 		A1000050 /* IOSDisplayShim.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000050 /* IOSDisplayShim.m */; };
 		A1000051 /* libdxmt_combined.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000051 /* libdxmt_combined.a */; };
 		A1000052 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000052 /* Metal.framework */; };
@@ -58,6 +59,35 @@
 		A1000202 /* FPSOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000202 /* FPSOverlay.swift */; };
 		A1000400 /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000400 /* Library.swift */; };
 		A1000401 /* GuestDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000401 /* GuestDisplay.swift */; };
+		A1000410 /* Onboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000410 /* Onboarding.swift */; };
+		A1000411 /* SteamAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000411 /* SteamAccount.swift */; };
+		A1000412 /* SteamFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000412 /* SteamFiles.swift */; };
+		A1000413 /* SteamInstallRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000413 /* SteamInstallRegistry.swift */; };
+		A1000414 /* SteamLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000414 /* SteamLibrary.swift */; };
+		A1000415 /* SteamStoreViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000415 /* SteamStoreViews.swift */; };
+		A1000416 /* SwiftSteam/Auth/SteamAuthAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000416 /* SwiftSteam/Auth/SteamAuthAPI.swift */; };
+		A1000417 /* SwiftSteam/Auth/SteamCredentialAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000417 /* SwiftSteam/Auth/SteamCredentialAuth.swift */; };
+		A1000418 /* SwiftSteam/Auth/SteamQRAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000418 /* SwiftSteam/Auth/SteamQRAuth.swift */; };
+		A1000419 /* SwiftSteam/Auth/SteamTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000419 /* SwiftSteam/Auth/SteamTokenStore.swift */; };
+		A100041A /* SwiftSteam/Content/ContentDecryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200041A /* SwiftSteam/Content/ContentDecryptor.swift */; };
+		A100041B /* SwiftSteam/Content/DepotDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200041B /* SwiftSteam/Content/DepotDownloader.swift */; };
+		A100041C /* SwiftSteam/Content/DepotManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200041C /* SwiftSteam/Content/DepotManifest.swift */; };
+		A100041D /* SwiftSteam/Core/CMServerList.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200041D /* SwiftSteam/Core/CMServerList.swift */; };
+		A100041E /* SwiftSteam/Core/LicenseListBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200041E /* SwiftSteam/Core/LicenseListBox.swift */; };
+		A100041F /* SwiftSteam/Core/SteamConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200041F /* SwiftSteam/Core/SteamConnection.swift */; };
+		A1000420 /* SwiftSteam/Core/SteamCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000420 /* SwiftSteam/Core/SteamCrypto.swift */; };
+		A1000421 /* SwiftSteam/Core/SteamError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000421 /* SwiftSteam/Core/SteamError.swift */; };
+		A1000422 /* SwiftSteam/Core/SteamMessageCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000422 /* SwiftSteam/Core/SteamMessageCodec.swift */; };
+		A1000423 /* SwiftSteam/Core/SteamSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000423 /* SwiftSteam/Core/SteamSession.swift */; };
+		A1000424 /* SwiftSteam/Helpers/SteamDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000424 /* SwiftSteam/Helpers/SteamDevice.swift */; };
+		A1000425 /* SwiftSteam/Helpers/SteamLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000425 /* SwiftSteam/Helpers/SteamLog.swift */; };
+		A1000426 /* SwiftSteam/Install/AppManifestWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000426 /* SwiftSteam/Install/AppManifestWriter.swift */; };
+		A1000427 /* SwiftSteam/Library/SteamAppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000427 /* SwiftSteam/Library/SteamAppInfo.swift */; };
+		A1000428 /* SwiftSteam/Library/SteamLibraryFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000428 /* SwiftSteam/Library/SteamLibraryFetcher.swift */; };
+		A1000429 /* SwiftSteam/Proto/SteamProtoMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000429 /* SwiftSteam/Proto/SteamProtoMessages.swift */; };
+		A100042A /* SwiftSteam/chunk_zip.c in Sources */ = {isa = PBXBuildFile; fileRef = A200042A /* SwiftSteam/chunk_zip.c */; };
+		A100042C /* SwiftSteam/lzma_shim.c in Sources */ = {isa = PBXBuildFile; fileRef = A200042C /* SwiftSteam/lzma_shim.c */; };
+		A100042E /* SwiftSteam/zstd_edu.c in Sources */ = {isa = PBXBuildFile; fileRef = A200042E /* SwiftSteam/zstd_edu.c */; };
 		A1000243 /* GamepadInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000243 /* GamepadInput.swift */; };
 		A1000244 /* Winios/WiniosGamepad.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000244 /* Winios/WiniosGamepad.c */; };
 		A1000245 /* TouchGamepad.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000245 /* TouchGamepad.swift */; };
@@ -99,6 +129,7 @@
 		A2000040 /* prefix-template.tar.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = "prefix-template.tar.gz"; sourceTree = "<group>"; };
 		A2000041 /* PrefixExtractor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = PrefixExtractor.c; sourceTree = "<group>"; };
 		A2000042 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		A2000430 /* liblzma.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = liblzma.tbd; path = usr/lib/liblzma.tbd; sourceTree = SDKROOT; };
 		A2000043 /* PrefixExtractor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixExtractor.h; sourceTree = "<group>"; };
 		A2000050 /* IOSDisplayShim.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IOSDisplayShim.m; sourceTree = "<group>"; };
 		A2000051 /* libdxmt_combined.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libdxmt_combined.a; sourceTree = "<group>"; };
@@ -126,6 +157,38 @@
 		A2000202 /* FPSOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FPSOverlay.swift; sourceTree = "<group>"; };
 		A2000400 /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
 		A2000401 /* GuestDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuestDisplay.swift; sourceTree = "<group>"; };
+		A2000410 /* Onboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onboarding.swift; sourceTree = "<group>"; };
+		A2000411 /* SteamAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteamAccount.swift; sourceTree = "<group>"; };
+		A2000412 /* SteamFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteamFiles.swift; sourceTree = "<group>"; };
+		A2000413 /* SteamInstallRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteamInstallRegistry.swift; sourceTree = "<group>"; };
+		A2000414 /* SteamLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteamLibrary.swift; sourceTree = "<group>"; };
+		A2000415 /* SteamStoreViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SteamStoreViews.swift; sourceTree = "<group>"; };
+		A2000416 /* SwiftSteam/Auth/SteamAuthAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Auth/SteamAuthAPI.swift"; sourceTree = "<group>"; };
+		A2000417 /* SwiftSteam/Auth/SteamCredentialAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Auth/SteamCredentialAuth.swift"; sourceTree = "<group>"; };
+		A2000418 /* SwiftSteam/Auth/SteamQRAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Auth/SteamQRAuth.swift"; sourceTree = "<group>"; };
+		A2000419 /* SwiftSteam/Auth/SteamTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Auth/SteamTokenStore.swift"; sourceTree = "<group>"; };
+		A200041A /* SwiftSteam/Content/ContentDecryptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Content/ContentDecryptor.swift"; sourceTree = "<group>"; };
+		A200041B /* SwiftSteam/Content/DepotDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Content/DepotDownloader.swift"; sourceTree = "<group>"; };
+		A200041C /* SwiftSteam/Content/DepotManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Content/DepotManifest.swift"; sourceTree = "<group>"; };
+		A200041D /* SwiftSteam/Core/CMServerList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Core/CMServerList.swift"; sourceTree = "<group>"; };
+		A200041E /* SwiftSteam/Core/LicenseListBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Core/LicenseListBox.swift"; sourceTree = "<group>"; };
+		A200041F /* SwiftSteam/Core/SteamConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Core/SteamConnection.swift"; sourceTree = "<group>"; };
+		A2000420 /* SwiftSteam/Core/SteamCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Core/SteamCrypto.swift"; sourceTree = "<group>"; };
+		A2000421 /* SwiftSteam/Core/SteamError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Core/SteamError.swift"; sourceTree = "<group>"; };
+		A2000422 /* SwiftSteam/Core/SteamMessageCodec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Core/SteamMessageCodec.swift"; sourceTree = "<group>"; };
+		A2000423 /* SwiftSteam/Core/SteamSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Core/SteamSession.swift"; sourceTree = "<group>"; };
+		A2000424 /* SwiftSteam/Helpers/SteamDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Helpers/SteamDevice.swift"; sourceTree = "<group>"; };
+		A2000425 /* SwiftSteam/Helpers/SteamLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Helpers/SteamLog.swift"; sourceTree = "<group>"; };
+		A2000426 /* SwiftSteam/Install/AppManifestWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Install/AppManifestWriter.swift"; sourceTree = "<group>"; };
+		A2000427 /* SwiftSteam/Library/SteamAppInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Library/SteamAppInfo.swift"; sourceTree = "<group>"; };
+		A2000428 /* SwiftSteam/Library/SteamLibraryFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Library/SteamLibraryFetcher.swift"; sourceTree = "<group>"; };
+		A2000429 /* SwiftSteam/Proto/SteamProtoMessages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Proto/SteamProtoMessages.swift"; sourceTree = "<group>"; };
+		A200042A /* SwiftSteam/chunk_zip.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "SwiftSteam/chunk_zip.c"; sourceTree = "<group>"; };
+		A200042B /* SwiftSteam/chunk_zip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwiftSteam/chunk_zip.h"; sourceTree = "<group>"; };
+		A200042C /* SwiftSteam/lzma_shim.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "SwiftSteam/lzma_shim.c"; sourceTree = "<group>"; };
+		A200042D /* SwiftSteam/lzma_shim.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwiftSteam/lzma_shim.h"; sourceTree = "<group>"; };
+		A200042E /* SwiftSteam/zstd_edu.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "SwiftSteam/zstd_edu.c"; sourceTree = "<group>"; };
+		A200042F /* SwiftSteam/zstd_edu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwiftSteam/zstd_edu.h"; sourceTree = "<group>"; };
 		A2000243 /* GamepadInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GamepadInput.swift"; sourceTree = "<group>"; };
 		A2000244 /* Winios/WiniosGamepad.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "Winios/WiniosGamepad.c"; sourceTree = "<group>"; };
 		A2000245 /* TouchGamepad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchGamepad.swift; sourceTree = "<group>"; };
@@ -148,6 +211,7 @@
 				A1000031 /* libntdll_unix.a in Frameworks */,
 				A1000034 /* IOKit.framework in Frameworks */,
 				A1000042 /* libz.tbd in Frameworks */,
+				A1000430 /* liblzma.tbd in Frameworks */,
 				A1000051 /* libdxmt_combined.a in Frameworks */,
 				A1000052 /* Metal.framework in Frameworks */,
 				A1000053 /* QuartzCore.framework in Frameworks */,
@@ -188,6 +252,38 @@
 				A2000202 /* FPSOverlay.swift */,
 				A2000400 /* Library.swift */,
 				A2000401 /* GuestDisplay.swift */,
+				A2000410 /* Onboarding.swift */,
+				A2000411 /* SteamAccount.swift */,
+				A2000412 /* SteamFiles.swift */,
+				A2000413 /* SteamInstallRegistry.swift */,
+				A2000414 /* SteamLibrary.swift */,
+				A2000415 /* SteamStoreViews.swift */,
+				A2000416 /* SwiftSteam/Auth/SteamAuthAPI.swift */,
+				A2000417 /* SwiftSteam/Auth/SteamCredentialAuth.swift */,
+				A2000418 /* SwiftSteam/Auth/SteamQRAuth.swift */,
+				A2000419 /* SwiftSteam/Auth/SteamTokenStore.swift */,
+				A200041A /* SwiftSteam/Content/ContentDecryptor.swift */,
+				A200041B /* SwiftSteam/Content/DepotDownloader.swift */,
+				A200041C /* SwiftSteam/Content/DepotManifest.swift */,
+				A200041D /* SwiftSteam/Core/CMServerList.swift */,
+				A200041E /* SwiftSteam/Core/LicenseListBox.swift */,
+				A200041F /* SwiftSteam/Core/SteamConnection.swift */,
+				A2000420 /* SwiftSteam/Core/SteamCrypto.swift */,
+				A2000421 /* SwiftSteam/Core/SteamError.swift */,
+				A2000422 /* SwiftSteam/Core/SteamMessageCodec.swift */,
+				A2000423 /* SwiftSteam/Core/SteamSession.swift */,
+				A2000424 /* SwiftSteam/Helpers/SteamDevice.swift */,
+				A2000425 /* SwiftSteam/Helpers/SteamLog.swift */,
+				A2000426 /* SwiftSteam/Install/AppManifestWriter.swift */,
+				A2000427 /* SwiftSteam/Library/SteamAppInfo.swift */,
+				A2000428 /* SwiftSteam/Library/SteamLibraryFetcher.swift */,
+				A2000429 /* SwiftSteam/Proto/SteamProtoMessages.swift */,
+				A200042A /* SwiftSteam/chunk_zip.c */,
+				A200042B /* SwiftSteam/chunk_zip.h */,
+				A200042C /* SwiftSteam/lzma_shim.c */,
+				A200042D /* SwiftSteam/lzma_shim.h */,
+				A200042E /* SwiftSteam/zstd_edu.c */,
+				A200042F /* SwiftSteam/zstd_edu.h */,
 				A2000004 /* JITAllocator.c */,
 				A2000005 /* JITAllocator.h */,
 				A200000B /* FEXBridge.mm */,
@@ -245,6 +341,7 @@
 				A2000032 /* libntdll_unix.a */,
 				A2000035 /* IOKit.framework */,
 				A2000042 /* libz.tbd */,
+				A2000430 /* liblzma.tbd */,
 				A2000051 /* libdxmt_combined.a */,
 				A2000052 /* Metal.framework */,
 				A2000053 /* QuartzCore.framework */,
@@ -368,6 +465,35 @@
 				A1000202 /* FPSOverlay.swift in Sources */,
 				A1000400 /* Library.swift in Sources */,
 				A1000401 /* GuestDisplay.swift in Sources */,
+				A1000410 /* Onboarding.swift in Sources */,
+				A1000411 /* SteamAccount.swift in Sources */,
+				A1000412 /* SteamFiles.swift in Sources */,
+				A1000413 /* SteamInstallRegistry.swift in Sources */,
+				A1000414 /* SteamLibrary.swift in Sources */,
+				A1000415 /* SteamStoreViews.swift in Sources */,
+				A1000416 /* SwiftSteam/Auth/SteamAuthAPI.swift in Sources */,
+				A1000417 /* SwiftSteam/Auth/SteamCredentialAuth.swift in Sources */,
+				A1000418 /* SwiftSteam/Auth/SteamQRAuth.swift in Sources */,
+				A1000419 /* SwiftSteam/Auth/SteamTokenStore.swift in Sources */,
+				A100041A /* SwiftSteam/Content/ContentDecryptor.swift in Sources */,
+				A100041B /* SwiftSteam/Content/DepotDownloader.swift in Sources */,
+				A100041C /* SwiftSteam/Content/DepotManifest.swift in Sources */,
+				A100041D /* SwiftSteam/Core/CMServerList.swift in Sources */,
+				A100041E /* SwiftSteam/Core/LicenseListBox.swift in Sources */,
+				A100041F /* SwiftSteam/Core/SteamConnection.swift in Sources */,
+				A1000420 /* SwiftSteam/Core/SteamCrypto.swift in Sources */,
+				A1000421 /* SwiftSteam/Core/SteamError.swift in Sources */,
+				A1000422 /* SwiftSteam/Core/SteamMessageCodec.swift in Sources */,
+				A1000423 /* SwiftSteam/Core/SteamSession.swift in Sources */,
+				A1000424 /* SwiftSteam/Helpers/SteamDevice.swift in Sources */,
+				A1000425 /* SwiftSteam/Helpers/SteamLog.swift in Sources */,
+				A1000426 /* SwiftSteam/Install/AppManifestWriter.swift in Sources */,
+				A1000427 /* SwiftSteam/Library/SteamAppInfo.swift in Sources */,
+				A1000428 /* SwiftSteam/Library/SteamLibraryFetcher.swift in Sources */,
+				A1000429 /* SwiftSteam/Proto/SteamProtoMessages.swift in Sources */,
+				A100042A /* SwiftSteam/chunk_zip.c in Sources */,
+				A100042C /* SwiftSteam/lzma_shim.c in Sources */,
+				A100042E /* SwiftSteam/zstd_edu.c in Sources */,
 				A1000004 /* JITAllocator.c in Sources */,
 				A1000005 /* EntitlementChecker.swift in Sources */,
 				A1000006 /* FEXBridge.mm in Sources */,
