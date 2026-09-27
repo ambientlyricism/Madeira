@@ -27,6 +27,12 @@ Statically linked into the application binary:
 - Zstandard educational decoder (Meta Platforms), used for Steam content:
   BSD-3-Clause (ZSTD-BSD.txt).
 
+Separate program started inside the Wine session (not linked):
+- Madeira Dock (arm64ec-windows/dockhost.exe): proprietary, (C) 2026 125hz,
+  under the licence in arm64ec-windows/dock-notices.txt, which also carries
+  its LLVM and MinGW-w64 runtime notices. Not covered by Madeira's
+  GPL-3.0-or-later; its source is not distributed.
+
 Dynamically loaded at runtime:
 - liblzma, the iOS system library (public domain / 0BSD), for Steam content;
   nothing is bundled.

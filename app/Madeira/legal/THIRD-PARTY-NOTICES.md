@@ -167,3 +167,19 @@ into a signed app.
 `LiveContainer/` and `research/LiveContainer/` are AGPL-3.0 reference copies
 used for local research. Both are gitignored, untracked, and no part of them is
 linked into or shipped with the app. They form no part of the combined work.
+
+## Madeira Dock executable (not GPL)
+
+`app/Madeira/arm64ec-windows/dockhost.exe` is a separately built, proprietary
+Madeira Dock release, copyright (c) 2026 125hz, distributed under the Madeira
+Dock licence in `app/Madeira/arm64ec-windows/dock-notices.txt`, which permits
+distribution of unmodified executable releases with Madeira. It is **not**
+covered by this repository's GPL-3.0-or-later or the Madeira Converter
+Exception, and its source is not part of this source distribution. It is an
+independent program that Madeira starts inside the Wine session; the app talks
+to it only through environment variables, a one-use file and a numeric report
+file (`app/Madeira/MadeiraDock.swift`, `docs/MADEIRA_DOCK.md`).
+
+`dock-notices.txt` also carries the LLVM and MinGW-w64 runtime notices for the
+statically linked runtime. Dock includes no Valve client files, game content
+or developer login; users install Valve's client files and sign in at runtime.
