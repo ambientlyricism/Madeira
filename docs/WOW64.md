@@ -172,6 +172,7 @@ Wine starts, and the Swift-side ones read the same line through
 | `MADEIRA_LAA` | on | Treat every 32-bit image as large-address-aware, so placements may use the guest range above 2 GB (the trade Proton makes by default); TEBs, PEB and the shared-data page stay low |
 | `MADEIRA_JIT_EARLY_POOL` | on | Take the JIT pool as soon as a debugger attaches, then detach |
 | `MADEIRA_POOL_FEEDBACK` | on | A session that runs the pool dry raises the next run's pool (896, then 1152 MB) |
+| `MADEIRA_POOL_STICKY_MAX` | on | Size the early pool like the largest recent session (0 = the last session); an explicit madeira.cfg `pool` always wins |
 | `MADEIRA_POOL_FALLBACK` | on | Fall back to 768/640/512 MB when the requested pool has no home |
 | `MADEIRA_RW_ALIAS_HIGH` | off | Hint the pool's RW alias at `0x7000000000` |
 | `MADEIRA_CONFIG_ENV_MERGE` | on | Import a `madeira-env.txt` written after madeira.cfg exists (0 = leave it unimported and undeleted) |

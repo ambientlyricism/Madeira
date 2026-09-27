@@ -1936,13 +1936,18 @@ struct ContentView: View {
             // so it can be swapped between runs without a rebuild, and deleting
             // the file reverts to the proven default. Clamped to sane values --
             // a typo here would otherwise move the VA floor with it.
-            var poolSizeMB = 896
-            if let txt = MadeiraConfig.get("pool"),
-               let mb = Int(txt.trimmingCharacters(in: .whitespacesAndNewlines)),
-               mb >= 256, mb <= 1152 {
-                poolSizeMB = mb
+            // An earlier session that ran the pool dry raises the default
+            // (madeira-pool-pressure.txt, JITPoolPolicy); madeira.cfg pool wins.
+            let explicitPoolMB = StikJITHelper.explicitPoolMB
+            let poolSizeMB = JITPoolPolicy.sessionPoolMB(explicit: explicitPoolMB,
+                                                         pressureFloorMB: StikJITHelper.poolPressureFloorMB)
+            if let mb = explicitPoolMB {
                 logStore.log("JIT pool overridden to \(mb)MB via madeira.cfg pool")
+            } else if poolSizeMB > JITPoolPolicy.defaultMB {
+                logStore.log("JIT pool \(poolSizeMB)MB: an earlier session ran the pool dry ([pool-pressure])")
             }
+            // The next app run's early pool is sized from this (StikJITHelper).
+            StikJITHelper.rememberSessionPool(sizeMB: poolSizeMB, explicit: explicitPoolMB != nil)
             // ml694: W^X A/B switch. Documents/madeira-wx.txt containing "0"
             // disables page demotion for the SAME binary, so the on/off
             // comparison needs one rebuild, not two. The previous gate read

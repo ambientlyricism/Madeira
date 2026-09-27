@@ -119,7 +119,7 @@ enum StikJITHelper {
             if let text = try? String(contentsOf: url, encoding: .utf8) {
                 try? FileManager.default.removeItem(at: url)
                 let used = Int(text.trimmingCharacters(in: .whitespacesAndNewlines)) ?? 0
-                let next = max(used, floor) < 896 ? 896 : 1152
+                let next = JITPoolPolicy.afterPressure(usedMB: max(used, floor))
                 if next > floor { floor = next; UserDefaults.standard.set(floor, forKey: pressurePoolKey) }
                 LogStore.shared.log("[pool-pressure] ml2000 last session ran a \(used)MB pool dry; early pool floor now \(floor)MB")
             }
@@ -140,8 +140,26 @@ enum StikJITHelper {
     static var explicitPoolMB: Int? {
         guard let text = MadeiraConfig.get("pool"),
               let mb = Int(text.trimmingCharacters(in: .whitespacesAndNewlines)),
-              (256...1152).contains(mb) else { return nil }
+              JITPoolPolicy.validMB.contains(mb) else { return nil }
         return mb
+    }
+
+    // ml1330/ml1420: the early pool is taken at app start and kept for the whole
+    // app run, and one run can host any kind of session, so it is sized like the
+    // LARGEST recent session rather than the last one: a run whose early pool
+    // was sized after a small session ran a bigger one dry. Each session records
+    // its size here; MADEIRA_POOL_STICKY_MAX=0 remembers the last session only.
+    private static let lastPoolKey = "madeiraLastPoolMB"
+    static var rememberedPoolMB: Int? {
+        let mb = UserDefaults.standard.integer(forKey: lastPoolKey)
+        return JITPoolPolicy.validMB.contains(mb) ? mb : nil
+    }
+    static func rememberSessionPool(sizeMB: Int, explicit: Bool) {
+        let previous = UserDefaults.standard.integer(forKey: lastPoolKey)
+        let remembered = JITPoolPolicy.rememberedMB(session: sizeMB, explicit: explicit, previous: previous,
+                                                    sticky: MadeiraConfig.flag("MADEIRA_POOL_STICKY_MAX"))
+        UserDefaults.standard.set(remembered, forKey: lastPoolKey)
+        LogStore.shared.log("[jit-early] ml1420 next run's early pool \(remembered)MB (session \(sizeMB)MB, previous \(previous)MB)")
     }
 
     /// Install the SIGTRAP fallback (skip a stray BRK, x0 = 0) once no debugger
@@ -158,8 +176,9 @@ enum StikJITHelper {
 
     /// Allocate the JIT pool now if a debugger is attached and no pool exists,
     /// then detach. Size: madeira.cfg `pool` (madeira-pool.txt without a
-    /// madeira.cfg), else the session default ContentView asks for (896 MB),
-    /// raised to the pressure floor when an earlier session ran the pool dry.
+    /// madeira.cfg), else the size remembered from recent sessions, else the
+    /// session default ContentView asks for (896 MB), raised to the pressure
+    /// floor when an earlier session ran the pool dry (see JITPoolPolicy).
     static func prepareEarlyPool(trigger: String, completion: ((Bool) -> Void)? = nil) {
         guard MadeiraConfig.flag("MADEIRA_JIT_EARLY_POOL"), !earlyInFlight, !poolReady, !debuggerDetached,
               jit_debugger_attached(), wine_process_is_running() == 0 else {
@@ -168,6 +187,7 @@ enum StikJITHelper {
         earlyInFlight = true
         var sizeMB = 896
         var source = "default"
+        if let mb = rememberedPoolMB { sizeMB = mb; source = "recent sessions, ml1420" }
         if let mb = explicitPoolMB { sizeMB = mb; source = "madeira.cfg pool" }
         let pressureMB = consumePoolPressure()
         if explicitPoolMB == nil && pressureMB > sizeMB {
@@ -1040,5 +1060,33 @@ enum StikJITHelper {
         // is sticky post-detach, so an env flag is the reliable signal.
         setenv("MADEIRA_DETACHED", "1", 1)
         LogStore.shared.log("Debugger detached.", level: .success)
+    }
+}
+
+/// JIT-pool sizing rules, free of UIKit and debugger calls so a host test can
+/// compile them (build/host-tests/check-pool-sizing.py). Sizes are in MB.
+///
+///   early pool    madeira.cfg `pool` if set (256...1152); else the size
+///                 remembered from recent sessions (896 when there is none),
+///                 raised to the pressure floor (StikJITHelper.prepareEarlyPool)
+///   session pool  madeira.cfg `pool` if set; else 896 raised to the floor
+///   remembered    the session's size, or with MADEIRA_POOL_STICKY_MAX (on by
+///                 default) the larger of it and the previous one, except
+///                 after an explicit `pool`
+///   floor         a session that ran a pool of N MB dry raises it one step:
+///                 896 below 896, else 1152 (MADEIRA_POOL_FEEDBACK=0: none)
+enum JITPoolPolicy {
+    static let defaultMB = 896
+    static let validMB = 256...1152
+
+    static func afterPressure(usedMB: Int) -> Int { usedMB < 896 ? 896 : 1152 }
+
+    static func sessionPoolMB(explicit: Int?, pressureFloorMB: Int) -> Int {
+        explicit ?? max(defaultMB, pressureFloorMB)
+    }
+
+    static func rememberedMB(session: Int, explicit: Bool, previous: Int, sticky: Bool) -> Int {
+        guard sticky, !explicit, validMB.contains(previous), previous > session else { return session }
+        return previous
     }
 }
