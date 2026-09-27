@@ -114,7 +114,7 @@ final class GamepadBridge {
     var sy : Int32 = 0
     var MouseMoving = false
     var MouseClicking = false
-   @ObservedObject private var cursor = CursorPos.shared()
+   @ObservedObject private var cursor = CursorPos.shared
     
     func registerMouse(_ mouseDevice: GCMouse) {
         self.MouseMoving = false
@@ -125,6 +125,7 @@ final class GamepadBridge {
             }
             
             mouseInput.mouseMovedHandler = {(_ mouse: GCMouseInput, _ deltaX: Float, _ deltaY: Float) -> Void in
+                let sens: Float = 2.0
                 // let currentScreenScale = window.screen?.backingScaleFactor ?? 1.0
                 // let viewportScale = renderer?.viewportScale ?? 1.0
                 // let frameSize = metalView.frame.size
@@ -134,8 +135,8 @@ final class GamepadBridge {
                 // logger.trace("move cursor: cocoa (\(absolutePoint.x), \(absolutePoint.y)), native (\(newX), \(newY))")
                 // vmInput.sendMousePosition(buttonMask, absolutePoint: point, forMonitorID: vmDisplay?.monitorID ?? 0)
                 // vmDisplay?.cursor?.move(to: point) // required to show cursor on screen
-                cursor.position.x = cursor.position.x+Int32(deltaX)
-                cursor.position.y = cursor.position.y-Int32(deltaY)
+                cursor.position.x = cursor.position.x+deltaX*sens
+                cursor.position.y = cursor.position.y-deltaY*sens
                 self.delta = CGPoint(x: CGFloat(deltaX), y: CGFloat(deltaY))
                 if deltaX != 0 || deltaY != 0 {
                    self.MouseMoving = true
@@ -143,7 +144,7 @@ final class GamepadBridge {
                 else {
                    self.MouseMoving = false
                 }
-                winios_pointer(cursor.positon.x, cursor.position.dy, 0x0001 | 0x8000, 0)
+                winios_pointer(Int32(cursor.positon.x), Int32(cursor.position.dy), 0x0001 | 0x8000, 0)
             }
             mouseInput.scroll.valueChangedHandler = {
                 (_ cursor: GCControllerDirectionPad, _ scrollX: Float, _ scrollY: Float) -> Void in
