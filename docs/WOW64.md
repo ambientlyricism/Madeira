@@ -153,10 +153,10 @@ Wine does.
 ## 7. Switches
 
 All of these are environment names. Set them as `env.NAME = value` in
-`Documents/madeira.cfg` (or `NAME=value` in `madeira-env.txt` when there is no
-madeira.cfg); the app exports them before Wine starts, and the Swift-side
-ones read the same line through `MadeiraConfig.flag`. Defaults are the tested
-state; `0` turns a feature off.
+`Documents/madeira.cfg` (or `NAME=value` lines in `madeira-env.txt`, which the
+app imports into madeira.cfg at the next launch); the app exports them before
+Wine starts, and the Swift-side ones read the same line through
+`MadeiraConfig.flag`. Defaults are the tested state; `0` turns a feature off.
 
 | Switch | Default | Effect |
 |---|---|---|
@@ -174,6 +174,7 @@ state; `0` turns a feature off.
 | `MADEIRA_POOL_FEEDBACK` | on | A session that runs the pool dry raises the next run's pool (896, then 1152 MB) |
 | `MADEIRA_POOL_FALLBACK` | on | Fall back to 768/640/512 MB when the requested pool has no home |
 | `MADEIRA_RW_ALIAS_HIGH` | off | Hint the pool's RW alias at `0x7000000000` |
+| `MADEIRA_CONFIG_ENV_MERGE` | on | Import a `madeira-env.txt` written after madeira.cfg exists (0 = leave it unimported and undeleted) |
 
 The source has more switches (diagnostics, the thread registry, fastsync, the
 session hand-off); each is documented where it is read, with the log line that
