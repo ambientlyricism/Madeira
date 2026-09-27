@@ -136,8 +136,8 @@ final class GamepadBridge {
                 // logger.trace("move cursor: cocoa (\(absolutePoint.x), \(absolutePoint.y)), native (\(newX), \(newY))")
                 // vmInput.sendMousePosition(buttonMask, absolutePoint: point, forMonitorID: vmDisplay?.monitorID ?? 0)
                 // vmDisplay?.cursor?.move(to: point) // required to show cursor on screen
-                self.cursor.position.x = min(max(self.cursor.position.x+CGFloat(deltaX*sens),0),ScreenRes.shared.res.x)
-                self.cursor.position.y = min(max(self.cursor.position.y-CGFloat(deltaY*sens),0),ScreenRes.shared.res.y)
+                self.cursor.position.x = min(max(self.cursor.position.x+CGFloat(deltaX*sens),0),Resolution.shared.res.x)
+                self.cursor.position.y = min(max(self.cursor.position.y-CGFloat(deltaY*sens),0),Resolution.shared.res.y)
                 self.delta = CGPoint(x: CGFloat(deltaX), y: CGFloat(deltaY))
                 if deltaX != 0 || deltaY != 0 {
                    self.MouseMoving = true
